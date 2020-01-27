@@ -1,0 +1,3 @@
+DEFAULT_REALMS = [
+    'master'
+]
