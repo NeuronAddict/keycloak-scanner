@@ -16,4 +16,4 @@ def main():
 def start(base_url, realms=[]):
     scanner = Scanner({'base_url': base_url, 'realms': realms})
     scanner.start()
-    print(scanner.scan_properties)
+    print(json.dumps(scanner.scan_properties, sort_keys=True, indent=4))
