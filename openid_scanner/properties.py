@@ -6,7 +6,7 @@ def add_list(scan_properties, key, value):
 
 
 def add_kv(scan_properties, parentkey, key, value):
-    if key not in scan_properties or scan_properties[key] is None:
-        scan_properties[parentkey] = {key: value}
+    if parentkey not in scan_properties or scan_properties[parentkey] is None:
+        scan_properties[parentkey] = [{key: value}]
     else:
-        scan_properties[parentkey][key] = value
+        scan_properties[parentkey].append({key: value})
