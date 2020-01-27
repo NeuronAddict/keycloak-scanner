@@ -1,7 +1,7 @@
 import requests
 from termcolor import colored
 
-from openid_scanner.properties import add_list, add_kv
+from openid_scanner.properties import add_kv
 from openid_scanner.scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
@@ -10,7 +10,7 @@ URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 class WellKnownScan(Scan):
 
     def perform(self, launch_properties, scan_properties):
-        realms = list(scan_properties['realms'].keys())
+        realms = map(lambda x: list(x.keys())[0], scan_properties['realms'])
         for realm in realms:
             base_url = launch_properties['base_url']
             url = URL_PATTERN.format(base_url, realm)
