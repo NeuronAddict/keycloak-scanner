@@ -19,7 +19,7 @@ DEFAULT_REALMS = [
 class WellKnownScan(Scan):
 
     def perform(self, launch_properties, scan_properties):
-        realms = launch_properties['realms']
+        realms = list(scan_properties['realms'].keys())
         for realm in DEFAULT_REALMS + realms:
             base_url = launch_properties['base_url']
             url = URL_PATTERN.format(base_url, realm)
