@@ -1,20 +1,11 @@
 import requests
 from termcolor import colored
 
-from properties import add_list, add_kv
+from constants import DEFAULT_REALMS
+from properties import add_kv
 from scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}'
-
-DEFAULT_REALMS = [
-    'account',
-    'admin-cli',
-    'broker',
-    'realm-management',
-    'security-admin-console'
-
-]
-
 
 class RealmScanner(Scan):
 
