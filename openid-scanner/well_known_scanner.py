@@ -1,7 +1,7 @@
 import requests
 from termcolor import colored
 
-from properties import add_list
+from properties import add_list, add_kv
 from scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
@@ -29,3 +29,4 @@ class WellKnownScan(Scan):
             else:
                 print(colored('[+] Find a well known for realm {} {}: {}'.format(realm, url, r.status_code), 'green'))
                 add_list(scan_properties, 'realms', realm)
+                add_kv(scan_properties, 'wellknowns', realm, r.json())
