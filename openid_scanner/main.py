@@ -1,7 +1,7 @@
 import argparse
 import json
 
-from scanner import Scanner
+from openid_scanner.scanner import Scanner
 
 
 def main():

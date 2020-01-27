@@ -1,8 +1,8 @@
 import requests
 from termcolor import colored
 
-from properties import add_list, add_kv
-from scan import Scan
+from openid_scanner.properties import add_list, add_kv
+from openid_scanner.scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 
