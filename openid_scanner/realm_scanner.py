@@ -7,6 +7,7 @@ from openid_scanner.scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}'
 
+
 class RealmScanner(Scan):
 
     def perform(self, launch_properties, scan_properties):
@@ -18,5 +19,5 @@ class RealmScanner(Scan):
             if r.status_code != 200:
                 print(colored('[-] Bad status code for realm {} {}: {}'.format(realm, url, r.status_code), 'red'))
             else:
-                print(colored('[+] Find a well known for realm {} {}: {}'.format(realm, url, r.status_code), 'green'))
+                print('[*] Find realm {} ({})'.format(realm, url))
                 add_kv(scan_properties, 'realms', realm, r.json())
