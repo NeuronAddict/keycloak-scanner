@@ -1,9 +1,9 @@
 import requests
 from termcolor import colored
 
-from constants import DEFAULT_REALMS
-from properties import add_kv
-from scan import Scan
+from openid_scanner.constants import DEFAULT_REALMS
+from openid_scanner.properties import add_kv
+from openid_scanner.scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}'
 

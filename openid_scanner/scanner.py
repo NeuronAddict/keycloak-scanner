@@ -1,5 +1,5 @@
-from realm_scanner import RealmScanner
-from well_known_scanner import WellKnownScan
+from openid_scanner.realm_scanner import RealmScanner
+from openid_scanner.well_known_scanner import WellKnownScan
 
 SCANS = [
     RealmScanner(),
