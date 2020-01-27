@@ -4,7 +4,7 @@ from termcolor import colored
 from properties import add_list, add_kv
 from scan import Scan
 
-URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
+URL_PATTERN = '{}/auth/realms/{}'
 
 DEFAULT_REALMS = [
     'account',
@@ -16,7 +16,7 @@ DEFAULT_REALMS = [
 ]
 
 
-class WellKnownScan(Scan):
+class RealmScanner(Scan):
 
     def perform(self, launch_properties, scan_properties):
         realms = launch_properties['realms']
@@ -28,4 +28,4 @@ class WellKnownScan(Scan):
                 print(colored('[-] Bad status code for realm {} {}: {}'.format(realm, url, r.status_code), 'red'))
             else:
                 print(colored('[+] Find a well known for realm {} {}: {}'.format(realm, url, r.status_code), 'green'))
-                add_kv(scan_properties, 'wellknowns', realm, r.json())
+                add_kv(scan_properties, 'realms', realm, r.json())
