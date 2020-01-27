@@ -7,5 +7,5 @@ setup(name='openid-scanner',
       author='neuronaddict',
       author_email='',
       license='GNUv3',
-      packages=['openid-scanner'],
+      packages=['openid_scanner'],
       zip_safe=False, install_requires=['requests', 'termcolor'])
