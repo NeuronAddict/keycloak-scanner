@@ -1,12 +1,14 @@
 from termcolor import colored
 
+verbose_mode = False
 
 def info(msg):
     print('[*] {}'.format(msg))
 
 
-def error(msg, color='red'):
-    print(colored('[-] {}'.format(msg), color))
+def verbose(msg, color='gray'):
+    if verbose_mode:
+        print(colored('[*] {}'.format(msg), color))
 
 
 def find(msg):
