@@ -16,4 +16,4 @@ class Test(TestCase):
         scan_properties = {}
         add_kv(scan_properties, 'realms', 'master', data)
         add_kv(scan_properties, 'realms', 'external', data)
-        self.assertDictEqual(scan_properties, {'realms': [{'master': data}, {'external': data}]})
+        self.assertDictEqual(scan_properties, {'realms': {'master': data, 'external': data}})
