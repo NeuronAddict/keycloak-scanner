@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 
 import custom_logging
 from openid_scanner.scanner import Scanner
@@ -16,6 +17,8 @@ def main():
     parser.add_argument('--password')
     parser.add_argument('--ssl-noverify', action='store_true')
     parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--fail-on-vuln', action='store_true',
+                        help='fail with an exit code 4 if a vulnerability is discovered')
     args = parser.parse_args()
 
     start(args)
@@ -41,3 +44,6 @@ def start(args):
     })
     scanner.start()
     print(json.dumps(scanner.scan_properties, sort_keys=True, indent=4))
+    if args.fail_on_vuln and custom_logging.has_vuln:
+        print('Fail with exit code 4 because vulnerabilities are discovered')
+        sys.exit(4)
