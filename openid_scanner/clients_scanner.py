@@ -1,7 +1,7 @@
 import requests
 
 from constants import DEFAULT_CLIENTS
-from custom_logging import error, find, info
+from custom_logging import verbose, info
 from openid_scanner.properties import add_list
 from openid_scanner.scan import Scan
 
@@ -30,7 +30,7 @@ class ClientScan(Scan):
                         info('Find a client for realm {}: {}'.format(realm, client))
                         add_list(scan_properties['clients'], realm, client)
                     else:
-                        error('client {} seems to not exists'.format(client))
+                        verbose('client {} seems to not exists'.format(client))
                 else:
                     info('Find a client for realm {}: {} ({})'.format(realm, client, url))
                     add_list(scan_properties['clients'], realm, client)
