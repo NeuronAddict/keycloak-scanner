@@ -1,6 +1,6 @@
 import requests
 
-from custom_logging import error, find
+from custom_logging import error, find, info
 from openid_scanner.constants import DEFAULT_REALMS
 from openid_scanner.properties import add_kv
 from openid_scanner.scan import Scan
@@ -21,3 +21,6 @@ class RealmScanner(Scan):
             else:
                 find('Find realm {} ({})'.format(realm, url))
                 add_kv(scan_properties, 'realms', realm, r.json())
+                if 'public_key' in scan_properties['realms'][realm]:
+                    info('Public key for realm {} : {}'
+                         .format(realm, scan_properties['realms'][realm]['public_key']))
