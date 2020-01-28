@@ -1,5 +1,4 @@
 import argparse
-import json
 
 from openid_scanner.scanner import Scanner
 
@@ -11,14 +10,16 @@ def main():
     parser.add_argument('--clients', help='Comma separated list of custom clients to test')
     args = parser.parse_args()
 
+    start(args)
+
+
+def start(args):
+
     realms = args.realms.split(',') if args.realms else []
     clients = args.clients.split(',') if args.clients else []
-    start(args.base_url, realms, clients)
 
-
-def start(base_url, realms, clients):
     scanner = Scanner({
-        'base_url': base_url,
+        'base_url': args.base_url,
         'realms': realms,
         'clients': clients
     })
