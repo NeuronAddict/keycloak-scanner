@@ -1,9 +1,6 @@
 import requests
-from termcolor import colored
 
-from constants import DEFAULT_CLIENTS
-from custom_logging import error, find
-from openid_scanner.properties import add_kv, add_list
+from custom_logging import verbose, find
 from openid_scanner.scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
@@ -19,7 +16,7 @@ class OpenRedirectScan(Scan):
             clients = scan_properties['clients'][realm]
             well_known = scan_properties['wellknowns'][realm]
             if 'code' not in well_known['response_types_supported']:
-                error('code not in supported response types, can\' test redirect_uri for realm {}'.format(realm))
+                verbose('code not in supported response types, can\' test redirect_uri for realm {}'.format(realm))
             else:
                 url = well_known['authorization_endpoint']
 

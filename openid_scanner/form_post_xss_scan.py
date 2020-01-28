@@ -1,4 +1,4 @@
-from custom_logging import error, find
+from custom_logging import verbose, find
 from request import Request
 
 
@@ -12,7 +12,7 @@ class FormPostXssScan:
             clients = scan_properties['clients'][realm]
             well_known = scan_properties['wellknowns'][realm]
             if 'form_post' not in well_known['response_modes_supported']:
-                error('post_form not in supported response types, can\' test CVE-2018-14655 for realm {}'.format(realm))
+                verbose('post_form not in supported response types, can\' test CVE-2018-14655 for realm {}'.format(realm))
             else:
                 url = well_known['authorization_endpoint']
 
