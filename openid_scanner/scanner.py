@@ -1,9 +1,11 @@
+from clients_scanner import ClientScan
 from openid_scanner.realm_scanner import RealmScanner
 from openid_scanner.well_known_scanner import WellKnownScan
 
 SCANS = [
     RealmScanner(),
-    WellKnownScan()
+    WellKnownScan(),
+    ClientScan()
 ]
 
 

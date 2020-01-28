@@ -1,7 +1,9 @@
 import requests
 from termcolor import colored
 
-from openid_scanner.properties import add_kv
+from constants import DEFAULT_CLIENTS
+from custom_logging import error, find
+from openid_scanner.properties import add_kv, add_list
 from openid_scanner.scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
@@ -13,15 +15,14 @@ class ClientScan(Scan):
 
         base_url = launch_properties['base_url']
         realms = map(lambda x: list(x.keys())[0], scan_properties['realms'])
-
+        clients = DEFAULT_CLIENTS + launch_properties['clients']
         for realm in realms:
+            for client in clients:
+                url = URL_PATTERN.format(base_url, realm, client)
+                r = requests.get(url)
 
-            # noinspection DuplicatedCode
-            url = URL_PATTERN.format(base_url, realm)
-
-            r = requests.get(url)
-            if r.status_code != 200:
-                print(colored('[*] Bad status code for realm {} {}: {}'.format(realm, url, r.status_code), 'gray'))
-            else:
-                print(colored('[+] Find a well known for realm {} {}: {}'.format(realm, url, r.status_code), 'red'))
-                add_kv(scan_properties, 'wellknowns', realm, r.json())
+                if r.status_code != 200:
+                    error('Bad status code for realm {} and client {} {}: {}'.format(realm, client, url, r.status_code))
+                else:
+                    find('Find a client for realm {}: {} ({})'.format(realm, client, url))
+                    add_list(scan_properties, 'clients', client)
