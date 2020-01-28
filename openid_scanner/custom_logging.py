@@ -1,14 +1,20 @@
 from termcolor import colored
 
+verbose_mode = False
+
+has_vuln = False
+
 
 def info(msg):
-    print('[*] {}'.format(msg))
+    print('[INFO] {}'.format(msg))
 
 
-def error(msg, color='red'):
-    print(colored('[-] {}'.format(msg), color))
+def verbose(msg, color='gray'):
+    if verbose_mode:
+        print(colored('[VERBOSE] {}'.format(msg), color))
 
 
 def find(msg):
-    print(colored('[+] {}'.format(msg), color='green'))
-
+    global has_vuln
+    has_vuln = True
+    print(colored('[VULNERABILITY] {}'.format(msg), color='red'))
