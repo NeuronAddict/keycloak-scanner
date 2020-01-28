@@ -8,4 +8,4 @@ setup(name='openid-scanner',
       author_email='',
       license='GNUv3',
       packages=['openid_scanner'],
-      zip_safe=False, install_requires=['requests', 'termcolor'])
+      zip_safe=False, install_requires=['requests', 'termcolor', 'pyjwt'])
