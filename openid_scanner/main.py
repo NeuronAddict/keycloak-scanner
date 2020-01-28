@@ -1,4 +1,5 @@
 import argparse
+import json
 
 import custom_logging
 from openid_scanner.scanner import Scanner
@@ -39,4 +40,4 @@ def start(args):
         'password': args.password
     })
     scanner.start()
-    #print(json.dumps(scanner.scan_properties, sort_keys=True, indent=4))
+    print(json.dumps(scanner.scan_properties, sort_keys=True, indent=4))
