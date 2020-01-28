@@ -11,7 +11,7 @@ URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 class WellKnownScan(Scan):
 
     def perform(self, launch_properties, scan_properties):
-        realms = map(lambda x: list(x.keys())[0], scan_properties['realms'])
+        realms = scan_properties['realms'].keys()
         for realm in realms:
             base_url = launch_properties['base_url']
             url = URL_PATTERN.format(base_url, realm)
