@@ -1,4 +1,4 @@
-from custom_logging import error, info, find
+from custom_logging import verbose, info, find
 from jwt_attack import change_to_none
 from keycloak_api import KeyCloakApi
 
@@ -12,9 +12,9 @@ def test_none(api, client, client_secret, username, password):
             access_token, refresh_token = api.refresh(client, none_refresh_token)
             find('Refresh work with none. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
         except Exception as e:
-            error('None refresh token fail : {}'.format(e))
+            verbose('None refresh token fail : {}'.format(e))
     except Exception as e:
-        error(e)
+        verbose(e)
 
 
 class NoneSignScan:
@@ -32,7 +32,7 @@ class NoneSignScan:
             if 'security-admin-console' not in scan_properties \
                     or realm not in scan_properties['security-admin-console'] \
                     or 'secret' not in scan_properties['security-admin-console'][realm]:
-                error('No secret for realm {}'.format(realm))
+                verbose('No secret for realm {}'.format(realm))
                 continue
 
             client_secret = scan_properties['security-admin-console'][realm]['secret']

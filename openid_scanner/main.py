@@ -1,6 +1,6 @@
 import argparse
-import json
 
+import custom_logging
 from openid_scanner.scanner import Scanner
 from request import Request
 
@@ -14,6 +14,7 @@ def main():
     parser.add_argument('--username')
     parser.add_argument('--password')
     parser.add_argument('--ssl-noverify', action='store_true')
+    parser.add_argument('--verbose', action='store_true')
     args = parser.parse_args()
 
     start(args)
@@ -23,6 +24,8 @@ def start(args):
 
     realms = args.realms.split(',') if args.realms else []
     clients = args.clients.split(',') if args.clients else []
+
+    custom_logging.verbose_mode = args.verbose
 
     if args.proxy:
         Request.proxy = {'http': args.proxy, 'https': args.proxy}
