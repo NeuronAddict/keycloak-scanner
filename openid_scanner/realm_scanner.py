@@ -19,7 +19,7 @@ class RealmScanner(Scan):
             if r.status_code != 200:
                 error('Bad status code for realm {} {}: {}'.format(realm, url, r.status_code))
             else:
-                find('Find realm {} ({})'.format(realm, url))
+                info('Find realm {} ({})'.format(realm, url))
                 add_kv(scan_properties, 'realms', realm, r.json())
                 if 'public_key' in scan_properties['realms'][realm]:
                     info('Public key for realm {} : {}'

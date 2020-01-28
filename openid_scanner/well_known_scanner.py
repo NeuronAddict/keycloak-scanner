@@ -1,7 +1,6 @@
 import requests
-from termcolor import colored
 
-from custom_logging import find, error
+from custom_logging import error, info
 from openid_scanner.properties import add_kv
 from openid_scanner.scan import Scan
 
@@ -19,5 +18,5 @@ class WellKnownScan(Scan):
             if r.status_code != 200:
                 error('Bad status code for realm {} {}: {}'.format(realm, url, r.status_code))
             else:
-                find('Find a well known for realm {} {}'.format(realm, url))
+                info('Find a well known for realm {} {}'.format(realm, url))
                 add_kv(scan_properties, 'wellknowns', realm, r.json())
