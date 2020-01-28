@@ -1,11 +1,13 @@
 from clients_scanner import ClientScan
 from openid_scanner.realm_scanner import RealmScanner
 from openid_scanner.well_known_scanner import WellKnownScan
+from security_console_scanner import SecurityConsoleScan
 
 SCANS = [
     RealmScanner(),
     WellKnownScan(),
-    ClientScan()
+    ClientScan(),
+    SecurityConsoleScan()
 ]
 
 
