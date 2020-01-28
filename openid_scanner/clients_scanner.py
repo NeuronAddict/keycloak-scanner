@@ -16,6 +16,9 @@ class ClientScan(Scan):
         base_url = launch_properties['base_url']
         realms = scan_properties['realms'].keys()
         clients = DEFAULT_CLIENTS + launch_properties['clients']
+
+        scan_properties['clients'] = {}
+
         for realm in realms:
             for client in clients:
                 url = URL_PATTERN.format(base_url, realm, client)
@@ -26,9 +29,9 @@ class ClientScan(Scan):
                     r = requests.get(url, params={'client_id': client}, allow_redirects=False)
                     if r.status_code == 302:
                         find('Find a client for realm {}: {}'.format(realm, client))
-                        add_kv(scan_properties, 'clients', realm, client)
+                        add_list(scan_properties['clients'], realm, client)
                     else:
                         error('client {} seems to not exists'.format(client))
                 else:
                     find('Find a client for realm {}: {} ({})'.format(realm, client, url))
-                    add_kv(scan_properties, 'clients', realm, client)
+                    add_list(scan_properties['clients'], realm, client)
