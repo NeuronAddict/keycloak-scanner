@@ -14,7 +14,7 @@ class ClientScan(Scan):
     def perform(self, launch_properties, scan_properties):
 
         base_url = launch_properties['base_url']
-        realms = map(lambda x: list(x.keys())[0], scan_properties['realms'])
+        realms = scan_properties['realms'].keys()
         clients = DEFAULT_CLIENTS + launch_properties['clients']
         for realm in realms:
             for client in clients:
@@ -22,7 +22,13 @@ class ClientScan(Scan):
                 r = requests.get(url)
 
                 if r.status_code != 200:
-                    error('Bad status code for realm {} and client {} {}: {}'.format(realm, client, url, r.status_code))
+                    url = scan_properties['wellknowns'][realm]['authorization_endpoint']
+                    r = requests.get(url, params={'client_id': client}, allow_redirects=False)
+                    if r.status_code == 302:
+                        find('Find a client for realm {}: {}'.format(realm, client))
+                        add_list(scan_properties, 'clients', client)
+                    else:
+                        error('client {} seems to not exists'.format(client))
                 else:
                     find('Find a client for realm {}: {} ({})'.format(realm, client, url))
                     add_list(scan_properties, 'clients', client)
