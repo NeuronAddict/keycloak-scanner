@@ -13,7 +13,6 @@ class OpenRedirectScan(Scan):
 
     def perform(self, launch_properties, scan_properties):
 
-        base_url = launch_properties['base_url']
         realms = scan_properties['realms'].keys()
 
         for realm in realms:
