@@ -1,5 +1,6 @@
 from clients_scanner import ClientScan
 from form_post_xss_scan import FormPostXssScan
+from none_sign_scan import NoneSignScan
 from open_redirect_scanner import OpenRedirectScan
 from openid_scanner.realm_scanner import RealmScanner
 from openid_scanner.well_known_scanner import WellKnownScan
@@ -11,7 +12,8 @@ SCANS = [
     ClientScan(),
     SecurityConsoleScan(),
     OpenRedirectScan(),
-    FormPostXssScan()
+    FormPostXssScan(),
+    NoneSignScan()
 ]
 
 
