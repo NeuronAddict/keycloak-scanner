@@ -4,9 +4,9 @@ import sys
 
 import urllib3
 
-import custom_logging
+from keycloak_scanner import custom_logging
 from keycloak_scanner.scanner import Scanner
-from request import Request
+from keycloak_scanner.request import Request
 
 
 def main():
