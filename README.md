@@ -1,4 +1,4 @@
-# keycloack-scanner
+# keycloak-scanner
 
 ## Introduction
 
