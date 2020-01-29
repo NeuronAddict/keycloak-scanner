@@ -2,6 +2,8 @@ import argparse
 import json
 import sys
 
+import urllib3
+
 import custom_logging
 from keycloak_scanner.scanner import Scanner
 from request import Request
@@ -33,7 +35,10 @@ def start(args):
 
     if args.proxy:
         Request.proxy = {'http': args.proxy, 'https': args.proxy}
-    Request.verify = not args.ssl_noverify
+
+    if args.ssl_noverify:
+        Request.verify = False
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     scanner = Scanner({
         'base_url': args.base_url,
