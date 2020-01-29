@@ -16,7 +16,7 @@ setup(name='keycloak-scanner',
               'keycloak-scanner = keycloak_scanner.main:main'
           ]
       },
-      license='GNUv3',
+      license='Apache 2.0',
       packages=['keycloak_scanner'],
       zip_safe=False, install_requires=['requests', 'termcolor', 'pyjwt', 'urllib3'],
       classifiers=[
