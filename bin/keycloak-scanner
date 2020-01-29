@@ -1,4 +1,0 @@
-#! /usr/bin/env python3
-from keycloak_scanner import main
-
-main()
