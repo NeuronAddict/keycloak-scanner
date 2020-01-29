@@ -3,7 +3,7 @@ import json
 import sys
 
 import custom_logging
-from openid_scanner.scanner import Scanner
+from keycloak_scanner.scanner import Scanner
 from request import Request
 
 
