@@ -1,4 +1,4 @@
-from request import Request
+from keycloak_scanner.request import Request
 
 
 class KeyCloakApi:

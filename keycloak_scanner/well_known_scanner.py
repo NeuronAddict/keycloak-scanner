@@ -1,6 +1,6 @@
 import requests
 
-from custom_logging import verbose, info
+from keycloak_scanner.custom_logging import verbose, info
 from keycloak_scanner.properties import add_kv
 from keycloak_scanner.scan import Scan
 
