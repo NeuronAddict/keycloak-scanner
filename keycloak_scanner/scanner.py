@@ -2,8 +2,8 @@ from clients_scanner import ClientScan
 from form_post_xss_scan import FormPostXssScan
 from none_sign_scan import NoneSignScan
 from open_redirect_scanner import OpenRedirectScan
-from openid_scanner.realm_scanner import RealmScanner
-from openid_scanner.well_known_scanner import WellKnownScan
+from keycloak_scanner.realm_scanner import RealmScanner
+from keycloak_scanner.well_known_scanner import WellKnownScan
 from security_console_scanner import SecurityConsoleScan
 
 SCANS = [
