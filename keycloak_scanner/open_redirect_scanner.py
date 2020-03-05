@@ -1,6 +1,6 @@
 import requests
 
-from custom_logging import verbose, find
+from keycloak_scanner.custom_logging import verbose, find
 from keycloak_scanner.scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
