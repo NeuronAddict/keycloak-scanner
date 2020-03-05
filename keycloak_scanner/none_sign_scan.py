@@ -1,6 +1,6 @@
-from custom_logging import verbose, info, find
-from jwt_attack import change_to_none
-from keycloak_api import KeyCloakApi
+from keycloak_scanner.custom_logging import verbose, info, find
+from keycloak_scanner.jwt_attack import change_to_none
+from keycloak_scanner.keycloak_api import KeyCloakApi
 
 
 def test_none(api, client, client_secret, username, password):

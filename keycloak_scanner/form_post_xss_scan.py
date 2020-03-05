@@ -1,5 +1,5 @@
-from custom_logging import verbose, find
-from request import Request
+from keycloak_scanner.custom_logging import verbose, find
+from keycloak_scanner.request import Request
 
 
 class FormPostXssScan:
