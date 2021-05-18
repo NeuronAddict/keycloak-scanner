@@ -4,6 +4,27 @@
 
 This scanner scan openid for known vulnerabilities
 
+## install
+
+With venv:
+
+```
+cd keycloak-scanner
+python3 -m venv venv
+source venv/bin/activate
+pip install .
+keycloak-scanner
+```
+
+Or without venv :
+```
+cd keycloak-scanner
+pip install -r requirements.txt # use sudo for install for all users
+pip install . # use sudo for install for all users
+keycloak-scanner
+```
+
+
 ## example
 ```
 keycloak-scanner http://localhost:8080 \ # url to test
@@ -19,7 +40,7 @@ keycloak-scanner http://localhost:8080 \ # url to test
 ## help
 
 ```
-$ ./keycloak-scanner --help
+$ keycloak-scanner --help
 usage: keycloak-scanner [-h] [--realms REALMS] [--clients CLIENTS]
                         [--proxy PROXY] [--username USERNAME]
                         [--password PASSWORD] [--ssl-noverify] [--verbose]
