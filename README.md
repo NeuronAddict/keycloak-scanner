@@ -12,7 +12,7 @@ With venv:
 cd keycloak-scanner
 python3 -m venv venv
 source venv/bin/activate
-pip install .
+pip install -e . # with -e, git pull will update code
 keycloak-scanner
 ```
 
