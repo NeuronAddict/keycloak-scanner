@@ -12,12 +12,11 @@ from keycloak_scanner.none_sign_scan import NoneSignScan
 from keycloak_scanner.open_redirect_scanner import OpenRedirectScan
 from keycloak_scanner.realm_scanner import RealmScanner
 from keycloak_scanner.scanner import Scanner
-from keycloak_scanner.request import Request
 from keycloak_scanner.security_console_scanner import SecurityConsoleScan
 from keycloak_scanner.well_known_scanner import WellKnownScan
 
 
-def main():
+def parser():
     parser = argparse.ArgumentParser(description='KeyCloak vulnerabilities scanner.',
                                      epilog='''
 By default, master realm is already tested.
@@ -47,23 +46,25 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
     parser.add_argument('--password', help='password to test with username')
     parser.add_argument('--ssl-noverify', help='Do not verify ssl certificates', action='store_true')
     parser.add_argument('--verbose', help='Verbose mode', action='store_true')
-    parser.add_argument('--fail-on-vuln', action='store_true',
-                        help='fail with an exit code 4 if a vulnerability is discovered. '
+    parser.add_argument('--no-fail', action='store_true',
+                        help='Always exit with code 0 (by default, fail with an exit code 4 if a vulnerability is discovered). '
                              'Do NOT fail before all test are done.')
 
-    args = parser.parse_args()
+    return parser
 
-    start(args)
+def main():
+
+    args = parser().parse_args()
+
+    start(args, requests.Session())
 
 
-def start(args):
+def start(args, session: requests.Session):
 
     realms = args.realms.split(',') if args.realms else []
     clients = args.clients.split(',') if args.clients else []
 
     custom_logging.verbose_mode = args.verbose
-
-    session = requests.Session()
 
     if args.proxy:
         session = {'http': args.proxy, 'https': args.proxy}
@@ -93,7 +94,7 @@ def start(args):
 
     if args.verbose:
         print(json.dumps(scanner.scan_properties, sort_keys=True, indent=4))
-    if not args.no_fail_on_vuln and custom_logging.has_vuln:
+    if not args.no_fail and custom_logging.has_vuln:
         print('Fail with exit code 4 because vulnerabilities are discovered')
         sys.exit(4)
 
