@@ -1,9 +1,9 @@
-from .scan import Scan
+from .scanner import Scanner
 from .custom_logging import verbose, find
 
 
 
-class FormPostXssScan(Scan):
+class FormPostXssScanner(Scanner):
 
     def perform(self, launch_properties, scan_properties):
 

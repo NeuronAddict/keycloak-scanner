@@ -6,14 +6,14 @@ import requests
 import urllib3
 
 from keycloak_scanner import custom_logging
-from keycloak_scanner.clients_scanner import ClientScan
-from keycloak_scanner.form_post_xss_scan import FormPostXssScan
-from keycloak_scanner.none_sign_scan import NoneSignScan
-from keycloak_scanner.open_redirect_scanner import OpenRedirectScan
+from keycloak_scanner.clients_scanner import ClientScanner
+from keycloak_scanner.form_post_xss_scan import FormPostXssScanner
+from keycloak_scanner.none_sign_scan import NoneSignScanner
+from keycloak_scanner.open_redirect_scanner import OpenRedirectScanner
 from keycloak_scanner.realm_scanner import RealmScanner
 from keycloak_scanner.masterscanner import MasterScanner
-from keycloak_scanner.security_console_scanner import SecurityConsoleScan
-from keycloak_scanner.well_known_scanner import WellKnownScan
+from keycloak_scanner.security_console_scanner import SecurityConsoleScanner
+from keycloak_scanner.well_known_scanner import WellKnownScanner
 
 
 def parser():
@@ -75,12 +75,12 @@ def start(args, session: requests.Session):
 
     SCANS = [
         RealmScanner(),
-        WellKnownScan(),
-        ClientScan(),
-        SecurityConsoleScan(),
-        OpenRedirectScan(),
-        FormPostXssScan(),
-        NoneSignScan()
+        WellKnownScanner(),
+        ClientScanner(),
+        SecurityConsoleScanner(),
+        OpenRedirectScanner(),
+        FormPostXssScanner(),
+        NoneSignScanner()
     ]
 
     scanner = MasterScanner({

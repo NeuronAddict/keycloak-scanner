@@ -1,10 +1,10 @@
 from .custom_logging import verbose, find
-from .scan import Scan
+from .scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
 
-class OpenRedirectScan(Scan):
+class OpenRedirectScanner(Scanner):
 
     def perform(self, launch_properties, scan_properties):
 
