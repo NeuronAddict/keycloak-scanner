@@ -1,5 +1,3 @@
-import requests
-
 from .custom_logging import find, verbose
 from .properties import add_kv
 from .scan import Scan
