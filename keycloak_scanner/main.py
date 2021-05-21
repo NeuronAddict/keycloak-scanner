@@ -6,14 +6,14 @@ import requests
 import urllib3
 
 from keycloak_scanner import custom_logging
-from keycloak_scanner.clients_scanner import ClientScanner
-from keycloak_scanner.form_post_xss_scanner import FormPostXssScanner
-from keycloak_scanner.none_sign_scanner import NoneSignScanner
-from keycloak_scanner.open_redirect_scanner import OpenRedirectScanner
-from keycloak_scanner.realm_scanner import RealmScanner
+from keycloak_scanner.scanners.clients_scanner import ClientScanner
+from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
+from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
+from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
+from keycloak_scanner.scanners.realm_scanner import RealmScanner
 from keycloak_scanner.masterscanner import MasterScanner
-from keycloak_scanner.security_console_scanner import SecurityConsoleScanner
-from keycloak_scanner.well_known_scanner import WellKnownScanner
+from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
+from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
 
 
 def parser():
