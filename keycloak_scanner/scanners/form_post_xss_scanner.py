@@ -5,7 +5,10 @@ from keycloak_scanner.custom_logging import verbose, find
 
 class FormPostXssScanner(Scanner):
 
-    def perform(self, launch_properties, scan_properties):
+    def __init__(self, **kwars):
+        super().__init__(**kwars)
+
+    def perform(self, scan_properties):
 
         realms = scan_properties['realms'].keys()
 
@@ -20,7 +23,7 @@ class FormPostXssScanner(Scanner):
                 for client in clients:
 
                     payload = 'af0ifjsldkj"/><script type="text/javascript">alert(1)</script> <p class="'
-                    r = self.session.get(url, params={
+                    r = super().session().get(url, params={
                             'state': payload,
                             'response_type': 'token',
                             'response_mode': 'form_post',

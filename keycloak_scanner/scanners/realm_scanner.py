@@ -1,3 +1,5 @@
+from typing import List
+
 from keycloak_scanner.custom_logging import verbose, info
 from keycloak_scanner.constants import DEFAULT_REALMS
 from keycloak_scanner.properties import add_kv
@@ -8,12 +10,14 @@ URL_PATTERN = '{}/auth/realms/{}'
 
 class RealmScanner(Scanner):
 
-    def perform(self, launch_properties, scan_properties):
-        realms = launch_properties['realms']
-        for realm in DEFAULT_REALMS + realms:
-            base_url = launch_properties['base_url']
-            url = URL_PATTERN.format(base_url, realm)
-            r = self.session.get(url)
+    def __init__(self, realms: List[str], **kwargs):
+        self.realms = realms
+        super().__init__(**kwargs)
+
+    def perform(self, scan_properties):
+        for realm in DEFAULT_REALMS + self.realms:
+            url = URL_PATTERN.format(super().base_url(), realm)
+            r = super().session().get(url)
             if r.status_code != 200:
                 verbose('Bad status code for realm {} {}: {}'.format(realm, url, r.status_code))
             else:
@@ -22,3 +26,4 @@ class RealmScanner(Scanner):
                 if 'public_key' in scan_properties['realms'][realm]:
                     info('Public key for realm {} : {}'
                          .format(realm, scan_properties['realms'][realm]['public_key']))
+        super().perform(scan_properties)
