@@ -19,8 +19,7 @@ keycloak-scanner
 Or without venv :
 ```
 cd keycloak-scanner
-pip install -r requirements.txt # use sudo for install for all users
-pip install . # use sudo for install for all users
+pip3 install . # use sudo for install for all users
 keycloak-scanner
 ```
 
