@@ -4,7 +4,7 @@
 
 This scanner scan openid for known vulnerabilities
 
-## install
+## Installation
 
 With venv:
 
@@ -19,12 +19,12 @@ keycloak-scanner
 Or without venv :
 ```
 cd keycloak-scanner
-pip3 install . # use sudo for install for all users
+sudo pip3 install . # use sudo for install for all users
 keycloak-scanner
 ```
 
 
-## example
+## Example
 ```
 keycloak-scanner http://localhost:8080 \ # url to test
 --realms myorganisation \ # realms to scan
@@ -36,15 +36,11 @@ keycloak-scanner http://localhost:8080 \ # url to test
 --ssl-noverify \ # don't check ssl certificates
 ```
 
-## help
+## Help
 
 ```
 $ keycloak-scanner --help
-usage: keycloak-scanner [-h] [--realms REALMS] [--clients CLIENTS]
-                        [--proxy PROXY] [--username USERNAME]
-                        [--password PASSWORD] [--ssl-noverify] [--verbose]
-                        [--fail-on-vuln]
-                        base_url
+usage: keycloak-scanner [-h] [--realms REALMS] [--clients CLIENTS] [--proxy PROXY] [--username USERNAME] [--password PASSWORD] [--ssl-noverify] [--verbose] [--no-fail] base_url
 
 KeyCloak vulnerabilities scanner.
 
@@ -56,18 +52,16 @@ optional arguments:
   --realms REALMS      Comma separated list of custom realms to test
   --clients CLIENTS    Comma separated list of custom clients to test
   --proxy PROXY        Use a great proxy like BURP ;)
-  --username USERNAME  If a username is specified, try to connect and attack a
-                       token. If no password, try username as password.
+  --username USERNAME  If a username is specified, try to connect and attack a token. If no password, try username as password.
   --password PASSWORD  password to test with username
   --ssl-noverify       Do not verify ssl certificates
   --verbose            Verbose mode
-  --fail-on-vuln       fail with an exit code 4 if a vulnerability is
-                       discovered. Do NOT fail before all test are done.
+  --no-fail            Always exit with code 0 (by default, fail with an exit code 4 if a vulnerability is discovered). Do NOT fail before all test are done.
 
 By default, master realm is already tested.
 Clients always tested : account, admin-cli, broker, realm-management, security-admin-console.
 
-Scans : 
+Scans :
 - list realms
 - Search well-known files
 - Search for clients
@@ -79,5 +73,6 @@ Scans :
 Bugs, feature requests, request another scan, questions : https://github.com/NeuronAddict/keycloak-scanner.
 
 *** Use it on production systems at your own risk ***
+
 ```
 
