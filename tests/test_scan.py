@@ -5,7 +5,7 @@ from pytest import fixture
 
 from keycloak_scanner.clients_scanner import ClientScanner
 from keycloak_scanner.form_post_xss_scan import FormPostXssScanner
-from keycloak_scanner.none_sign_scan import NoneSignScanner
+from keycloak_scanner.none_sign_scanner import NoneSignScanner
 from keycloak_scanner.open_redirect_scanner import OpenRedirectScanner
 from keycloak_scanner.realm_scanner import RealmScanner
 
