@@ -16,7 +16,7 @@ script:
 deploy:
   provider: pypi
   username: "__token__"
-  server: https://test.pypi.org/simple/
+  server: https://test.pypi.org/legacy/
   skip_existing: true
   on:
     branch: feature/pipy-deployment
