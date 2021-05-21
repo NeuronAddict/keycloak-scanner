@@ -1,6 +1,7 @@
 from keycloak_scanner.custom_logging import verbose, info, find
 from keycloak_scanner.jwt_attack import change_to_none
 from keycloak_scanner.keycloak_api import KeyCloakApi
+from keycloak_scanner.scan import Scan
 
 
 def test_none(api, client, client_secret, username, password):
@@ -10,14 +11,14 @@ def test_none(api, client, client_secret, username, password):
         none_refresh_token = change_to_none(refresh_token)
         try:
             access_token, refresh_token = api.refresh(client, none_refresh_token)
-            find('Refresh work with none. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
+            find('NoneSign', 'Refresh work with none. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
         except Exception as e:
             verbose('None refresh token fail : {}'.format(e))
     except Exception as e:
         verbose(e)
 
 
-class NoneSignScan:
+class NoneSignScan(Scan):
 
     def perform(self, launch_properties, scan_properties):
 
@@ -27,7 +28,7 @@ class NoneSignScan:
             clients = scan_properties['clients'][realm]
             well_known = scan_properties['wellknowns'][realm]
 
-            api = KeyCloakApi(well_known)
+            api = KeyCloakApi(self.session, well_known)
 
             if 'security-admin-console' not in scan_properties \
                     or realm not in scan_properties['security-admin-console'] \

