@@ -33,7 +33,7 @@ def test_start(well_known):
     session.put = MagicMock()
     session.delete = MagicMock()
 
-    p: argparse.ArgumentParser = parser()
+    p = parser()
 
     args = p.parse_args(['http://localhost', '--realms', 'test-realm', '--clients', 'test-client', '--username', 'username', '--password', 'password', '--no-fail'])
 
