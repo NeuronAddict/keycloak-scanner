@@ -1,5 +1,3 @@
-import requests
-
 from keycloak_scanner.custom_logging import verbose, info
 from keycloak_scanner.properties import add_kv
 from keycloak_scanner.scan import Scan
@@ -14,7 +12,7 @@ class WellKnownScan(Scan):
         for realm in realms:
             base_url = launch_properties['base_url']
             url = URL_PATTERN.format(base_url, realm)
-            r = requests.get(url)
+            r = self.session.get(url)
             if r.status_code != 200:
                 verbose('Bad status code for realm {} {}: {}'.format(realm, url, r.status_code))
             else:

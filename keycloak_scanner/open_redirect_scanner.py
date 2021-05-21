@@ -1,7 +1,5 @@
-import requests
-
-from keycloak_scanner.custom_logging import verbose, find
-from keycloak_scanner.scan import Scan
+from .custom_logging import verbose, find
+from .scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
@@ -22,12 +20,12 @@ class OpenRedirectScan(Scan):
 
                 for client in clients:
 
-                    r = requests.get(url, params={
+                    r = self.session.get(url, params={
                         'response_type': 'code',
                         'client_id': client,
                         'redirect_uri': 'https://devops-devsecops.org/auth/{}/{}/'.format(realm, client)
                     })
 
                     if r.status_code == 200:
-                        find('Open redirection for realm {} and clientid {}'.format(realm, client))
+                        find('OpenRedirection', 'Open redirection for realm {} and clientid {}'.format(realm, client))
 
