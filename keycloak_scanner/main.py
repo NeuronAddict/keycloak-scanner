@@ -88,7 +88,7 @@ def start(args):
         'clients': clients,
         'username': args.username,
         'password': args.password
-    }, SCANS)
+    }, session=session, scans=SCANS)
     scanner.start()
 
     if args.verbose:

@@ -1,8 +1,8 @@
 from keycloak_scanner.custom_logging import verbose, find
-from keycloak_scanner.request import Request
+from keycloak_scanner.scan import Scan
 
 
-class FormPostXssScan:
+class FormPostXssScan(Scan):
 
     def perform(self, launch_properties, scan_properties):
 
@@ -19,7 +19,7 @@ class FormPostXssScan:
                 for client in clients:
 
                     payload = 'af0ifjsldkj"/><script type="text/javascript">alert(1)</script> <p class="'
-                    r = Request.request().get(url, params={
+                    r = self.session.get(url, params={
                             'state': payload,
                             'response_type': 'token',
                             'response_mode': 'form_post',
