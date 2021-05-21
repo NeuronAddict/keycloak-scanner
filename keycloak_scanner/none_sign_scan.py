@@ -1,7 +1,7 @@
 from keycloak_scanner.custom_logging import verbose, info, find
 from keycloak_scanner.jwt_attack import change_to_none
 from keycloak_scanner.keycloak_api import KeyCloakApi
-from keycloak_scanner.scan import Scan
+from keycloak_scanner.scanner import Scanner
 
 
 def test_none(api, client, client_secret, username, password):
@@ -18,7 +18,7 @@ def test_none(api, client, client_secret, username, password):
         verbose(e)
 
 
-class NoneSignScan(Scan):
+class NoneSignScanner(Scanner):
 
     def perform(self, launch_properties, scan_properties):
 
