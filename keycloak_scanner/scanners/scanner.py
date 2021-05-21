@@ -1,19 +1,17 @@
-from abc import ABC, abstractmethod
+import requests
+
+from keycloak_scanner.scanners.session_holder import SessionHolder
 
 
-class Scanner(ABC):
+class Scanner(SessionHolder):
 
-    def __init__(self):
-        self.scan_properties = {}
+    def __init__(self, base_url: str, **kwargs):
+        self.base_url = base_url
+        super().__init__(**kwargs)
 
-    def init(self, config, scan_properties, session):
-        self.scan_properties = scan_properties
-        self.session = session
-
-    @abstractmethod
-    def perform(self, launch_properties, scan_properties):
+    def perform(self, scan_properties):
         """
-
+        Perform the scan
         :return: scan result (json)
         """
-        pass
+        assert not hasattr(super(), 'perform')
