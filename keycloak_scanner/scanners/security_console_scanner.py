@@ -7,13 +7,15 @@ URL_PATTERN = '{}/auth/realms/{}/clients-registrations/default/security-admin-co
 
 class SecurityConsoleScanner(Scanner):
 
-    def perform(self, launch_properties, scan_properties):
+    def __init__(self, **kwars):
+        super().__init__(**kwars)
 
-        base_url = launch_properties['base_url']
+    def perform(self, scan_properties):
+
         realms = list(scan_properties['realms'].keys())
         for realm in realms:
-            url = URL_PATTERN.format(base_url, realm)
-            r = self.session.get(url)
+            url = URL_PATTERN.format(super().base_url(), realm)
+            r = super().session().get(url)
             if r.status_code != 200:
                 verbose('Bad status code for {}: {}'.format(url, r.status_code))
             else:
