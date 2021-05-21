@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from properties import add_list, add_kv
+from keycloak_scanner.properties import add_list, add_kv
 
 
 class Test(TestCase):
