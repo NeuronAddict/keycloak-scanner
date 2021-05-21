@@ -1,12 +1,12 @@
 from .constants import DEFAULT_CLIENTS
 from .custom_logging import verbose, info
 from .properties import add_list
-from .scan import Scan
+from .scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
 
-class ClientScan(Scan):
+class ClientScanner(Scanner):
 
     def perform(self, launch_properties, scan_properties):
 

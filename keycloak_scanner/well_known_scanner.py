@@ -1,11 +1,11 @@
 from keycloak_scanner.custom_logging import verbose, info
 from keycloak_scanner.properties import add_kv
-from keycloak_scanner.scan import Scan
+from keycloak_scanner.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 
 
-class WellKnownScan(Scan):
+class WellKnownScanner(Scanner):
 
     def perform(self, launch_properties, scan_properties):
         realms = scan_properties['realms'].keys()
