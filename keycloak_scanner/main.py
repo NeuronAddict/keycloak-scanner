@@ -52,6 +52,7 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
 
     return parser
 
+
 def main():
 
     args = parser().parse_args()
@@ -73,23 +74,15 @@ def start(args, session: requests.Session):
         session.verify = False
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-    SCANS = [
-        RealmScanner(),
-        WellKnownScanner(),
-        ClientScanner(),
-        SecurityConsoleScanner(),
-        OpenRedirectScanner(),
-        FormPostXssScanner(),
-        NoneSignScanner()
-    ]
-
-    scanner = MasterScanner({
-        'base_url': args.base_url,
-        'realms': realms,
-        'clients': clients,
-        'username': args.username,
-        'password': args.password
-    }, session=session, scans=SCANS)
+    scanner = MasterScanner(scans=[
+        RealmScanner(base_url=args.base_url, session=session, realms=realms),
+        WellKnownScanner(base_url=args.base_url, session=session),
+        ClientScanner(base_url=args.base_url, session=session, clients=clients),
+        SecurityConsoleScanner(base_url=args.base_url, session=session),
+        OpenRedirectScanner(base_url=args.base_url, session=session),
+        FormPostXssScanner(base_url=args.base_url, session=session),
+        NoneSignScanner(base_url=args.base_url, session=session)
+    ])
     scanner.start()
 
     if args.verbose:
