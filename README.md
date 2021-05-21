@@ -4,23 +4,11 @@
 
 This scanner scan openid for known vulnerabilities
 
+
 ## Installation
 
-With venv:
-
 ```
-cd keycloak-scanner
-python3 -m venv venv
-source venv/bin/activate
-pip install -e . # with -e, git pull will update code
-keycloak-scanner
-```
-
-Or without venv :
-```
-cd keycloak-scanner
-sudo pip3 install . # use sudo for install for all users
-keycloak-scanner
+pip install keycloak-scanner
 ```
 
 
@@ -76,3 +64,22 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
 
 ```
 
+
+## Install with source code
+
+With venv:
+
+```
+cd keycloak-scanner
+python3 -m venv venv
+source venv/bin/activate
+pip install -e . # with -e, git pull will update code
+keycloak-scanner
+```
+
+Or without venv :
+```
+cd keycloak-scanner
+sudo pip3 install . # use sudo for install for all users
+keycloak-scanner
+```
