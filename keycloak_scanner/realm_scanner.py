@@ -1,12 +1,12 @@
 from keycloak_scanner.custom_logging import verbose, info
 from keycloak_scanner.constants import DEFAULT_REALMS
 from keycloak_scanner.properties import add_kv
-from keycloak_scanner.scan import Scan
+from keycloak_scanner.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}'
 
 
-class RealmScanner(Scan):
+class RealmScanner(Scanner):
 
     def perform(self, launch_properties, scan_properties):
         realms = launch_properties['realms']

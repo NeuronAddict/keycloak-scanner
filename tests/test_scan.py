@@ -3,19 +3,19 @@ from unittest.mock import MagicMock
 import requests
 from pytest import fixture
 
-from keycloak_scanner.clients_scanner import ClientScan
-from keycloak_scanner.form_post_xss_scan import FormPostXssScan
-from keycloak_scanner.none_sign_scan import NoneSignScan
-from keycloak_scanner.open_redirect_scanner import OpenRedirectScan
+from keycloak_scanner.clients_scanner import ClientScanner
+from keycloak_scanner.form_post_xss_scan import FormPostXssScanner
+from keycloak_scanner.none_sign_scan import NoneSignScanner
+from keycloak_scanner.open_redirect_scanner import OpenRedirectScanner
 from keycloak_scanner.realm_scanner import RealmScanner
 
-from keycloak_scanner.scan import Scan
+from keycloak_scanner.scanner import Scanner
 from keycloak_scanner.masterscanner import MasterScanner
-from keycloak_scanner.security_console_scanner import SecurityConsoleScan
-from keycloak_scanner.well_known_scanner import WellKnownScan
+from keycloak_scanner.security_console_scanner import SecurityConsoleScanner
+from keycloak_scanner.well_known_scanner import WellKnownScanner
 
 
-class TestScan(Scan):
+class TestScanner(Scanner):
     def perform(self, launch_properties, scan_properties):
         self.session.get('http://testscan')
 
@@ -46,7 +46,7 @@ def test_start():
         'clients': ['test-client'],
         'username': 'username',
         'password': 'password'
-    }, session, {TestScan()})
+    }, session, {TestScanner()})
     scanner.start()
 
     assert scanner.session == session
@@ -56,12 +56,12 @@ def test_full_scan(well_known):
 
     SCANS = [
         RealmScanner(),
-        WellKnownScan(),
-        ClientScan(),
-        SecurityConsoleScan(),
-        OpenRedirectScan(),
-        FormPostXssScan(),
-        NoneSignScan()
+        WellKnownScanner(),
+        ClientScanner(),
+        SecurityConsoleScanner(),
+        OpenRedirectScanner(),
+        FormPostXssScanner(),
+        NoneSignScanner()
     ]
 
     session = requests.Session()

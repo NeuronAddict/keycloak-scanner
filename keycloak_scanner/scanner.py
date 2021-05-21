@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class Scan(ABC):
+class Scanner(ABC):
 
     def __init__(self):
         self.scan_properties = {}

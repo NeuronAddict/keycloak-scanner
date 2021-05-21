@@ -1,11 +1,11 @@
 from .custom_logging import find, verbose
 from .properties import add_kv
-from .scan import Scan
+from .scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/clients-registrations/default/security-admin-console'
 
 
-class SecurityConsoleScan(Scan):
+class SecurityConsoleScanner(Scanner):
 
     def perform(self, launch_properties, scan_properties):
 
