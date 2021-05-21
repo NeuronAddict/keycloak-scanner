@@ -19,6 +19,6 @@ deploy:
   server: https://test.pypi.org/simple/
   skip_existing: true
   on:
-    branch: develop
+    branch: feature/pipy-deployment
   password:
     secure: jwY9HvDT5dRFgdT/ObgwjhePiKHteLM6WS2UTZXaI6C5UPMsrc7a5C9oxn5LHlNFTgCOsOnHlezpUHxZ8p+YMsk8F5UKOvq+rgeDLZa7lFGP9cQbqIH2lVgog6838SOnqTvwwPMF28kUAtsFXbLJDmc/WORq2cLk15K7kf8vTT2lxWg7OahkYwUXwq+pY7/byF7vKKcSXNnttXVx+Pn9B5K8VkOM2hAqKRO/9/iUn5gQhZOILyDoWOXKKjoeJZitYKp47DA0lByUufNQN1uJEBPOZr+bQ9KvCdeTEH1tqErHneU3rFF8akgXZprk8cBSV4k1ytn0srGMDd0+zWCWeqg6GglFp9XbbrZ5l8Ue11aIjo+6+olT8j/VsGD9sYX8VuxN9tvT6fXYyD+dbyNBEA0Xt63WDBd/zW6rUM6SHY3VSNCk/62AumKz9Yq76xeYrn/0kMW2We/1MLufekkXe0BHXn2xp0ecSYhiEkjqbft82mi6vsGW2eq7J3VXFWAyqAqokWQ1KkNuGbhBvh8wPDM22j3i14G1joCQ+SVMtgqI9DKAZl9jNcG8jDW5MUwVmwJz7ox16CQtbJ1QXff6HUB1tQVchPxg3ql9V4ccTaUT/r/+t+m6p4Os7GPBKNZKaQP5lfQcByUwxufh9f4biWD/MI+UMJUpy6jRvaJINk8=
