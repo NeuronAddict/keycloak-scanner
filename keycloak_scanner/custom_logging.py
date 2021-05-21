@@ -9,7 +9,7 @@ def info(msg):
     print('[INFO] {}'.format(msg))
 
 
-def verbose(msg, color='gray'):
+def verbose(msg, color='grey'):
     if verbose_mode:
         print(colored('[VERBOSE] {}'.format(msg), color))
 
