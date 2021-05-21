@@ -1,5 +1,5 @@
-from .custom_logging import verbose, find
-from .scanner import Scanner
+from keycloak_scanner.custom_logging import verbose, find
+from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
