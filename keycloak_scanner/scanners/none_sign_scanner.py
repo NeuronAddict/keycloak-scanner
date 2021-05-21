@@ -15,12 +15,18 @@ def test_none(api, client, client_secret, username, password):
         except Exception as e:
             verbose('None refresh token fail : {}'.format(e))
     except Exception as e:
-        verbose(e)
+        raise e
+#        verbose(e)
 
 
 class NoneSignScanner(Scanner):
 
-    def perform(self, launch_properties, scan_properties):
+    def __init__(self, username: str = None, password: str = None, **kwars):
+        self.username = username
+        self.password = password
+        super().__init__(**kwars)
+
+    def perform(self, scan_properties):
 
         realms = scan_properties['realms'].keys()
 
@@ -28,23 +34,20 @@ class NoneSignScanner(Scanner):
             clients = scan_properties['clients'][realm]
             well_known = scan_properties['wellknowns'][realm]
 
-            api = KeyCloakApi(self.session, well_known)
+            api = KeyCloakApi(super().session(), well_known)
 
-            if 'security-admin-console' not in scan_properties \
-                    or realm not in scan_properties['security-admin-console'] \
-                    or 'secret' not in scan_properties['security-admin-console'][realm]:
-                verbose('No secret for realm {}'.format(realm))
-                continue
+            if 'security-admin-console' in scan_properties and realm in scan_properties['security-admin-console'] \
+                    and 'secret' in scan_properties['security-admin-console'][realm]:
 
-            client_secret = scan_properties['security-admin-console'][realm]['secret']
+                client_secret = scan_properties['security-admin-console'][realm]['secret']
 
-            for client in clients:
-                if 'username' in launch_properties:
-                    username = launch_properties['username']
-                    if 'password' in launch_properties:
-                        password = launch_properties['password']
-                        test_none(api, client, client_secret, username, password)
+                for client in clients:
+                    if self.username is not None:
+                        if self.password is not None:
+                            test_none(api, client, client_secret, self.username, self.password)
+                        else:
+                            test_none(api, client, client_secret, self.username, self.username)
                     else:
-                        test_none(api, client, client_secret, username, username)
-                else:
-                    info('No none scan, provide credentials to test jwt none signature')
+                        info('No none scan, provide credentials to test jwt none signature')
+            else:
+                verbose('No secret for realm {}'.format(realm))
