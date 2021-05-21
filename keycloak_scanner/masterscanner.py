@@ -3,7 +3,7 @@ from datetime import datetime
 from keycloak_scanner.custom_logging import info
 
 
-class Scanner:
+class MasterScanner:
 
     def __init__(self, launch_config: dict, session, scans):
         self.launch_config = launch_config
