@@ -23,7 +23,7 @@ def other_realm():
 
 @fixture
 def full_scan_mock_session(master_realm, other_realm, well_known):
-    def mock_response(url, params={}):
+    def get_mock_response(url, params={}):
         responses = {
             'http://testscan/auth/realms/master/.well-known/openid-configuration': MockResponse(status_code=200,
                                                                                                 response=well_known),
@@ -41,15 +41,27 @@ def full_scan_mock_session(master_realm, other_realm, well_known):
             'http://testscan/auth/realms/other/clients-registrations/default/security-admin-console': MockResponse(
                 status_code=401, response={"error": "invalid_token",
                                            "error_description": "Not authorized to view client. Not valid token or client credentials provided."}),
-            'http://testscan/auth': MockResponse(status_code=400)
+            'http://testscan/auth': MockResponse(status_code=400),
+            'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth': MockResponse(200, response='test')
+        }
+        if url not in responses:
+            raise Exception(f'bad url test : {url}')
+        return responses[url]
+
+    def post_mock_response(url, data={}):
+        responses = {
+            'http://testscan/master/token': MockResponse(status_code=200, response={
+                'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI',
+                'refresh_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI'
+            })
         }
         if url not in responses:
             raise Exception(f'bad url test : {url}')
         return responses[url]
 
     session = requests.Session()
-    session.get = MagicMock(side_effect=mock_response)
-    session.post = MagicMock()
+    session.get = MagicMock(side_effect=get_mock_response)
+    session.post = MagicMock(side_effect=post_mock_response)
     session.put = MagicMock()
     session.delete = MagicMock()
 
