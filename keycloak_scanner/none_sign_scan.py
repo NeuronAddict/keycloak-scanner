@@ -11,7 +11,7 @@ def test_none(api, client, client_secret, username, password):
         none_refresh_token = change_to_none(refresh_token)
         try:
             access_token, refresh_token = api.refresh(client, none_refresh_token)
-            find('Refresh work with none. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
+            find('NoneSign', 'Refresh work with none. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
         except Exception as e:
             verbose('None refresh token fail : {}'.format(e))
     except Exception as e:
