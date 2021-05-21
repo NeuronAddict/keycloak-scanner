@@ -35,6 +35,6 @@ def test_start(well_known):
 
     p: argparse.ArgumentParser = parser()
 
-    args = p.parse_args(['http://localhost', '--realms', 'test-realm', '--clients', 'test-client', '--username', 'username', '--password', 'password', '--no-fail-on-vuln'])
+    args = p.parse_args(['http://localhost', '--realms', 'test-realm', '--clients', 'test-client', '--username', 'username', '--password', 'password', '--no-fail'])
 
     start(args, session)
