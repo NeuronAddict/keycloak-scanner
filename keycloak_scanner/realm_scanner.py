@@ -1,5 +1,3 @@
-import requests
-
 from keycloak_scanner.custom_logging import verbose, info
 from keycloak_scanner.constants import DEFAULT_REALMS
 from keycloak_scanner.properties import add_kv
