@@ -1,5 +1,6 @@
-from keycloak_scanner.custom_logging import verbose, find
-from keycloak_scanner.scan import Scan
+from .scan import Scan
+from .custom_logging import verbose, find
+
 
 
 class FormPostXssScan(Scan):
@@ -29,4 +30,4 @@ class FormPostXssScan(Scan):
 
                     if r.status_code == 200:
                         if payload in r.text:
-                            find('Vulnerable to CVE 2018 14655 realm:{}, client:{}'.format(realm, client))
+                            find('XSS-CVE2018-14655', 'Vulnerable to CVE 2018 14655 realm:{}, client:{}'.format(realm, client))
