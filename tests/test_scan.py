@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import requests
+from pytest import fixture
 
 from keycloak_scanner.clients_scanner import ClientScan
 from keycloak_scanner.form_post_xss_scan import FormPostXssScan
@@ -19,6 +20,22 @@ class TestScan(Scan):
         self.session.get('http://testscan')
 
 
+class MockResponse:
+    status_code = 200
+
+    text = 'coucou'
+
+    def json(self):
+        return {'response_types_supported': ['code'],
+                'authorization_endpoint': 'http://testscan/auth',
+                'response_modes_supported': ['form_post']
+                }
+
+@fixture
+def well_known():
+    return MockResponse()
+
+
 def test_start():
 
     session = requests.Session()
@@ -35,8 +52,7 @@ def test_start():
     assert scanner.session == session
     session.get.assert_called_with('http://testscan')
 
-
-def test_full_scan():
+def test_full_scan(well_known):
 
     SCANS = [
         RealmScanner(),
@@ -49,7 +65,7 @@ def test_full_scan():
     ]
 
     session = requests.Session()
-    session.get = MagicMock()
+    session.get = MagicMock(return_value=well_known)
     session.post = MagicMock()
     session.put = MagicMock()
     session.delete = MagicMock()

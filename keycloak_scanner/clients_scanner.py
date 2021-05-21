@@ -1,9 +1,7 @@
-import requests
-
-from keycloak_scanner.constants import DEFAULT_CLIENTS
-from keycloak_scanner.custom_logging import verbose, info
-from keycloak_scanner.properties import add_list
-from keycloak_scanner.scan import Scan
+from .constants import DEFAULT_CLIENTS
+from .custom_logging import verbose, info
+from .properties import add_list
+from .scan import Scan
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
@@ -21,11 +19,11 @@ class ClientScan(Scan):
         for realm in realms:
             for client in clients:
                 url = URL_PATTERN.format(base_url, realm, client)
-                r = requests.get(url)
+                r = self.session.get(url)
 
                 if r.status_code != 200:
                     url = scan_properties['wellknowns'][realm]['authorization_endpoint']
-                    r = requests.get(url, params={'client_id': client}, allow_redirects=False)
+                    r = self.session.get(url, params={'client_id': client}, allow_redirects=False)
                     if r.status_code == 302:
                         info('Find a client for realm {}: {}'.format(realm, client))
                         add_list(scan_properties['clients'], realm, client)
