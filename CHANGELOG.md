@@ -1,5 +1,11 @@
 # changelog
 
+## Version 1.0.1
+
+- Script available in pip (pip install keycloak-scanner)
+- Fix error on verbose mode
+
+
 ## version 0.2.0
 
 - Use fixed set of dependencies
