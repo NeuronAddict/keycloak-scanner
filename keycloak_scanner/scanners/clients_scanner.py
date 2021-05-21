@@ -1,7 +1,7 @@
-from .constants import DEFAULT_CLIENTS
-from .custom_logging import verbose, info
-from .properties import add_list
-from .scanner import Scanner
+from keycloak_scanner.constants import DEFAULT_CLIENTS
+from keycloak_scanner.custom_logging import verbose, info
+from keycloak_scanner.properties import add_list
+from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 

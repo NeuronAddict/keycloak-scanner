@@ -1,6 +1,6 @@
-from .custom_logging import find, verbose
-from .properties import add_kv
-from .scanner import Scanner
+from keycloak_scanner.custom_logging import find, verbose
+from keycloak_scanner.properties import add_kv
+from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/clients-registrations/default/security-admin-console'
 

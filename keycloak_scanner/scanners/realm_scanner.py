@@ -1,7 +1,7 @@
 from keycloak_scanner.custom_logging import verbose, info
 from keycloak_scanner.constants import DEFAULT_REALMS
 from keycloak_scanner.properties import add_kv
-from keycloak_scanner.scanner import Scanner
+from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}'
 
