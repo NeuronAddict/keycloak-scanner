@@ -10,7 +10,7 @@ from keycloak_scanner.open_redirect_scanner import OpenRedirectScan
 from keycloak_scanner.realm_scanner import RealmScanner
 
 from keycloak_scanner.scan import Scan
-from keycloak_scanner.scanner import Scanner
+from keycloak_scanner.masterscanner import MasterScanner
 from keycloak_scanner.security_console_scanner import SecurityConsoleScan
 from keycloak_scanner.well_known_scanner import WellKnownScan
 
@@ -40,7 +40,7 @@ def test_start():
 
     session = requests.Session()
     session.get = MagicMock()
-    scanner = Scanner({
+    scanner = MasterScanner({
         'base_url': 'http://localhost',
         'realms': ['test-realm'],
         'clients': ['test-client'],
@@ -70,7 +70,7 @@ def test_full_scan(well_known):
     session.put = MagicMock()
     session.delete = MagicMock()
 
-    scanner = Scanner({
+    scanner = MasterScanner({
         'base_url': 'http://testscan',
         'realms': ['realm1'],
         'clients': ['client1', 'client2'],
