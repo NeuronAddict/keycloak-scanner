@@ -6,7 +6,10 @@ URL_PATTERN = '{}/auth/realms/{}/{}'
 
 class OpenRedirectScanner(Scanner):
 
-    def perform(self, launch_properties, scan_properties):
+    def __init__(self, **kwars):
+        super().__init__(**kwars)
+
+    def perform(self, scan_properties):
 
         realms = scan_properties['realms'].keys()
 
@@ -20,7 +23,7 @@ class OpenRedirectScanner(Scanner):
 
                 for client in clients:
 
-                    r = self.session.get(url, params={
+                    r = super().session().get(url, params={
                         'response_type': 'code',
                         'client_id': client,
                         'redirect_uri': 'https://devops-devsecops.org/auth/{}/{}/'.format(realm, client)

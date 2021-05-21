@@ -16,65 +16,43 @@ from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
 
 
 class TestScanner(Scanner):
-    def perform(self, launch_properties, scan_properties):
-        self.session.get('http://testscan')
-
-
-class MockResponse:
-    status_code = 200
-
-    text = 'coucou'
-
-    def json(self):
-        return {'response_types_supported': ['code'],
-                'authorization_endpoint': 'http://testscan/auth',
-                'response_modes_supported': ['form_post']
-                }
-
-@fixture
-def well_known():
-    return MockResponse()
+    def perform(self, scan_properties):
+        super().session().get(super().base_url())
 
 
 def test_start():
-
     session = requests.Session()
     session.get = MagicMock()
-    scanner = MasterScanner({
-        'base_url': 'http://localhost',
-        'realms': ['test-realm'],
-        'clients': ['test-client'],
-        'username': 'username',
-        'password': 'password'
-    }, session, {TestScanner()})
+    scanner = MasterScanner([TestScanner(base_url='http://testscan', session=session)])
     scanner.start()
-
-    assert scanner.session == session
     session.get.assert_called_with('http://testscan')
 
-def test_full_scan(well_known):
 
-    SCANS = [
-        RealmScanner(),
-        WellKnownScanner(),
-        ClientScanner(),
-        SecurityConsoleScanner(),
-        OpenRedirectScanner(),
-        FormPostXssScanner(),
-        NoneSignScanner()
+def test_full_scan(full_scan_mock_session):
+
+    scans = [
+        RealmScanner(base_url='http://testscan', session=full_scan_mock_session, realms=['master', 'other']),
+        WellKnownScanner(base_url='http://testscan', session=full_scan_mock_session),
+        ClientScanner(base_url='http://testscan', session=full_scan_mock_session, clients=['client1', 'client2']),
+        SecurityConsoleScanner(base_url='http://testscan', session=full_scan_mock_session),
+        OpenRedirectScanner(base_url='http://testscan', session=full_scan_mock_session),
+        FormPostXssScanner(base_url='http://testscan', session=full_scan_mock_session),
+        NoneSignScanner(base_url='http://testscan', session=full_scan_mock_session)
     ]
 
-    session = requests.Session()
-    session.get = MagicMock(return_value=well_known)
-    session.post = MagicMock()
-    session.put = MagicMock()
-    session.delete = MagicMock()
-
-    scanner = MasterScanner({
-        'base_url': 'http://testscan',
-        'realms': ['realm1'],
-        'clients': ['client1', 'client2'],
-        'username': 'username1',
-        'password': 'password123'
-    }, session=session, scans=SCANS)
+    scanner = MasterScanner(scans=scans)
     scanner.start()
+
+    assert scanner.scan_properties == {'clients': {'master': ['client1', 'client2'], 'other': ['client1', 'client2']},
+                                       'realms': {'master': {'authorization_endpoint': 'http://testscan/auth',
+                                                             'response_modes_supported': ['form_post'],
+                                                             'response_types_supported': ['code']},
+                                                  'other': {'authorization_endpoint': 'http://testscan/auth',
+                                                            'response_modes_supported': ['form_post'],
+                                                            'response_types_supported': ['code']}},
+                                       'wellknowns': {'master': {'authorization_endpoint': 'http://testscan/auth',
+                                                                 'response_modes_supported': ['form_post'],
+                                                                 'response_types_supported': ['code']},
+                                                      'other': {'authorization_endpoint': 'http://testscan/auth',
+                                                                'response_modes_supported': ['form_post'],
+                                                                'response_types_supported': ['code']}}}

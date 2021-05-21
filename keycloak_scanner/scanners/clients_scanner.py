@@ -1,6 +1,5 @@
 from typing import List
 
-from keycloak_scanner.constants import DEFAULT_CLIENTS
 from keycloak_scanner.custom_logging import verbose, info
 from keycloak_scanner.properties import add_list
 from keycloak_scanner.scanners.scanner import Scanner
@@ -22,7 +21,7 @@ class ClientScanner(Scanner):
 
         for realm in realms:
             for client in self.clients:
-                url = URL_PATTERN.format(super().base_url, realm, client)
+                url = URL_PATTERN.format(super().base_url(), realm, client)
                 r = super().session().get(url)
 
                 if r.status_code != 200:
