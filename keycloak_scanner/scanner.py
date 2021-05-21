@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from custom_logging import info
+from keycloak_scanner.custom_logging import info
 from keycloak_scanner.clients_scanner import ClientScan
 from keycloak_scanner.form_post_xss_scan import FormPostXssScan
 from keycloak_scanner.none_sign_scan import NoneSignScan
