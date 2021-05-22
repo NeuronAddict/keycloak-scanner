@@ -1,10 +1,8 @@
-from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.custom_logging import find
 
 
-
-class FormPostXssScanner(Scanner, PrintLogger):
+class FormPostXssScanner(Scanner):
 
     def __init__(self, **kwars):
         super().__init__(**kwars)

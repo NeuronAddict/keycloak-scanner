@@ -1,11 +1,10 @@
-from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.properties import add_kv
 from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 
 
-class WellKnownScanner(Scanner, PrintLogger):
+class WellKnownScanner(Scanner):
 
     def __init__(self, **kwars):
         super().__init__(**kwars)
