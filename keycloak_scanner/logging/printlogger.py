@@ -9,11 +9,11 @@ class PrintLogger(RootLogger):
         self.verbose = verbose
         super().__init__(**kwargs)
 
-    def info(self, msg):
-        print('[INFO] {}'.format(msg))
-        super().info(msg)
+    def info(self, message: str):
+        print('[INFO] {}'.format(message))
+        super().info(message)
 
-    def verbose(self, msg, color='grey'):
+    def verbose(self, message: str, color='grey'):
         if self.verbose:
-            print(colored('[VERBOSE] {}'.format(msg), color))
-        super().verbose(msg, color)
+            print(colored('[VERBOSE] {}'.format(message), color))
+        super().verbose(message, color)
