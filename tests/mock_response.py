@@ -1,3 +1,6 @@
+from keycloak_scanner.logging.printlogger import PrintLogger
+
+
 class MockResponse:
 
     def __init__(self, status_code, response=None):
@@ -14,3 +17,18 @@ class MockResponse:
             return self.response
         else:
             raise Exception(f'response spec is not json ({self.response})')
+
+class MockPrintLogger(PrintLogger):
+
+    def __init__(self, **kwargs):
+        self.infos = []
+        self.verboses = []
+        super().__init__(**kwargs)
+
+    def info(self, message: str):
+        self.infos.append(message)
+        super().info(message)
+
+    def verbose(self, message: str, color='grey'):
+        self.verboses.append({'message': message, 'color': color})
+        super().verbose(message, color)
