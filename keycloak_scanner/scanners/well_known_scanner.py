@@ -1,11 +1,11 @@
-from keycloak_scanner.custom_logging import verbose, info
+from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.properties import add_kv
 from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 
 
-class WellKnownScanner(Scanner):
+class WellKnownScanner(Scanner, PrintLogger):
 
     def __init__(self, **kwars):
         super().__init__(**kwars)
@@ -17,7 +17,7 @@ class WellKnownScanner(Scanner):
             url = URL_PATTERN.format(super().base_url(), realm)
             r = super().session().get(url)
             if r.status_code != 200:
-                verbose('Bad status code for realm {} {}: {}'.format(realm, url, r.status_code))
+                super().verbose('Bad status code for realm {} {}: {}'.format(realm, url, r.status_code))
             else:
-                info('Find a well known for realm {} {}'.format(realm, url))
+                super().info('Find a well known for realm {} {}'.format(realm, url))
                 add_kv(scan_properties, 'wellknowns', realm, r.json())

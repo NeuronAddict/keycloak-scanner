@@ -1,10 +1,11 @@
-from keycloak_scanner.custom_logging import verbose, find
+from keycloak_scanner.custom_logging import find
+from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
 
-class OpenRedirectScanner(Scanner):
+class OpenRedirectScanner(Scanner, PrintLogger):
 
     def __init__(self, **kwars):
         super().__init__(**kwars)
@@ -17,7 +18,7 @@ class OpenRedirectScanner(Scanner):
             clients = scan_properties['clients'][realm]
             well_known = scan_properties['wellknowns'][realm]
             if 'code' not in well_known['response_types_supported']:
-                verbose('code not in supported response types, can\' test redirect_uri for realm {}'.format(realm))
+                super().verbose('code not in supported response types, can\' test redirect_uri for realm {}'.format(realm))
             else:
                 url = well_known['authorization_endpoint']
 
