@@ -1,13 +1,13 @@
 from typing import List
 
-from keycloak_scanner.custom_logging import verbose, info
+from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.properties import add_list
 from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
 
-class ClientScanner(Scanner):
+class ClientScanner(Scanner, PrintLogger):
 
     def __init__(self, clients: List[str], **kwargs):
         self.clients = clients
@@ -28,10 +28,10 @@ class ClientScanner(Scanner):
                     url = scan_properties['wellknowns'][realm]['authorization_endpoint']
                     r = super().session().get(url, params={'client_id': client}, allow_redirects=False)
                     if r.status_code == 302:
-                        info('Find a client for realm {}: {}'.format(realm, client))
+                        super().info('Find a client for realm {}: {}'.format(realm, client))
                         add_list(scan_properties['clients'], realm, client)
                     else:
-                        verbose('client {} seems to not exists'.format(client))
+                        super().verbose('client {} seems to not exists'.format(client))
                 else:
-                    info('Find a client for realm {}: {} ({})'.format(realm, client, url))
+                    super().info('Find a client for realm {}: {} ({})'.format(realm, client, url))
                     add_list(scan_properties['clients'], realm, client)
