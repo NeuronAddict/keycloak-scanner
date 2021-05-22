@@ -7,7 +7,7 @@ from keycloak_scanner.scanners.scanner import Scanner
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
 
-class ClientScanner(Scanner, PrintLogger):
+class ClientScanner(Scanner):
 
     def __init__(self, clients: List[str], **kwargs):
         self.clients = clients
