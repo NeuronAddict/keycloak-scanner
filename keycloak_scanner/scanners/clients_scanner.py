@@ -1,6 +1,5 @@
 from typing import List
 
-from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.properties import add_list
 from keycloak_scanner.scanners.scanner import Scanner
 
