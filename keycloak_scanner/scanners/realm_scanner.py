@@ -1,14 +1,13 @@
 from typing import List
 
 from keycloak_scanner.constants import DEFAULT_REALMS
-from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.properties import add_kv
 from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}'
 
 
-class RealmScanner(Scanner, PrintLogger):
+class RealmScanner(Scanner):
 
     def __init__(self, realms: List[str], **kwargs):
         self.realms = realms

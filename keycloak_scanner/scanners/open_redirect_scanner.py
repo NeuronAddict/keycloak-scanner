@@ -1,11 +1,10 @@
 from keycloak_scanner.custom_logging import find
-from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
 
-class OpenRedirectScanner(Scanner, PrintLogger):
+class OpenRedirectScanner(Scanner):
 
     def __init__(self, **kwars):
         super().__init__(**kwars)

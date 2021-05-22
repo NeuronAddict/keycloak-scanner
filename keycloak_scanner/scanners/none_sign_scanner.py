@@ -1,11 +1,10 @@
 from keycloak_scanner.custom_logging import find
 from keycloak_scanner.jwt_attack import change_to_none
 from keycloak_scanner.keycloak_api import KeyCloakApi
-from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.scanner import Scanner
 
 
-class NoneSignScanner(Scanner, PrintLogger):
+class NoneSignScanner(Scanner):
 
     def __init__(self, username: str = None, password: str = None, **kwars):
         self.username = username
