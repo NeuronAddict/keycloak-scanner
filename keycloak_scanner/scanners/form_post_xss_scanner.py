@@ -1,9 +1,10 @@
+from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.custom_logging import verbose, find
+from keycloak_scanner.custom_logging import find
 
 
 
-class FormPostXssScanner(Scanner):
+class FormPostXssScanner(Scanner, PrintLogger):
 
     def __init__(self, **kwars):
         super().__init__(**kwars)
@@ -16,7 +17,7 @@ class FormPostXssScanner(Scanner):
             clients = scan_properties['clients'][realm]
             well_known = scan_properties['wellknowns'][realm]
             if 'form_post' not in well_known['response_modes_supported']:
-                verbose('post_form not in supported response types, can\' test CVE-2018-14655 for realm {}'.format(realm))
+                super().verbose('post_form not in supported response types, can\' test CVE-2018-14655 for realm {}'.format(realm))
             else:
                 url = well_known['authorization_endpoint']
 
