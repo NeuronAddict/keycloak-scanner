@@ -1,7 +1,3 @@
-from pprint import pprint
-
-from keycloak_scanner.logging.printlogger import PrintLogger
-from keycloak_scanner.logging.root_logger import RootLogger
 from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
 from tests.mock_response import MockPrintLogger
 
@@ -10,8 +6,6 @@ def test_perform(full_scan_mock_session):
 
     class TestNoneSignScanner(NoneSignScanner, MockPrintLogger):
         pass
-
-    pprint(TestNoneSignScanner.__mro__)
 
     scanner = TestNoneSignScanner(username='user', password='password', base_url='http://testscan',
                               session=full_scan_mock_session)
