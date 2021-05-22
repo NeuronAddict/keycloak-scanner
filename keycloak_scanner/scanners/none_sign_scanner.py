@@ -1,25 +1,11 @@
-from keycloak_scanner.custom_logging import verbose, info, find
+from keycloak_scanner.custom_logging import find
 from keycloak_scanner.jwt_attack import change_to_none
 from keycloak_scanner.keycloak_api import KeyCloakApi
+from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.scanner import Scanner
 
 
-def test_none(api, client, client_secret, username, password):
-    try:
-        access_token, refresh_token = api.get_token(client, client_secret, username, password)
-        info('Got token via password method. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
-        none_refresh_token = change_to_none(refresh_token)
-        try:
-            access_token, refresh_token = api.refresh(client, none_refresh_token)
-            find('NoneSign', 'Refresh work with none. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
-        except Exception as e:
-            verbose('None refresh token fail : {}'.format(e))
-    except Exception as e:
-        raise e
-#        verbose(e)
-
-
-class NoneSignScanner(Scanner):
+class NoneSignScanner(Scanner, PrintLogger):
 
     def __init__(self, username: str = None, password: str = None, **kwars):
         self.username = username
@@ -44,10 +30,25 @@ class NoneSignScanner(Scanner):
                 for client in clients:
                     if self.username is not None:
                         if self.password is not None:
-                            test_none(api, client, client_secret, self.username, self.password)
+                            self.test_none(api, client, client_secret, self.username, self.password)
                         else:
-                            test_none(api, client, client_secret, self.username, self.username)
+                            self.test_none(api, client, client_secret, self.username, self.username)
                     else:
-                        info('No none scan, provide credentials to test jwt none signature')
+                        super().info('No none scan, provide credentials to test jwt none signature')
             else:
-                verbose('No secret for realm {}'.format(realm))
+                super().verbose('No secret for realm {}'.format(realm))
+
+    def test_none(self, api, client, client_secret, username, password):
+        try:
+            access_token, refresh_token = api.get_token(client, client_secret, username, password)
+            super().info(
+                'Got token via password method. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
+            none_refresh_token = change_to_none(refresh_token)
+            try:
+                access_token, refresh_token = api.refresh(client, none_refresh_token)
+                find('NoneSign',
+                     'Refresh work with none. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
+            except Exception as e:
+                super().verbose('None refresh token fail : {}'.format(e))
+        except Exception as e:
+            raise e
