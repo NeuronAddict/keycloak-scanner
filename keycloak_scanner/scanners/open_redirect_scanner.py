@@ -1,24 +1,13 @@
 from typing import List, Dict
 
 from keycloak_scanner.custom_logging import find
+from keycloak_scanner.scanners.clients_scanner import Clients
+from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need, Need3
+from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
-
-
-class WellKnown:
-
-    def __init__(self, json: dict):
-        self.json = json
-
-    def __getitem__(self, key) -> dict:
-        return self.json[key]
-
-
-Realms = List[str]
-
-Clients = List[str]
 
 
 class OpenRedirect:
@@ -30,33 +19,33 @@ class OpenRedirect:
         self.results[realm] = value
 
 
-class OpenRedirectScanner(Need3[WellKnown, Realms, Clients], Scanner[OpenRedirect]):
+class OpenRedirectScanner(Need3[WellKnownDict, Realms, Clients], Scanner[OpenRedirect]):
 
     def __init__(self, **kwars):
         super().__init__(**kwars)
 
-    def perform(self, well_known: WellKnown, realms: Realms, clients: Clients, **kwargs) -> OpenRedirect:
+    def perform(self, well_known_dict: WellKnownDict, realms: Realms, clients: Clients, **kwargs) -> OpenRedirect:
 
         ret = OpenRedirect()
 
         for realm in realms:
-            if 'code' not in well_known['response_types_supported']:
-                super().verbose('code not in supported response types, can\' test redirect_uri for realm {}'.format(realm))
+            if 'code' not in well_known_dict[realm.name].json['response_types_supported']:
+                super().verbose(f'code not in supported response types, can\' test redirect_uri for realm {realm.name}')
             else:
-                url = well_known['authorization_endpoint']
+                url = well_known_dict[realm.name].json['authorization_endpoint']
 
                 for client in clients:
 
                     r = super().session().get(url, params={
                         'response_type': 'code',
                         'client_id': client,
-                        'redirect_uri': 'https://devops-devsecops.org/auth/{}/{}/'.format(realm, client)
+                        'redirect_uri': f'https://devops-devsecops.org/auth/{realm.name}/{client.name}/'
                     })
 
                     if r.status_code == 200:
-                        find('OpenRedirection', 'Open redirection for realm {} and clientid {}'.format(realm, client))
-                        ret.find(f'{realm}-{client}', True)
+                        find('OpenRedirection', f'Open redirection for realm {realm.name} and clientid {client.name}')
+                        ret.find(f'{realm.name}-{client.name}', True)
                     else:
-                        ret.find(f'{realm}-{client}', False)
+                        ret.find(f'{realm.name}-{client.name}', False)
 
         return ret
