@@ -28,6 +28,8 @@ class ScanResults(PrintLogger):
         super().verbose(f'new result with key: {key} ({result})')
         self.results[key] = result
 
+    def __repr__(self):
+        return repr(self.results)
 
 class MasterScanner(PrintLogger):
 
