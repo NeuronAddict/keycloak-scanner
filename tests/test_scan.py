@@ -1,5 +1,7 @@
+from typing import List
 from unittest.mock import MagicMock
 
+import pytest
 import requests
 from pytest import fixture
 from requests import Session
@@ -14,11 +16,33 @@ from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.masterscanner import MasterScanner
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner, WellKnown
+from tests.mock_response import MockPrintLogger
 
 
-class TestScanner(Scanner):
+class TestResult:
+    pass
+
+
+class TestResultList(List[str], MockPrintLogger):
+    pass
+
+
+class TestScanner(Scanner[TestResult], MockPrintLogger):
     def perform(self):
         super().session().get(super().base_url())
+        return TestResult()
+
+
+class TestScannerList(Scanner[TestResultList], MockPrintLogger):
+    def perform(self):
+        super().session().get(super().base_url())
+        return TestResultList()
+
+
+class TestMasterScanner(MasterScanner, MockPrintLogger):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 def test_start():
@@ -28,6 +52,16 @@ def test_start():
     scanner.start()
     session.get.assert_called_with('http://testscan')
 
+
+def test_should_fail_when_scanner_return_empty_list():
+    session = requests.Session()
+    session.get = MagicMock()
+    test_scanner = TestScannerList(base_url='http://testscan', session=session)
+    scanner = TestMasterScanner(scans=[test_scanner])
+    scanner.start()
+    assert scanner.warns == [
+        'Result of TestScannerList as no results (void list), subsequent scans can be void too.'
+    ]
 
 def test_full_scan(base_url: str, full_scan_mock_session: Session):
     scans = [
