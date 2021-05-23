@@ -1,13 +1,17 @@
+import pytest
+from requests import Session
+
 from keycloak_scanner.main import parser
 from keycloak_scanner.main import start
 
 
-def test_start(full_scan_mock_session):
+def test_start(base_url: str, full_scan_mock_session: Session):
 
     p = parser()
 
-    args = p.parse_args(['https://localhost:8080', '--realms', 'other', '--clients', 'client1,client2',
-                         '--username', 'username', '--password', 'password', '--no-fail', '--verbose'])
+    args = p.parse_args([base_url, '--realms', 'other', '--clients', 'client1,client2',
+                         '--username', 'username', '--password', 'password', '--verbose'])
 
-    start(args, full_scan_mock_session)
-    # TODO: fail when error
+    with pytest.raises(SystemExit):
+
+        start(args, full_scan_mock_session)

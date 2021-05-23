@@ -26,7 +26,10 @@ def test_start(base_url: str, full_scan_mock_session: Session):
         NoneSignScanner(base_url=base_url, session=full_scan_mock_session)
     ])
 
-    ms.start()
+    status = ms.start()
+
+    assert not status.has_error
+    assert status.has_vulns
 
 
 def test_start_open_redirect(well_known_dict):
