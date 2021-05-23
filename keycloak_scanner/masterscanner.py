@@ -20,6 +20,7 @@ class MasterScanner:
 
         results = self.previous_deps
 
+        # TODO: return code when error
         for scanner in self.scans:
             try:
                 result = scanner.perform(**results)
