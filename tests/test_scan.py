@@ -1,19 +1,16 @@
 from typing import List
 from unittest.mock import MagicMock
 
-import pytest
 import requests
-from pytest import fixture
 from requests import Session
 
+from keycloak_scanner.masterscanner import MasterScanner
 from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner, FormPostXssResult
 from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
 from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner, OpenRedirect
 from keycloak_scanner.scanners.realm_scanner import RealmScanner, Realm
-
 from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.masterscanner import MasterScanner
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner, WellKnown
 from tests.mock_response import MockPrintLogger
@@ -48,20 +45,21 @@ class TestMasterScanner(MasterScanner, MockPrintLogger):
 def test_start():
     session = requests.Session()
     session.get = MagicMock()
-    scanner = MasterScanner([TestScanner(base_url='http://testscan', session=session)])
+    scanner = MasterScanner([TestScanner(base_url='https://testscan', session=session)])
     scanner.start()
-    session.get.assert_called_with('http://testscan')
+    session.get.assert_called_with('https://testscan')
 
 
 def test_should_fail_when_scanner_return_empty_list():
     session = requests.Session()
     session.get = MagicMock()
-    test_scanner = TestScannerList(base_url='http://testscan', session=session)
+    test_scanner = TestScannerList(base_url='https://testscan', session=session)
     scanner = TestMasterScanner(scans=[test_scanner])
     scanner.start()
     assert scanner.warns == [
         'Result of TestScannerList as no results (void list), subsequent scans can be void too.'
     ]
+
 
 def test_full_scan(base_url: str, full_scan_mock_session: Session):
     scans = [
