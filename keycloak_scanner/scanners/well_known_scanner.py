@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from keycloak_scanner.properties import add_kv
 from keycloak_scanner.scanners.json_result import JsonResult
@@ -16,7 +16,7 @@ class WellKnown(JsonResult):
         super().__init__(**kwargs)
 
 
-WellKnownList = List[WellKnown]
+WellKnownDict = Dict[str, WellKnown]
 
 
 class WellKnownScanner(Need[Realms], Scanner):
@@ -26,7 +26,7 @@ class WellKnownScanner(Need[Realms], Scanner):
 
     def perform(self, realms: Realms, **kwargs):
 
-        result: WellKnownList = []
+        result: WellKnownDict = {}
 
         for realm in realms:
 
@@ -38,6 +38,6 @@ class WellKnownScanner(Need[Realms], Scanner):
 
             else:
                 super().info('Find a well known for realm {} {}'.format(realm, url))
-                result.append(WellKnown(realm, name=realm.name, url=url, json=r.json()))
+                result[realm.name] = WellKnown(realm, name=realm.name, url=url, json=r.json())
 
         return result
