@@ -15,6 +15,14 @@ class WellKnown(JsonResult):
         self.realm = realm
         super().__init__(**kwargs)
 
+    def __repr__(self):
+        return f"WellKnown({repr(self.realm)}, name='{self.name}', url='{self.url}', json={self.json})"
+
+    def __eq__(self, other):
+        if isinstance(other, WellKnown):
+            return self.realm == other.realm and self.url == other.url and self.json == other.json
+        return NotImplemented
+
 
 class WellKnownDict(Dict[str, WellKnown]):
     pass
