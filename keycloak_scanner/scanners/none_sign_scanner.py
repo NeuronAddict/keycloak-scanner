@@ -59,7 +59,7 @@ class NoneSignScanner(Need4[Realms, Clients, WellKnownDict, SecurityConsoleResul
                     else:
                         super().info('No none scan, provide credentials to test jwt none signature')
             else:
-                super().verbose('No secret for realm {}'.format(realm))
+                super().verbose(f'No secret for realm {realm.name}')
 
             results[realm.name] = NoneSignResult(realm, is_vulnerable)
 
