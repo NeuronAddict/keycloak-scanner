@@ -9,13 +9,16 @@ class Scanner(SessionHolder, PrintLogger):
         super().__init__(**kwargs)
 
     def base_url(self):
+        assert not hasattr(super(), 'base_url')
         return self.base_url_
 
     def name(self):
+        assert not hasattr(super(), 'name')
         return self.__class__.__name__
 
     def init_scan(self):
         super().info(f'Start logger {self.name()}')
+        assert not hasattr(super(), 'init_scan')
 
     def perform(self, scan_properties):
         """
