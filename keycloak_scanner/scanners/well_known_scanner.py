@@ -1,6 +1,5 @@
-from typing import List, Dict
+from typing import Dict
 
-from keycloak_scanner.properties import add_kv
 from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.scanner import Scanner
