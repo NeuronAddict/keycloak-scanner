@@ -38,7 +38,7 @@ class ClientScanner(Need2[Realms, WellKnownDict], Scanner[Clients]):
 
     def perform(self, realms: Realms, well_known_dict: WellKnownDict, **kwargs) -> Clients:
 
-        result: Clients = []
+        result: Clients = Clients()
 
         for realm in realms:
             for client_name in self.clients:

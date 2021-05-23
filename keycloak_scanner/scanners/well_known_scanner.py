@@ -27,7 +27,7 @@ class WellKnownScanner(Need[Realms], Scanner):
 
     def perform(self, realms: Realms, **kwargs):
 
-        result: WellKnownDict = {}
+        result: WellKnownDict = WellKnownDict()
 
         for realm in realms:
 
