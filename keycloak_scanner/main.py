@@ -85,8 +85,6 @@ def start(args, session: requests.Session):
     ])
     scanner.start()
 
-    if args.verbose:
-        print(json.dumps(scanner.scan_properties, sort_keys=True, indent=4))
     if not args.no_fail and custom_logging.has_vuln:
         print('Fail with exit code 4 because vulnerabilities are discovered')
         sys.exit(4)
