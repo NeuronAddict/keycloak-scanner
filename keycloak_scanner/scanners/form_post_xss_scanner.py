@@ -3,8 +3,7 @@ from typing import Dict
 from keycloak_scanner.scanners.clients_scanner import Clients
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.custom_logging import find
-from keycloak_scanner.scanners.scanner_pieces import Need, Need3
+from keycloak_scanner.scanners.scanner_pieces import Need3
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
 
