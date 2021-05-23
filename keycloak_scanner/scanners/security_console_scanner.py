@@ -1,21 +1,23 @@
-from .custom_logging import find, verbose
-from .properties import add_kv
-from .scan import Scan
+from keycloak_scanner.custom_logging import find
+from keycloak_scanner.properties import add_kv
+from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}/clients-registrations/default/security-admin-console'
 
 
-class SecurityConsoleScan(Scan):
+class SecurityConsoleScanner(Scanner):
 
-    def perform(self, launch_properties, scan_properties):
+    def __init__(self, **kwars):
+        super().__init__(**kwars)
 
-        base_url = launch_properties['base_url']
+    def perform(self, scan_properties):
+
         realms = list(scan_properties['realms'].keys())
         for realm in realms:
-            url = URL_PATTERN.format(base_url, realm)
-            r = self.session.get(url)
+            url = URL_PATTERN.format(super().base_url(), realm)
+            r = super().session().get(url)
             if r.status_code != 200:
-                verbose('Bad status code for {}: {}'.format(url, r.status_code))
+                super().verbose('Bad status code for {}: {}'.format(url, r.status_code))
             else:
                 find('SecurityAdminConsole', 'Find a security-admin-console {}: {}'.format(url, r.status_code))
                 add_kv(scan_properties, 'security-admin-console', realm, r.json())

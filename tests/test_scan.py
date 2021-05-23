@@ -3,78 +3,378 @@ from unittest.mock import MagicMock
 import requests
 from pytest import fixture
 
-from keycloak_scanner.clients_scanner import ClientScan
-from keycloak_scanner.form_post_xss_scan import FormPostXssScan
-from keycloak_scanner.none_sign_scan import NoneSignScan
-from keycloak_scanner.open_redirect_scanner import OpenRedirectScan
-from keycloak_scanner.realm_scanner import RealmScanner
+from keycloak_scanner.scanners.clients_scanner import ClientScanner
+from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
+from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
+from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
+from keycloak_scanner.scanners.realm_scanner import RealmScanner
 
-from keycloak_scanner.scan import Scan
-from keycloak_scanner.scanner import Scanner
-from keycloak_scanner.security_console_scanner import SecurityConsoleScan
-from keycloak_scanner.well_known_scanner import WellKnownScan
-
-
-class TestScan(Scan):
-    def perform(self, launch_properties, scan_properties):
-        self.session.get('http://testscan')
+from keycloak_scanner.scanners.scanner import Scanner
+from keycloak_scanner.masterscanner import MasterScanner
+from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
+from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
 
 
-class MockResponse:
-    status_code = 200
-
-    text = 'coucou'
-
-    def json(self):
-        return {'response_types_supported': ['code'],
-                'authorization_endpoint': 'http://testscan/auth',
-                'response_modes_supported': ['form_post']
-                }
-
-@fixture
-def well_known():
-    return MockResponse()
+class TestScanner(Scanner):
+    def perform(self, scan_properties):
+        super().session().get(super().base_url())
 
 
 def test_start():
-
     session = requests.Session()
     session.get = MagicMock()
-    scanner = Scanner({
-        'base_url': 'http://localhost',
-        'realms': ['test-realm'],
-        'clients': ['test-client'],
-        'username': 'username',
-        'password': 'password'
-    }, session, {TestScan()})
+    scanner = MasterScanner([TestScanner(base_url='http://testscan', session=session)])
     scanner.start()
-
-    assert scanner.session == session
     session.get.assert_called_with('http://testscan')
 
-def test_full_scan(well_known):
 
-    SCANS = [
-        RealmScanner(),
-        WellKnownScan(),
-        ClientScan(),
-        SecurityConsoleScan(),
-        OpenRedirectScan(),
-        FormPostXssScan(),
-        NoneSignScan()
+def test_full_scan(full_scan_mock_session):
+    scans = [
+        RealmScanner(base_url='http://testscan', session=full_scan_mock_session, realms=['master', 'other']),
+        WellKnownScanner(base_url='http://testscan', session=full_scan_mock_session),
+        ClientScanner(base_url='http://testscan', session=full_scan_mock_session, clients=['client1', 'client2']),
+        SecurityConsoleScanner(base_url='http://testscan', session=full_scan_mock_session),
+        OpenRedirectScanner(base_url='http://testscan', session=full_scan_mock_session),
+        FormPostXssScanner(base_url='http://testscan', session=full_scan_mock_session),
+        NoneSignScanner(base_url='http://testscan', session=full_scan_mock_session)
     ]
 
-    session = requests.Session()
-    session.get = MagicMock(return_value=well_known)
-    session.post = MagicMock()
-    session.put = MagicMock()
-    session.delete = MagicMock()
-
-    scanner = Scanner({
-        'base_url': 'http://testscan',
-        'realms': ['realm1'],
-        'clients': ['client1', 'client2'],
-        'username': 'username1',
-        'password': 'password123'
-    }, session=session, scans=SCANS)
+    scanner = MasterScanner(scans=scans)
     scanner.start()
+
+    assert scanner.scan_properties == {'clients': {'master': ['client1', 'client2'], 'other': ['client1', 'client2']},
+                                       'realms': {'master': {
+                                           'account-service': 'http://localhost:8080/auth/realms/master/account',
+                                           'public_key': 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwbbkdpQ9J5QR4nmfNL6y/+3PaIKzoeUIa1oRI1QlmXgtD/mCURhdVi52S0xQ8XGy2HIsrrct/G6rVMPDBzqa2bdKP0uB6iuuBmeH/RyJlMCdrXYTZjG5uWt6SlI7462966iqGYq1o3crHbSnLr/9OFIJD2zFBEYJZ2Xbd9IRcGpwpCSKJ5YAs1EnmLQrEBHxdLsQyIiHy5yU8bT5otgyS4tvn0UiY04zOonsvH5XmzvaZ77fo6DV8GY79eqCECiBF2OHUhZ7GjZfcHlKzeCS4vEODntPc/FzV+eqDkv9/ikDwJ9KHsLbIUkR9Ob2JE7jHg0a76CF2N/z8tztFAruawIDAQAB',
+                                           'realm': 'master',
+                                           'token-service': 'http://localhost:8080/auth/realms/master/protocol/openid-connect',
+                                           'tokens-not-before': 0},
+                                                  'other': {
+                                                      'account-service': 'http://localhost:8080/auth/realms/other/account',
+                                                      'public_key': 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwbbkdpQ9J5QR4nmfNL6y/+3PaIKzoeUIa1oRI1QlmXgtD/mCURhdVi52S0xQ8XGy2HIsrrct/G6rVMPDBzqa2bdKP0uB6iuuBmeH/RyJlMCdrXYTZjG5uWt6SlI7462966iqGYq1o3crHbSnLr/9OFIJD2zFBEYJZ2Xbd9IRcGpwpCSKJ5YAs1EnmLQrEBHxdLsQyIiHy5yU8bT5otgyS4tvn0UiY04zOonsvH5XmzvaZ77fo6DV8GY79eqCECiBF2OHUhZ7GjZfcHlKzeCS4vEODntPc/FzV+eqDkv9/ikDwJ9KHsLbIUkR9Ob2JE7jHg0a76CF2N/z8tztFAruawIDAQAB',
+                                                      'realm': 'other',
+                                                      'token-service': 'http://localhost:8080/auth/realms/other/protocol/openid-connect',
+                                                      'tokens-not-before': 0}},
+                                       'wellknowns': {'master': {
+                                           'authorization_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth',
+                                           'backchannel_authentication_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/ext/ciba/auth',
+                                           'backchannel_logout_session_supported': 'true',
+                                           'backchannel_logout_supported': 'true',
+                                           'backchannel_token_delivery_modes_supported': ['poll'],
+                                           'check_session_iframe': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/login-status-iframe.html',
+                                           'claim_types_supported': ['normal'],
+                                           'claims_parameter_supported': 'true',
+                                           'claims_supported': ['aud',
+                                                                'sub',
+                                                                'iss',
+                                                                'auth_time',
+                                                                'name',
+                                                                'given_name',
+                                                                'family_name',
+                                                                'preferred_username',
+                                                                'email',
+                                                                'acr'],
+                                           'code_challenge_methods_supported': ['plain',
+                                                                                'S256'],
+                                           'device_authorization_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth/device',
+                                           'end_session_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/logout',
+                                           'grant_types_supported': ['authorization_code',
+                                                                     'implicit',
+                                                                     'refresh_token',
+                                                                     'password',
+                                                                     'client_credentials',
+                                                                     'urn:ietf:params:oauth:grant-type:device_code',
+                                                                     'urn:openid:params:grant-type:ciba'],
+                                           'id_token_encryption_alg_values_supported': ['RSA-OAEP',
+                                                                                        'RSA-OAEP-256',
+                                                                                        'RSA1_5'],
+                                           'id_token_encryption_enc_values_supported': ['A256GCM',
+                                                                                        'A192GCM',
+                                                                                        'A128GCM',
+                                                                                        'A128CBC-HS256',
+                                                                                        'A192CBC-HS384',
+                                                                                        'A256CBC-HS512'],
+                                           'id_token_signing_alg_values_supported': ['PS384',
+                                                                                     'ES384',
+                                                                                     'RS384',
+                                                                                     'HS256',
+                                                                                     'HS512',
+                                                                                     'ES256',
+                                                                                     'RS256',
+                                                                                     'HS384',
+                                                                                     'ES512',
+                                                                                     'PS256',
+                                                                                     'PS512',
+                                                                                     'RS512'],
+                                           'introspection_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/token/introspect',
+                                           'introspection_endpoint_auth_methods_supported': ['private_key_jwt',
+                                                                                             'client_secret_basic',
+                                                                                             'client_secret_post',
+                                                                                             'tls_client_auth',
+                                                                                             'client_secret_jwt'],
+                                           'introspection_endpoint_auth_signing_alg_values_supported': ['PS384',
+                                                                                                        'ES384',
+                                                                                                        'RS384',
+                                                                                                        'HS256',
+                                                                                                        'HS512',
+                                                                                                        'ES256',
+                                                                                                        'RS256',
+                                                                                                        'HS384',
+                                                                                                        'ES512',
+                                                                                                        'PS256',
+                                                                                                        'PS512',
+                                                                                                        'RS512'],
+                                           'issuer': 'http://localhost:8080/auth/realms/master',
+                                           'jwks_uri': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/certs',
+                                           'registration_endpoint': 'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect',
+                                           'request_object_signing_alg_values_supported': ['PS384',
+                                                                                           'ES384',
+                                                                                           'RS384',
+                                                                                           'HS256',
+                                                                                           'HS512',
+                                                                                           'ES256',
+                                                                                           'RS256',
+                                                                                           'HS384',
+                                                                                           'ES512',
+                                                                                           'PS256',
+                                                                                           'PS512',
+                                                                                           'RS512',
+                                                                                           'none'],
+                                           'request_parameter_supported': 'true',
+                                           'request_uri_parameter_supported': 'true',
+                                           'require_request_uri_registration': 'true',
+                                           'response_modes_supported': ['query',
+                                                                        'fragment',
+                                                                        'form_post'],
+                                           'response_types_supported': ['code',
+                                                                        'none',
+                                                                        'id_token',
+                                                                        'token',
+                                                                        'id_token token',
+                                                                        'code id_token',
+                                                                        'code token',
+                                                                        'code id_token token'],
+                                           'revocation_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/revoke',
+                                           'revocation_endpoint_auth_methods_supported': ['private_key_jwt',
+                                                                                          'client_secret_basic',
+                                                                                          'client_secret_post',
+                                                                                          'tls_client_auth',
+                                                                                          'client_secret_jwt'],
+                                           'revocation_endpoint_auth_signing_alg_values_supported': ['PS384',
+                                                                                                     'ES384',
+                                                                                                     'RS384',
+                                                                                                     'HS256',
+                                                                                                     'HS512',
+                                                                                                     'ES256',
+                                                                                                     'RS256',
+                                                                                                     'HS384',
+                                                                                                     'ES512',
+                                                                                                     'PS256',
+                                                                                                     'PS512',
+                                                                                                     'RS512'],
+                                           'scopes_supported': ['openid',
+                                                                'web-origins',
+                                                                'offline_access',
+                                                                'address',
+                                                                'phone',
+                                                                'microprofile-jwt',
+                                                                'roles',
+                                                                'profile',
+                                                                'email'],
+                                           'subject_types_supported': ['public', 'pairwise'],
+                                           'tls_client_certificate_bound_access_tokens': 'true',
+                                           'token_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/token',
+                                           'token_endpoint_auth_methods_supported': ['private_key_jwt',
+                                                                                     'client_secret_basic',
+                                                                                     'client_secret_post',
+                                                                                     'tls_client_auth',
+                                                                                     'client_secret_jwt'],
+                                           'token_endpoint_auth_signing_alg_values_supported': ['PS384',
+                                                                                                'ES384',
+                                                                                                'RS384',
+                                                                                                'HS256',
+                                                                                                'HS512',
+                                                                                                'ES256',
+                                                                                                'RS256',
+                                                                                                'HS384',
+                                                                                                'ES512',
+                                                                                                'PS256',
+                                                                                                'PS512',
+                                                                                                'RS512'],
+                                           'userinfo_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/userinfo',
+                                           'userinfo_signing_alg_values_supported': ['PS384',
+                                                                                     'ES384',
+                                                                                     'RS384',
+                                                                                     'HS256',
+                                                                                     'HS512',
+                                                                                     'ES256',
+                                                                                     'RS256',
+                                                                                     'HS384',
+                                                                                     'ES512',
+                                                                                     'PS256',
+                                                                                     'PS512',
+                                                                                     'RS512',
+                                                                                     'none']},
+                                                      'other': {
+                                                          'authorization_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth',
+                                                          'backchannel_authentication_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/ext/ciba/auth',
+                                                          'backchannel_logout_session_supported': 'true',
+                                                          'backchannel_logout_supported': 'true',
+                                                          'backchannel_token_delivery_modes_supported': ['poll'],
+                                                          'check_session_iframe': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/login-status-iframe.html',
+                                                          'claim_types_supported': ['normal'],
+                                                          'claims_parameter_supported': 'true',
+                                                          'claims_supported': ['aud',
+                                                                               'sub',
+                                                                               'iss',
+                                                                               'auth_time',
+                                                                               'name',
+                                                                               'given_name',
+                                                                               'family_name',
+                                                                               'preferred_username',
+                                                                               'email',
+                                                                               'acr'],
+                                                          'code_challenge_methods_supported': ['plain', 'S256'],
+                                                          'device_authorization_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth/device',
+                                                          'end_session_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/logout',
+                                                          'grant_types_supported': ['authorization_code',
+                                                                                    'implicit',
+                                                                                    'refresh_token',
+                                                                                    'password',
+                                                                                    'client_credentials',
+                                                                                    'urn:ietf:params:oauth:grant-type:device_code',
+                                                                                    'urn:openid:params:grant-type:ciba'],
+                                                          'id_token_encryption_alg_values_supported': ['RSA-OAEP',
+                                                                                                       'RSA-OAEP-256',
+                                                                                                       'RSA1_5'],
+                                                          'id_token_encryption_enc_values_supported': ['A256GCM',
+                                                                                                       'A192GCM',
+                                                                                                       'A128GCM',
+                                                                                                       'A128CBC-HS256',
+                                                                                                       'A192CBC-HS384',
+                                                                                                       'A256CBC-HS512'],
+                                                          'id_token_signing_alg_values_supported': ['PS384',
+                                                                                                    'ES384',
+                                                                                                    'RS384',
+                                                                                                    'HS256',
+                                                                                                    'HS512',
+                                                                                                    'ES256',
+                                                                                                    'RS256',
+                                                                                                    'HS384',
+                                                                                                    'ES512',
+                                                                                                    'PS256',
+                                                                                                    'PS512',
+                                                                                                    'RS512'],
+                                                          'introspection_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/token/introspect',
+                                                          'introspection_endpoint_auth_methods_supported': [
+                                                              'private_key_jwt',
+                                                              'client_secret_basic',
+                                                              'client_secret_post',
+                                                              'tls_client_auth',
+                                                              'client_secret_jwt'],
+                                                          'introspection_endpoint_auth_signing_alg_values_supported': [
+                                                              'PS384',
+                                                              'ES384',
+                                                              'RS384',
+                                                              'HS256',
+                                                              'HS512',
+                                                              'ES256',
+                                                              'RS256',
+                                                              'HS384',
+                                                              'ES512',
+                                                              'PS256',
+                                                              'PS512',
+                                                              'RS512'],
+                                                          'issuer': 'http://localhost:8080/auth/realms/master',
+                                                          'jwks_uri': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/certs',
+                                                          'registration_endpoint': 'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect',
+                                                          'request_object_signing_alg_values_supported': ['PS384',
+                                                                                                          'ES384',
+                                                                                                          'RS384',
+                                                                                                          'HS256',
+                                                                                                          'HS512',
+                                                                                                          'ES256',
+                                                                                                          'RS256',
+                                                                                                          'HS384',
+                                                                                                          'ES512',
+                                                                                                          'PS256',
+                                                                                                          'PS512',
+                                                                                                          'RS512',
+                                                                                                          'none'],
+                                                          'request_parameter_supported': 'true',
+                                                          'request_uri_parameter_supported': 'true',
+                                                          'require_request_uri_registration': 'true',
+                                                          'response_modes_supported': ['query',
+                                                                                       'fragment',
+                                                                                       'form_post'],
+                                                          'response_types_supported': ['code',
+                                                                                       'none',
+                                                                                       'id_token',
+                                                                                       'token',
+                                                                                       'id_token token',
+                                                                                       'code id_token',
+                                                                                       'code token',
+                                                                                       'code id_token token'],
+                                                          'revocation_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/revoke',
+                                                          'revocation_endpoint_auth_methods_supported': [
+                                                              'private_key_jwt',
+                                                              'client_secret_basic',
+                                                              'client_secret_post',
+                                                              'tls_client_auth',
+                                                              'client_secret_jwt'],
+                                                          'revocation_endpoint_auth_signing_alg_values_supported': [
+                                                              'PS384',
+                                                              'ES384',
+                                                              'RS384',
+                                                              'HS256',
+                                                              'HS512',
+                                                              'ES256',
+                                                              'RS256',
+                                                              'HS384',
+                                                              'ES512',
+                                                              'PS256',
+                                                              'PS512',
+                                                              'RS512'],
+                                                          'scopes_supported': ['openid',
+                                                                               'web-origins',
+                                                                               'offline_access',
+                                                                               'address',
+                                                                               'phone',
+                                                                               'microprofile-jwt',
+                                                                               'roles',
+                                                                               'profile',
+                                                                               'email'],
+                                                          'subject_types_supported': ['public', 'pairwise'],
+                                                          'tls_client_certificate_bound_access_tokens': 'true',
+                                                          'token_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/token',
+                                                          'token_endpoint_auth_methods_supported': ['private_key_jwt',
+                                                                                                    'client_secret_basic',
+                                                                                                    'client_secret_post',
+                                                                                                    'tls_client_auth',
+                                                                                                    'client_secret_jwt'],
+                                                          'token_endpoint_auth_signing_alg_values_supported': ['PS384',
+                                                                                                               'ES384',
+                                                                                                               'RS384',
+                                                                                                               'HS256',
+                                                                                                               'HS512',
+                                                                                                               'ES256',
+                                                                                                               'RS256',
+                                                                                                               'HS384',
+                                                                                                               'ES512',
+                                                                                                               'PS256',
+                                                                                                               'PS512',
+                                                                                                               'RS512'],
+                                                          'userinfo_endpoint': 'http://localhost:8080/auth/realms/master/protocol/openid-connect/userinfo',
+                                                          'userinfo_signing_alg_values_supported': ['PS384',
+                                                                                                    'ES384',
+                                                                                                    'RS384',
+                                                                                                    'HS256',
+                                                                                                    'HS512',
+                                                                                                    'ES256',
+                                                                                                    'RS256',
+                                                                                                    'HS384',
+                                                                                                    'ES512',
+                                                                                                    'PS256',
+                                                                                                    'PS512',
+                                                                                                    'RS512',
+                                                                                                    'none']}}}
