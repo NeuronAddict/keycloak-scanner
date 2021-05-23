@@ -1,8 +1,12 @@
+from typing import TypeVar, Generic
+
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.session_holder import SessionHolder
 
+T = TypeVar('T')
 
-class Scanner(SessionHolder, PrintLogger):
+
+class Scanner(Generic[T], SessionHolder, PrintLogger):
 
     def __init__(self, base_url: str, **kwargs):
         self.base_url_ = base_url
@@ -20,7 +24,8 @@ class Scanner(SessionHolder, PrintLogger):
         super().info(f'Start logger {self.name()}')
         assert not hasattr(super(), 'init_scan')
 
-    def perform(self, scan_properties):
+
+    def perform(self, **kwargs) -> T:
         """
         Perform the scan
         :return: scan result (json)
