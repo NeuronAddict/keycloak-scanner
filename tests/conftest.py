@@ -4,8 +4,8 @@ import requests
 from _pytest.fixtures import fixture
 from requests import Session
 
-from keycloak_scanner.scanners.clients_scanner import Client
-from keycloak_scanner.scanners.realm_scanner import Realm
+from keycloak_scanner.scanners.clients_scanner import Client, Clients
+from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
 from tests.mock_response import MockResponse
 
@@ -22,10 +22,10 @@ def well_known_json() -> dict:
 @fixture()
 def well_known_dict(master_realm: Realm, other_realm: Realm, well_known_json: dict) -> WellKnownDict:
     # TODO: master wk json in all
-    return {
+    return WellKnownDict({
         'master': WellKnown(realm=master_realm, name='master', url='http://localhost:8080/auth/realms/master/.well-known/openid-configuration', json=well_known_json),
         'other': WellKnown(realm=master_realm, name='other', url='http://localhost:8080/auth/realms/other/.well-known/openid-configuration', json=well_known_json)
-    }
+    })
 
 
 @fixture
@@ -41,6 +41,10 @@ def master_realm(master_realm_json: dict) -> Realm:
 @fixture
 def other_realm_json() -> dict:
     return {"realm":"other","public_key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwbbkdpQ9J5QR4nmfNL6y/+3PaIKzoeUIa1oRI1QlmXgtD/mCURhdVi52S0xQ8XGy2HIsrrct/G6rVMPDBzqa2bdKP0uB6iuuBmeH/RyJlMCdrXYTZjG5uWt6SlI7462966iqGYq1o3crHbSnLr/9OFIJD2zFBEYJZ2Xbd9IRcGpwpCSKJ5YAs1EnmLQrEBHxdLsQyIiHy5yU8bT5otgyS4tvn0UiY04zOonsvH5XmzvaZ77fo6DV8GY79eqCECiBF2OHUhZ7GjZfcHlKzeCS4vEODntPc/FzV+eqDkv9/ikDwJ9KHsLbIUkR9Ob2JE7jHg0a76CF2N/z8tztFAruawIDAQAB","token-service":"http://localhost:8080/auth/realms/other/protocol/openid-connect","account-service":"http://localhost:8080/auth/realms/other/account","tokens-not-before":0}
+
+@fixture
+def all_realms(master_realm: Realm, other_realm: Realm) -> Realms:
+    return Realms([master_realm, other_realm])
 
 
 @fixture
@@ -58,6 +62,11 @@ def client2() -> Client:
 
 
 @fixture
+def all_clients(client1: Client, client2: Client) -> Clients:
+    return Clients([client1, client2])
+
+
+@fixture
 def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json) -> Session:
     def get_mock_response(url, params={}, allow_redirects=True):
         responses = {
@@ -66,7 +75,7 @@ def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json)
             'http://localhost:8080/auth/realms/master': MockResponse(status_code=200, response=master_realm_json),
             'http://localhost:8080/auth/realms/other': MockResponse(status_code=200, response=other_realm_json),
             'http://localhost:8080/auth/realms/other/.well-known/openid-configuration': MockResponse(status_code=200,
-                                                                                               response=well_known_json),
+                                                                                                     response=well_known_json),
             'http://localhost:8080/auth/realms/master/client1': MockResponse(status_code=200, response='coucou'),
             'http://localhost:8080/auth/realms/master/client2': MockResponse(status_code=200, response='coucou'),
             'http://localhost:8080/auth/realms/other/client1': MockResponse(status_code=200, response='coucou'),
