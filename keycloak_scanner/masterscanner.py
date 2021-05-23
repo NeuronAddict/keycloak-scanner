@@ -31,6 +31,11 @@ class ScanResults(PrintLogger):
     def __repr__(self):
         return repr(self.results)
 
+
+class NoneResultException(Exception):
+    pass
+
+
 class MasterScanner(PrintLogger):
 
     def __init__(self, scans: List[Scanner], previous_deps: Dict[str, Any] = None, verbose=False, **kwargs):
@@ -44,11 +49,21 @@ class MasterScanner(PrintLogger):
 
         # TODO: return code when error
         for scanner in self.scans:
+
             try:
                 result = scanner.perform(**self.results.results)
+
+                if result is None:
+                    super().warn(f'None result for scanner {scanner.name()}')
+                    raise NoneResultException()
+
+                if hasattr(result, '__len__') and len(result) == 0:
+                    super().warn(f'Result of {scanner.name()} as no results (void list), subsequent scans can be void too.')
                 self.results.add(result)
+
             except TypeError as e:
-                print(f'Missing dependency for {scanner.__class__.__name__}: ({repr(e)}). '
+                print(f'Missing dependency for {scanner.__class__.__name__}: ({str(e)}). '
                       f'A required previous scanner as fail.')
+
             except Exception as e:
-                print(f'Failed scan : {scanner.__class__.__name__}: ({repr(e)}). ')
+                print(f'Failed scan : {scanner.__class__.__name__}: ({str(e)}). ')
