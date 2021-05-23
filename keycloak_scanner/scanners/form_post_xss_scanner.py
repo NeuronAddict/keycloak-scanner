@@ -1,11 +1,13 @@
-from .scan import Scan
-from .custom_logging import verbose, find
+from keycloak_scanner.scanners.scanner import Scanner
+from keycloak_scanner.custom_logging import find
 
 
+class FormPostXssScanner(Scanner):
 
-class FormPostXssScan(Scan):
+    def __init__(self, **kwars):
+        super().__init__(**kwars)
 
-    def perform(self, launch_properties, scan_properties):
+    def perform(self, scan_properties):
 
         realms = scan_properties['realms'].keys()
 
@@ -13,14 +15,14 @@ class FormPostXssScan(Scan):
             clients = scan_properties['clients'][realm]
             well_known = scan_properties['wellknowns'][realm]
             if 'form_post' not in well_known['response_modes_supported']:
-                verbose('post_form not in supported response types, can\' test CVE-2018-14655 for realm {}'.format(realm))
+                super().verbose('post_form not in supported response types, can\' test CVE-2018-14655 for realm {}'.format(realm))
             else:
                 url = well_known['authorization_endpoint']
 
                 for client in clients:
 
                     payload = 'af0ifjsldkj"/><script type="text/javascript">alert(1)</script> <p class="'
-                    r = self.session.get(url, params={
+                    r = super().session().get(url, params={
                             'state': payload,
                             'response_type': 'token',
                             'response_mode': 'form_post',

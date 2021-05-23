@@ -6,14 +6,14 @@ import requests
 import urllib3
 
 from keycloak_scanner import custom_logging
-from keycloak_scanner.clients_scanner import ClientScan
-from keycloak_scanner.form_post_xss_scan import FormPostXssScan
-from keycloak_scanner.none_sign_scan import NoneSignScan
-from keycloak_scanner.open_redirect_scanner import OpenRedirectScan
-from keycloak_scanner.realm_scanner import RealmScanner
-from keycloak_scanner.scanner import Scanner
-from keycloak_scanner.security_console_scanner import SecurityConsoleScan
-from keycloak_scanner.well_known_scanner import WellKnownScan
+from keycloak_scanner.scanners.clients_scanner import ClientScanner
+from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
+from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
+from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
+from keycloak_scanner.scanners.realm_scanner import RealmScanner
+from keycloak_scanner.masterscanner import MasterScanner
+from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
+from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
 
 
 def parser():
@@ -52,6 +52,7 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
 
     return parser
 
+
 def main():
 
     args = parser().parse_args()
@@ -73,23 +74,15 @@ def start(args, session: requests.Session):
         session.verify = False
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-    SCANS = [
-        RealmScanner(),
-        WellKnownScan(),
-        ClientScan(),
-        SecurityConsoleScan(),
-        OpenRedirectScan(),
-        FormPostXssScan(),
-        NoneSignScan()
-    ]
-
-    scanner = Scanner({
-        'base_url': args.base_url,
-        'realms': realms,
-        'clients': clients,
-        'username': args.username,
-        'password': args.password
-    }, session=session, scans=SCANS)
+    scanner = MasterScanner(scans=[
+        RealmScanner(base_url=args.base_url, session=session, realms=realms),
+        WellKnownScanner(base_url=args.base_url, session=session),
+        ClientScanner(base_url=args.base_url, session=session, clients=clients),
+        SecurityConsoleScanner(base_url=args.base_url, session=session),
+        OpenRedirectScanner(base_url=args.base_url, session=session),
+        FormPostXssScanner(base_url=args.base_url, session=session),
+        NoneSignScanner(base_url=args.base_url, session=session)
+    ])
     scanner.start()
 
     if args.verbose:
