@@ -1,5 +1,6 @@
 from typing import List
 
+from keycloak_scanner.logging.vuln_flag import VoidFlag
 from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need2
@@ -24,7 +25,7 @@ class Client:
         return NotImplemented
 
 
-class Clients(List[Client]):
+class Clients(List[Client], VoidFlag):
     pass
 
 

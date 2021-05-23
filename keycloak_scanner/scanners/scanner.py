@@ -1,9 +1,10 @@
 from typing import TypeVar, Generic
 
 from keycloak_scanner.logging.printlogger import PrintLogger
+from keycloak_scanner.logging.vuln_flag import VoidFlag
 from keycloak_scanner.scanners.session_holder import SessionHolder
 
-T = TypeVar('T')
+T = TypeVar('T', bound=VoidFlag)
 
 
 class Scanner(Generic[T], SessionHolder, PrintLogger):
