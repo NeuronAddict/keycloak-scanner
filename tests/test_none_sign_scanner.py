@@ -35,12 +35,4 @@ def test_perform(base_url: str, full_scan_mock_session: Session, all_realms: Rea
     ]
 
     assert scanner.verboses == [{'color': 'grey',
-  'message': 'No secret for realm <master, '
-             "http://localhost:8080/auth/realms/master, {'realm': 'master', "
-             "'public_key': "
-             "'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwbbkdpQ9J5QR4nmfNL6y/+3PaIKzoeUIa1oRI1QlmXgtD/mCURhdVi52S0xQ8XGy2HIsrrct/G6rVMPDBzqa2bdKP0uB6iuuBmeH/RyJlMCdrXYTZjG5uWt6SlI7462966iqGYq1o3crHbSnLr/9OFIJD2zFBEYJZ2Xbd9IRcGpwpCSKJ5YAs1EnmLQrEBHxdLsQyIiHy5yU8bT5otgyS4tvn0UiY04zOonsvH5XmzvaZ77fo6DV8GY79eqCECiBF2OHUhZ7GjZfcHlKzeCS4vEODntPc/FzV+eqDkv9/ikDwJ9KHsLbIUkR9Ob2JE7jHg0a76CF2N/z8tztFAruawIDAQAB', "
-             "'token-service': "
-             "'http://localhost:8080/auth/realms/master/protocol/openid-connect', "
-             "'account-service': "
-             "'http://localhost:8080/auth/realms/master/account', "
-             "'tokens-not-before': 0}>"}]
+  'message': 'No secret for realm master'}]
