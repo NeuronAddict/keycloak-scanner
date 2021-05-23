@@ -1,21 +1,45 @@
+from typing import List, Dict
+
 from keycloak_scanner.custom_logging import find
 from keycloak_scanner.scanners.scanner import Scanner
+from keycloak_scanner.scanners.scanner_pieces import Need, Need3
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
 
-class OpenRedirectScanner(Scanner):
+class WellKnown:
+
+    def __init__(self, json: dict):
+        self.json = json
+
+    def __getitem__(self, key) -> dict:
+        return self.json[key]
+
+
+Realms = List[str]
+
+Clients = List[str]
+
+
+class OpenRedirect:
+
+    def __init__(self):
+        self.results: Dict[str, bool] = {}
+
+    def find(self, realm: str, value: bool):
+        self.results[realm] = value
+
+
+class OpenRedirectScanner(Need3[WellKnown, Realms, Clients], Scanner[OpenRedirect]):
 
     def __init__(self, **kwars):
         super().__init__(**kwars)
 
-    def perform(self, scan_properties):
+    def perform(self, well_known: WellKnown, realms: Realms, clients: Clients, **kwargs) -> OpenRedirect:
 
-        realms = scan_properties['realms'].keys()
+        ret = OpenRedirect()
 
         for realm in realms:
-            clients = scan_properties['clients'][realm]
-            well_known = scan_properties['wellknowns'][realm]
             if 'code' not in well_known['response_types_supported']:
                 super().verbose('code not in supported response types, can\' test redirect_uri for realm {}'.format(realm))
             else:
@@ -31,4 +55,8 @@ class OpenRedirectScanner(Scanner):
 
                     if r.status_code == 200:
                         find('OpenRedirection', 'Open redirection for realm {} and clientid {}'.format(realm, client))
+                        ret.find(f'{realm}-{client}', True)
+                    else:
+                        ret.find(f'{realm}-{client}', False)
 
+        return ret
