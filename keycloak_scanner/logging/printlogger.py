@@ -17,3 +17,6 @@ class PrintLogger(RootLogger):
         if self.verbose:
             print(colored('[VERBOSE] {}'.format(message), color))
         super().verbose(message, color)
+
+    def find(self, scanner: str, message: str, color='red'):
+        super().find(scanner, message, color)
