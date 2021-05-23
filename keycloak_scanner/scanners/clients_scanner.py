@@ -18,7 +18,7 @@ class Client:
         self.auth_endpoint = auth_endpoint
 
     def __repr__(self):
-        return f'<Client {self.name}, {self.url}, {self.auth_endpoint}>'
+        return f"Client('{self.name}', '{self.url}', '{self.auth_endpoint}')"
 
     def __eq__(self, other):
         if isinstance(other, Client):

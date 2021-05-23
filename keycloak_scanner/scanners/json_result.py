@@ -6,7 +6,7 @@ class JsonResult:
         self.json = json
 
     def __repr__(self):
-        return f'<{self.name}, {self.url}, {self.json}>'
+        return f"{self.__class__.__name__}('{self.name}', '{self.url}', {self.json})"
 
     def __eq__(self, other):
         if isinstance(other, JsonResult):

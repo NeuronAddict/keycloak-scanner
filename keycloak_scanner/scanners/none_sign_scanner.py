@@ -17,7 +17,7 @@ class NoneSignResult:
         self.is_vulnerable = is_vulnerable
 
     def __repr__(self):
-        return f'<NoneSignResult {self.realm.name}, vulnerable : {self.is_vulnerable}>'
+        return f'NoneSignResult({repr(self.realm)}, {self.is_vulnerable})'
 
     def __eq__(self, other):
         if isinstance(other, NoneSignResult):

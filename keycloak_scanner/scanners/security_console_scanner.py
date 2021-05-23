@@ -17,6 +17,14 @@ class SecurityConsoleResult:
         self.json = json
         self.secret = secret
 
+    def __eq__(self, other):
+        if isinstance(other, SecurityConsoleResult):
+            return self.realm == other.realm and self.url == other.url and self.json == other.json and self.secret == other.secret
+        return NotImplemented
+
+    def __repr__(self):
+        return f"SecurityConsoleResult({repr(self.realm)}, '{self.url}', '{self.json}', '{self.secret}')"
+
 
 class SecurityConsoleResults(Dict[str, SecurityConsoleResult]):
     pass
