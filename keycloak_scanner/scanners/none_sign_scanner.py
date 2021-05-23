@@ -1,12 +1,11 @@
 from typing import Dict
 
-from keycloak_scanner.custom_logging import find
 from keycloak_scanner.jwt_attack import change_to_none
 from keycloak_scanner.keycloak_api import KeyCloakApi
 from keycloak_scanner.scanners.clients_scanner import Clients
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.scanner_pieces import Need3, Need4
+from keycloak_scanner.scanners.scanner_pieces import Need4
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
