@@ -1,20 +1,17 @@
-from unittest.mock import MagicMock
+from requests import Session
 
-import requests
+from keycloak_scanner.scanners.clients_scanner import Client
+from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
+from keycloak_scanner.scanners.realm_scanner import Realm
+from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
-from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner, WellKnown
-from tests.mock_response import MockResponse
 
+def test_perform(base_url: str, full_scan_mock_session: Session, master_realm: Realm, other_realm: Realm,
+                 client1: Client, client2: Client, well_known_dict: WellKnownDict):
 
-def test_perform(well_known: dict):
+    open_redirect_scanner = OpenRedirectScanner(base_url=base_url, session=full_scan_mock_session)
 
-    session = requests.Session()
-    session.get = MagicMock(return_value=MockResponse(status_code=200, response={}))
+    result = open_redirect_scanner.perform(realms=[master_realm, other_realm], clients=[client1, client1],
+                                           well_known_dict=well_known_dict)
 
-    open_redirect_scanner = OpenRedirectScanner(base_url='http://localhost', session=session)
-
-    wk = WellKnown(well_known)
-
-    result = open_redirect_scanner.perform(wk, ['master'], ['client1'])
-
-    assert result.results == {'master-client1': True}
+    assert result.results == {'master-client1': True, 'other-client1': True}
