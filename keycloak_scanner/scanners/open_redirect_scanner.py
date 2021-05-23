@@ -12,11 +12,21 @@ URL_PATTERN = '{}/auth/realms/{}/{}'
 
 class OpenRedirect:
 
-    def __init__(self):
-        self.results: Dict[str, bool] = {}
+    def __init__(self, results=None):
+        if results is None:
+            results = {}
+        self.results: Dict[str, bool] = results
 
     def find(self, realm: str, value: bool):
         self.results[realm] = value
+
+    def __eq__(self, other):
+        if isinstance(other, OpenRedirect):
+            return self.results == other.results
+        return NotImplemented
+
+    def __repr__(self):
+        return f'OpenRedirect({repr(self.results)})'
 
 
 class OpenRedirectScanner(Need3[WellKnownDict, Realms, Clients], Scanner[OpenRedirect]):
