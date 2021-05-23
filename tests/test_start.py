@@ -19,22 +19,11 @@ class MockResponse:
                 }
 
 
-# TODO : factorize this conf
-@fixture
-def well_known():
-    return MockResponse()
 
-
-def test_start(well_known):
-
-    session = requests.Session()
-    session.get = MagicMock(return_value=well_known)
-    session.post = MagicMock()
-    session.put = MagicMock()
-    session.delete = MagicMock()
+def test_start(full_scan_mock_session):
 
     p = parser()
 
-    args = p.parse_args(['http://localhost', '--realms', 'test-realm', '--clients', 'test-client', '--username', 'username', '--password', 'password', '--no-fail', '--verbose'])
+    args = p.parse_args(['http://testscan', '--realms', 'other', '--clients', 'client1,client2', '--username', 'username', '--password', 'password', '--no-fail', '--verbose'])
 
-    start(args, session)
+    start(args, full_scan_mock_session)
