@@ -4,10 +4,15 @@ import requests
 from _pytest.fixtures import fixture
 from requests import Session
 
+from keycloak_scanner.scanners.clients_scanner import Client
 from keycloak_scanner.scanners.realm_scanner import Realm
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
 from tests.mock_response import MockResponse
 
+
+@fixture
+def base_url() -> str:
+    return 'http://localhost:8080'
 
 @fixture
 def well_known_json() -> dict:
@@ -44,8 +49,17 @@ def other_realm(other_realm_json: dict) -> Realm:
 
 
 @fixture
+def client1() -> Client:
+    return Client(name='client1', url='http://localhost:8080/auth/realms/master/client1', auth_endpoint='http://localhost:8080/auth/realms/master/protocol/openid-connect/auth')
+
+@fixture
+def client2() -> Client:
+    return Client(name='client2', url='http://localhost:8080/auth/realms/master/client2', auth_endpoint='http://localhost:8080/auth/realms/master/protocol/openid-connect/auth')
+
+
+@fixture
 def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json) -> Session:
-    def get_mock_response(url, params={}):
+    def get_mock_response(url, params={}, allow_redirects=True):
         responses = {
             'http://testscan/auth/realms/master/.well-known/openid-configuration': MockResponse(status_code=200,
                                                                                                 response=well_known_json),
@@ -53,10 +67,10 @@ def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json)
             'http://testscan/auth/realms/other': MockResponse(status_code=200, response=other_realm_json),
             'http://testscan/auth/realms/other/.well-known/openid-configuration': MockResponse(status_code=200,
                                                                                                response=well_known_json),
-            'http://testscan/auth/realms/master/client1': MockResponse(status_code=200, response='coucou'),
-            'http://testscan/auth/realms/master/client2': MockResponse(status_code=200, response='coucou'),
-            'http://testscan/auth/realms/other/client1': MockResponse(status_code=200, response='coucou'),
-            'http://testscan/auth/realms/other/client2': MockResponse(status_code=200, response='coucou'),
+            'http://localhost:8080/auth/realms/master/client1': MockResponse(status_code=200, response='coucou'),
+            'http://localhost:8080/auth/realms/master/client2': MockResponse(status_code=200, response='coucou'),
+            'http://localhost:8080/auth/realms/other/client1': MockResponse(status_code=200, response='coucou'),
+            'http://localhost:8080/auth/realms/other/client2': MockResponse(status_code=200, response='coucou'),
             'http://testscan/auth/realms/master/clients-registrations/default/security-admin-console': MockResponse(
                 status_code=401, response={"error": "invalid_token",
                                            "error_description": "Not authorized to view client. Not valid token or client credentials provided."}),
