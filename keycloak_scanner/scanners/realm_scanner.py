@@ -1,13 +1,17 @@
-from typing import List
+from typing import List, NewType
 
 from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.scanner import Scanner
 
 URL_PATTERN = '{}/auth/realms/{}'
 
-Realm = JsonResult
 
-Realms = List[Realm]
+class Realm(JsonResult):
+    pass
+
+
+class Realms(List[Realm]):
+    pass
 
 
 class RealmScanner(Scanner[Realms]):
@@ -22,7 +26,7 @@ class RealmScanner(Scanner[Realms]):
 
     def perform(self):
 
-        realms: Realms = []
+        realms: Realms = Realms([])
 
         for realm_name in self.realms:
 
