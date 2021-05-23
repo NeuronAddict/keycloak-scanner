@@ -22,6 +22,7 @@ def well_known_dict(master_realm: Realm, other_realm: Realm, well_known_json: di
         'other': WellKnown(realm=master_realm, name='other', url='http://testscan/auth/realms/other/.well-known/openid-configuration', json=well_known_json)
     }
 
+
 @fixture
 def master_realm_json() -> dict:
     return {"realm":"master","public_key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwbbkdpQ9J5QR4nmfNL6y/+3PaIKzoeUIa1oRI1QlmXgtD/mCURhdVi52S0xQ8XGy2HIsrrct/G6rVMPDBzqa2bdKP0uB6iuuBmeH/RyJlMCdrXYTZjG5uWt6SlI7462966iqGYq1o3crHbSnLr/9OFIJD2zFBEYJZ2Xbd9IRcGpwpCSKJ5YAs1EnmLQrEBHxdLsQyIiHy5yU8bT5otgyS4tvn0UiY04zOonsvH5XmzvaZ77fo6DV8GY79eqCECiBF2OHUhZ7GjZfcHlKzeCS4vEODntPc/FzV+eqDkv9/ikDwJ9KHsLbIUkR9Ob2JE7jHg0a76CF2N/z8tztFAruawIDAQAB","token-service":"http://localhost:8080/auth/realms/master/protocol/openid-connect","account-service":"http://localhost:8080/auth/realms/master/account","tokens-not-before":0}
@@ -31,10 +32,10 @@ def master_realm_json() -> dict:
 def master_realm(master_realm_json: dict) -> Realm:
     return Realm('master', 'http://testscan/auth/realms/master', json=master_realm_json)
 
+
 @fixture
 def other_realm_json() -> dict:
     return {"realm":"other","public_key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwbbkdpQ9J5QR4nmfNL6y/+3PaIKzoeUIa1oRI1QlmXgtD/mCURhdVi52S0xQ8XGy2HIsrrct/G6rVMPDBzqa2bdKP0uB6iuuBmeH/RyJlMCdrXYTZjG5uWt6SlI7462966iqGYq1o3crHbSnLr/9OFIJD2zFBEYJZ2Xbd9IRcGpwpCSKJ5YAs1EnmLQrEBHxdLsQyIiHy5yU8bT5otgyS4tvn0UiY04zOonsvH5XmzvaZ77fo6DV8GY79eqCECiBF2OHUhZ7GjZfcHlKzeCS4vEODntPc/FzV+eqDkv9/ikDwJ9KHsLbIUkR9Ob2JE7jHg0a76CF2N/z8tztFAruawIDAQAB","token-service":"http://localhost:8080/auth/realms/other/protocol/openid-connect","account-service":"http://localhost:8080/auth/realms/other/account","tokens-not-before":0}
-
 
 
 @fixture
