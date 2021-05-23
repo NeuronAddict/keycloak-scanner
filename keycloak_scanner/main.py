@@ -5,7 +5,7 @@ import sys
 import requests
 import urllib3
 
-from keycloak_scanner import custom_logging
+
 from keycloak_scanner.scanners.clients_scanner import ClientScanner
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
 from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
@@ -65,8 +65,6 @@ def start(args, session: requests.Session):
     realms = args.realms.split(',') if args.realms else []
     clients = args.clients.split(',') if args.clients else []
 
-    custom_logging.verbose_mode = args.verbose
-
     if args.proxy:
         session = {'http': args.proxy, 'https': args.proxy}
 
@@ -82,10 +80,14 @@ def start(args, session: requests.Session):
         OpenRedirectScanner(base_url=args.base_url, session=session),
         FormPostXssScanner(base_url=args.base_url, session=session),
         NoneSignScanner(base_url=args.base_url, session=session)
-    ])
-    scanner.start()
+    ], verbose=args.verbose)
+    status = scanner.start()
 
-    if not args.no_fail and custom_logging.has_vuln:
+    if not args.no_fail and status.has_vulns:
         print('Fail with exit code 4 because vulnerabilities are discovered')
         sys.exit(4)
+
+    if status.has_error:
+        print('No vulns but error(s) are returned, exit with code 8')
+        sys.exit(8)
 

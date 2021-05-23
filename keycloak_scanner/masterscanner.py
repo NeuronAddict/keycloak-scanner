@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Sized
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.scanner import Scanner
@@ -36,6 +36,13 @@ class NoneResultException(Exception):
     pass
 
 
+class ScanStatus:
+
+    def __init__(self, has_error=False, has_vulns=False):
+        self.has_error = has_error
+        self.has_vulns = has_vulns
+
+
 class MasterScanner(PrintLogger):
 
     def __init__(self, scans: List[Scanner], previous_deps: Dict[str, Any] = None, verbose=False, **kwargs):
@@ -45,25 +52,36 @@ class MasterScanner(PrintLogger):
         self.results = ScanResults(previous_deps, verbose=verbose)
         super().__init__(verbose=verbose, **kwargs)
 
-    def start(self):
+    def start(self) -> ScanStatus:
 
-        # TODO: return code when error
+        has_errors = False
+        has_vuln = False
+
         for scanner in self.scans:
 
+            super().info(f'Start scanner {scanner.name()}...')
+
             try:
+
                 result = scanner.perform(**self.results.results)
 
                 if result is None:
                     super().warn(f'None result for scanner {scanner.name()}')
                     raise NoneResultException()
 
-                if hasattr(result, '__len__') and len(result) == 0:
+                if isinstance(result, Sized) and len(result) == 0:
                     super().warn(f'Result of {scanner.name()} as no results (void list), subsequent scans can be void too.')
+
+                has_errors = has_errors or result.has_vuln
                 self.results.add(result)
 
             except TypeError as e:
                 print(f'Missing dependency for {scanner.__class__.__name__}: ({str(e)}). '
                       f'A required previous scanner as fail.')
+                has_errors = True
 
             except Exception as e:
                 print(f'Failed scan : {scanner.__class__.__name__}: ({str(e)}). ')
+                has_errors = True
+
+        return ScanStatus(has_errors, has_vuln)
