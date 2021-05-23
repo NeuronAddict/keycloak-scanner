@@ -49,6 +49,7 @@ def test_start_open_redirect(well_known: dict):
 
     ms.start()
 
+
 def test_camel_case():
     assert to_camel_case('ClassName') == 'class_name'
     assert to_camel_case('WellKnown') == 'well_known'
