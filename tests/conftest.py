@@ -15,9 +15,11 @@ def well_known_json() -> dict:
 
 
 @fixture()
-def well_known_dict(well_known_json: dict) -> WellKnownDict:
+def well_known_dict(master_realm: Realm, other_realm: Realm, well_known_json: dict) -> WellKnownDict:
+    # TODO: master wk json in all
     return {
-        'master': WellKnown(name='master', url='http://testscan/auth/realms/master/.well-known/openid-configuration', json=well_known_json)
+        'master': WellKnown(realm=master_realm, name='master', url='http://testscan/auth/realms/master/.well-known/openid-configuration', json=well_known_json),
+        'other': WellKnown(realm=master_realm, name='other', url='http://testscan/auth/realms/other/.well-known/openid-configuration', json=well_known_json)
     }
 
 @fixture
