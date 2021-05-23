@@ -9,13 +9,13 @@ from tests.mock_response import MockPrintLogger
 
 
 def test_perform(base_url: str, full_scan_mock_session: Session, all_realms: Realms, all_clients: Clients,
-                 well_known_dict: WellKnownDict, security_console_results: SecurityConsoleResults, master_realm: Realm, other_realm: Realm):
-
+                 well_known_dict: WellKnownDict, security_console_results: SecurityConsoleResults, master_realm: Realm,
+                 other_realm: Realm):
     class TestNoneSignScanner(NoneSignScanner, MockPrintLogger):
         pass
 
     scanner = TestNoneSignScanner(username='user', password='password', base_url=base_url,
-                              session=full_scan_mock_session)
+                                  session=full_scan_mock_session)
 
     scanner.init_scan()
     result = scanner.perform(realms=all_realms, clients=all_clients, well_known_dict=well_known_dict,
@@ -35,4 +35,4 @@ def test_perform(base_url: str, full_scan_mock_session: Session, all_realms: Rea
     ]
 
     assert scanner.verboses == [{'color': 'grey',
-  'message': 'No secret for realm master'}]
+                                 'message': 'No secret for realm master'}]

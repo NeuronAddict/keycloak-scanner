@@ -1,7 +1,6 @@
 from typing import Dict
 
 from keycloak_scanner.custom_logging import find
-from keycloak_scanner.properties import add_kv
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need
