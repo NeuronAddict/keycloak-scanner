@@ -26,7 +26,8 @@ class Client:
         return NotImplemented
 
 
-Clients = List[Client]
+class Clients(List[Client]):
+    pass
 
 
 class ClientScanner(Need2[Realms, WellKnownDict], Scanner[Clients]):

@@ -16,7 +16,8 @@ class WellKnown(JsonResult):
         super().__init__(**kwargs)
 
 
-WellKnownDict = Dict[str, WellKnown]
+class WellKnownDict(Dict[str, WellKnown]):
+    pass
 
 
 class WellKnownScanner(Need[Realms], Scanner):
