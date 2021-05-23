@@ -1,11 +1,9 @@
 from typing import List
 
-from keycloak_scanner.properties import add_list
-from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need2
-from keycloak_scanner.scanners.well_known_scanner import WellKnown, WellKnownDict
+from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
