@@ -1,6 +1,7 @@
 import re
 from typing import List, Dict, Any
 
+from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.scanner import Scanner
 
 
@@ -8,23 +9,42 @@ def to_camel_case(text: str):
     return re.sub('([a-z]+)([A-Z])', r'\1_\2', text).lower()
 
 
-class MasterScanner:
+class DuplicateResultException(Exception):
+    pass
 
-    def __init__(self, scans: List[Scanner], previous_deps=None):
+
+class ScanResults(PrintLogger):
+
+    def __init__(self, previous_deps: Dict[str, Any], **kwargs):
+        if previous_deps is None:
+            previous_deps = {}
+        self.results: Dict[str, Any] = previous_deps
+        super().__init__(**kwargs)
+
+    def add(self, result: Any):
+        key = to_camel_case(result.__class__.__name__)
+        if key in self.results:
+            raise DuplicateResultException(result)
+        super().verbose(f'new result with key: {key} ({result})')
+        self.results[key] = result
+
+
+class MasterScanner(PrintLogger):
+
+    def __init__(self, scans: List[Scanner], previous_deps: Dict[str, Any] = None, verbose=False, **kwargs):
         if previous_deps is None:
             previous_deps = {}
         self.scans = scans
-        self.previous_deps = previous_deps
+        self.results = ScanResults(previous_deps, verbose=verbose)
+        super().__init__(verbose=verbose, **kwargs)
 
     def start(self):
-
-        results = self.previous_deps
 
         # TODO: return code when error
         for scanner in self.scans:
             try:
-                result = scanner.perform(**results)
-                results[result.__class__.__name__] = result
+                result = scanner.perform(**self.results.results)
+                self.results.add(result)
             except TypeError as e:
                 print(f'Missing dependency for {scanner.__class__.__name__}: ({repr(e)}). '
                       f'A required previous scanner as fail.')
