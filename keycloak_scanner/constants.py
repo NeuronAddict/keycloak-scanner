@@ -1,7 +1,3 @@
-DEFAULT_REALMS = [
-    'master'
-]
-
 DEFAULT_CLIENTS = [
     'account',
     'admin-cli',
