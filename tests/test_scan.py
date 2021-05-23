@@ -17,7 +17,7 @@ from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner, WellK
 
 
 class TestScanner(Scanner):
-    def perform(self, scan_properties):
+    def perform(self):
         super().session().get(super().base_url())
 
 
