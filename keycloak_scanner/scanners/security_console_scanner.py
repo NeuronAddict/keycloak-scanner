@@ -1,6 +1,6 @@
 from typing import Dict
 
-from keycloak_scanner.logging.vuln_flag import VulnFlag
+from keycloak_scanner.custom_logging import find
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need
@@ -25,7 +25,7 @@ class SecurityConsoleResult:
         return f"SecurityConsoleResult({repr(self.realm)}, '{self.url}', '{self.json}', '{self.secret}')"
 
 
-class SecurityConsoleResults(Dict[str, SecurityConsoleResult], VulnFlag):
+class SecurityConsoleResults(Dict[str, SecurityConsoleResult]):
     pass
 
 
@@ -48,7 +48,7 @@ class SecurityConsoleScanner(Need[Realms], Scanner[SecurityConsoleResult]):
                 super().verbose('Bad status code for {}: {}'.format(url, r.status_code))
 
             else:
-                super().find('SecurityAdminConsole', 'Find a security-admin-console {}: {}'.format(url, r.status_code))
+                find('SecurityAdminConsole', 'Find a security-admin-console {}: {}'.format(url, r.status_code))
                 results[realm.name] = SecurityConsoleResult(realm, url, r.json())
 
                 if 'secret' in r.json():
