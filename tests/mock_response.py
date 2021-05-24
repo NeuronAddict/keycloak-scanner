@@ -18,11 +18,13 @@ class MockResponse:
         else:
             raise Exception(f'response spec is not json ({self.response})')
 
+
 class MockPrintLogger(PrintLogger):
 
     def __init__(self, **kwargs):
         self.infos = []
         self.verboses = []
+        self.warns = []
         super().__init__(**kwargs)
 
     def info(self, message: str):
@@ -32,3 +34,7 @@ class MockPrintLogger(PrintLogger):
     def verbose(self, message: str, color='grey'):
         self.verboses.append({'message': message, 'color': color})
         super().verbose(message, color)
+
+    def warn(self, message: str):
+        self.warns.append(message)
+        super().warn(message)
