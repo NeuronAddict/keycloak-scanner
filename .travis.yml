@@ -17,7 +17,7 @@ install:
 
 script:
 - pytest
-- pip install . && keycloak-scanner --help
+- pip install --use-feature=in-tree-build . && keycloak-scanner --help
 
 deploy:
   - provider: pypi
