@@ -9,7 +9,8 @@ from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 def test_perform(base_url: str, all_realms: Realms, all_clients: Clients, well_known_dict: WellKnownDict,
                  full_scan_mock_session: requests.Session):
 
-    scanner = LoginScanner(base_url=base_url, session=full_scan_mock_session, username='admin', password='pa55w0rd')
+    scanner = LoginScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session, username='admin',
+                           password='pa55w0rd')
 
     result, vf = scanner.perform(realms=all_realms, clients=all_clients, well_known_dict=well_known_dict)
 

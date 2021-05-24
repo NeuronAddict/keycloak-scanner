@@ -41,6 +41,9 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
         self.password = password
         super().__init__(**kwargs)
 
+    def give_session(self):
+        return super().session()
+
     def perform(self, realms: Realms, clients: Clients, well_known_dict: WellKnownDict, **kwargs) \
             -> (CredentialDict, VulnFlag):
 
@@ -50,21 +53,25 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
 
             for client in clients:
 
-                session = super().session()
-                kapi = KeyCloakApi(session, well_known_dict[realm.name].json, verbose=super().is_verbose())
+                well_known = well_known_dict[realm.name]
 
-                # TODO : get client secret
-                try:
-                    access_token, refresh_token = kapi.get_token(client.name, '', self.username, self.password)
+                for grant_type in well_known.allowed_grants():
 
-                    super().find(self.name(), f'Can login with username {self.username} on realm {realm.name}, '
-                                              f'client {client.name}')
-                    super().verbose(f'access_token: {access_token}, refresh_token: {refresh_token}, '
-                                    f'password: {self.password}')
+                    kapi = KeyCloakApi(well_known.json, verbose=super().is_verbose(),
+                                       session_provider=self.give_session)
 
-                    results[f'{realm.name}-{client.name}'] = Credential(realm, client, self.username, self.password)
+                    # TODO : get client secret
+                    try:
+                        access_token, refresh_token = kapi.get_token(client.name, '', self.username, self.password, grant_type=grant_type)
 
-                except HTTPError as e:
-                    super().warn(f'HTTP error when login : {e}')
+                        super().find(self.name(), f'Can login with username {self.username} on realm {realm.name}, '
+                                                  f'client {client.name}, grant_type: {grant_type}')
+                        super().verbose(f'access_token: {access_token}, refresh_token: {refresh_token}, '
+                                        f'password: {self.password}')
+
+                        results[f'{realm.name}-{client.name}'] = Credential(realm, client, self.username, self.password)
+
+                    except HTTPError as e:
+                        super().warn(f'HTTP error when login : {e}')
 
         return results, VulnFlag(False)
