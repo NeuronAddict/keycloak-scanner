@@ -8,6 +8,7 @@
 - Send warn in stderr
 - Fix various bugs
 - Better log when find something
+- Provide version (--version option)
 
 ## Version 1.0.2
 
