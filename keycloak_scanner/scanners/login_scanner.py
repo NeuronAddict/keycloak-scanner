@@ -51,7 +51,7 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
             for client in clients:
 
                 session = super().session()
-                kapi = KeyCloakApi(session, well_known_dict[realm.name].json)
+                kapi = KeyCloakApi(session, well_known_dict[realm.name].json, verbose=super().is_verbose())
 
                 # TODO : get client secret
                 try:
