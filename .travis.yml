@@ -5,11 +5,7 @@ git:
 
 cache: pip
 
-python:
-- '3.6'
-- '3.7'
-- '3.8'
-- '3.9'
+
 
 install:
 - pip install -r dev-requirements.txt
@@ -18,7 +14,14 @@ install:
 jobs:
   include:
     - script: pytest tests/
+      python:
+        - '3.6'
+        - '3.7'
+        - '3.8'
+        - '3.9'
     - script: pytest itests/
+      python:
+        - 3.8
       env: ITESTS=true
       before_script: docker-compose -f itests/docker-compose.yml up -d && python itests/wait-docker-compose.py
       after_script: docker-compose -f itests/docker-compose.yml down
