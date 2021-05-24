@@ -14,6 +14,7 @@ from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
 from keycloak_scanner.scanners.realm_scanner import RealmScanner
 from keycloak_scanner.masterscanner import MasterScanner
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
+from keycloak_scanner.scanners.session_holder import SessionProvider
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
 
 
@@ -58,17 +59,17 @@ def main():
 
     args = parser().parse_args()
 
-    start(args, requests.Session())
+    start(args, lambda: requests.Session())
 
 
-def start(args, session: requests.Session):
+def start(args, initial_session_provider: SessionProvider):
 
     realms = args.realms.split(',') if args.realms else []
     clients = args.clients.split(',') if args.clients else []
 
     def session_provider() -> requests.session():
 
-        session = requests.session()
+        session = initial_session_provider()
 
         if args.proxy:
             session.proxies = {'http': args.proxy, 'https': args.proxy}
@@ -76,6 +77,8 @@ def start(args, session: requests.Session):
         if args.ssl_noverify:
             session.verify = False
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+        return session
 
     common_args = {
         'base_url': args.base_url,
