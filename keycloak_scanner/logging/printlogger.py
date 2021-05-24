@@ -17,7 +17,7 @@ class PrintLogger(RootLogger):
         print('[INFO] {}'.format(message))
         super().info(message)
 
-    def verbose(self, message: str, color='grey'):
+    def verbose(self, message: str, color='blue'):
         if self.verbose:
             print(colored('[VERBOSE] {}'.format(message), color))
         super().verbose(message, color)
