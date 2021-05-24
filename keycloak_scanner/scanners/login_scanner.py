@@ -72,6 +72,6 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
                         results[f'{realm.name}-{client.name}'] = Credential(realm, client, self.username, self.password)
 
                     except HTTPError as e:
-                        super().warn(f'HTTP error when login : {e}')
+                        super().verbose(f'HTTP error when login : {e}')
 
         return results, VulnFlag(False)
