@@ -15,8 +15,17 @@ install:
 - pip install -r dev-requirements.txt
 - pip install -r requirements.txt
 
+jobs:
+  include:
+    - script: pytest tests/
+    - script: pytest itests/
+      env: ITESTS=true
+      before_script: docker-compose -f itests/docker-compose.yml up -d && python itests/wait-docker-compose.py
+      after_script: docker-compose -f itests/docker-compose.yml down
+
+
 script:
-- pytest
+- pytest tests/
 - pip install . && keycloak-scanner --help
 
 deploy:
