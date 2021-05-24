@@ -3,12 +3,18 @@ from unittest.mock import MagicMock
 import requests
 from _pytest.fixtures import fixture
 from requests import Session
+import logging
+import http.client
 
+from keycloak_scanner.logging.http_logging import httpclient_logging_patch
 from keycloak_scanner.scanners.clients_scanner import Client, Clients
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults, SecurityConsoleResult
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
 from tests.mock_response import MockResponse
+
+
+httpclient_logging_patch()
 
 
 @fixture
