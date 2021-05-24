@@ -74,14 +74,14 @@ def start(args, session: requests.Session):
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     scanner = MasterScanner(scans=[
-        RealmScanner(base_url=args.base_url, session=session, realms=realms),
-        WellKnownScanner(base_url=args.base_url, session=session),
-        ClientScanner(base_url=args.base_url, session=session, clients=clients),
-        LoginScanner(base_url=args.base_url, session=session, username=args.username, password=args.password),
-        SecurityConsoleScanner(base_url=args.base_url, session=session),
-        OpenRedirectScanner(base_url=args.base_url, session=session),
-        FormPostXssScanner(base_url=args.base_url, session=session),
-        NoneSignScanner(base_url=args.base_url, session=session)
+        RealmScanner(base_url=args.base_url, session=session, realms=realms, verbose=args.verbose),
+        WellKnownScanner(base_url=args.base_url, session=session, verbose=args.verbose),
+        ClientScanner(base_url=args.base_url, session=session, clients=clients, verbose=args.verbose),
+        LoginScanner(base_url=args.base_url, session=session, username=args.username, password=args.password, verbose=args.verbose),
+        SecurityConsoleScanner(base_url=args.base_url, session=session, verbose=args.verbose),
+        OpenRedirectScanner(base_url=args.base_url, session=session, verbose=args.verbose),
+        FormPostXssScanner(base_url=args.base_url, session=session, verbose=args.verbose),
+        NoneSignScanner(base_url=args.base_url, session=session, verbose=args.verbose)
     ], verbose=args.verbose)
     status = scanner.start()
 
