@@ -2,6 +2,7 @@ import re
 from typing import List, Dict, Any, Sized
 
 from keycloak_scanner.logging.printlogger import PrintLogger
+from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.scanner import Scanner
 
 
@@ -55,6 +56,7 @@ class MasterScanner(PrintLogger):
     def start(self) -> ScanStatus:
 
         has_errors = False
+        vf = VulnFlag()
 
         for scanner in self.scans:
 
@@ -64,6 +66,9 @@ class MasterScanner(PrintLogger):
 
                 result, has_vuln = scanner.perform(**self.results.results)
 
+                if has_vuln.has_vuln:
+                    vf.set_vuln()
+
                 if result is None:
                     super().warn(f'None result for scanner {scanner.name()}')
                     raise NoneResultException()
@@ -71,7 +76,6 @@ class MasterScanner(PrintLogger):
                 if isinstance(result, Sized) and len(result) == 0:
                     super().warn(f'Result of {scanner.name()} as no results (void list), subsequent scans can be void too.')
 
-                has_errors = has_errors or result.has_vuln
                 self.results.add(result)
 
             except TypeError as e:
@@ -83,4 +87,4 @@ class MasterScanner(PrintLogger):
                 print(f'Failed scan : {scanner.__class__.__name__}: ({str(e)}). ')
                 has_errors = True
 
-        return ScanStatus(has_errors, has_vuln.has_vuln)
+        return ScanStatus(has_errors, vf.has_vuln)

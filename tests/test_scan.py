@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 import requests
 from requests import Session
 
+from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.masterscanner import MasterScanner
 from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner, FormPostXssResult
@@ -33,7 +34,7 @@ class TestScanner(Scanner[TestResult], MockPrintLogger):
 class TestScannerList(Scanner[TestResultList], MockPrintLogger):
     def perform(self):
         super().session().get(super().base_url())
-        return TestResultList()
+        return TestResultList(), VulnFlag(True)
 
 
 class TestMasterScanner(MasterScanner, MockPrintLogger):
