@@ -1,3 +1,5 @@
+import sys
+
 from termcolor import colored
 
 from keycloak_scanner.logging.root_logger import RootLogger
@@ -10,7 +12,7 @@ class PrintLogger(RootLogger):
         super().__init__(**kwargs)
 
     def warn(self, message: str):
-        print(f'[WARN] {message}')
+        print(f'[WARN] {message}', file=sys.stderr)
         super().warn(message)
 
     def info(self, message: str):
