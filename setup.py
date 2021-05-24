@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='keycloak-scanner',
-      version='1.0.1',
+      version='1.0.2',
       description='Keycloak vulnerabilities scanner',
       url='http://github.com/neuronaddict/keycloak-scanner',
       author='neuronaddict',
