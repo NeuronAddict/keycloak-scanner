@@ -1,4 +1,3 @@
-from typing import Callable
 from urllib.parse import urlparse, parse_qs
 
 import requests
@@ -6,22 +5,17 @@ from bs4 import BeautifulSoup
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.clients_scanner import Client
+from keycloak_scanner.scanners.session_holder import SessionHolder
 
-SessionProvider = Callable[[], requests.Session]
 
+class KeyCloakApi(PrintLogger, SessionHolder):
 
-class KeyCloakApi(PrintLogger):
-
-    def __init__(self, well_known: dict, session_provider: SessionProvider, **kwargs):
-        self.session_provider = session_provider
+    def __init__(self, well_known: dict, **kwargs):
         self.well_known = well_known
         super().__init__(**kwargs)
 
-    def try_auth(self, username: str, password: str):
-        r = self.session_provider().get(self.well_known['authorization_endpoint'])
-
     def get_token(self, client_id: str, client_secret: str, username: str, password: str, grant_type='password'):
-        r = self.session_provider().post(self.well_known['token_endpoint'],
+        r = super().session().post(self.well_known['token_endpoint'],
                               data={
                                   'client_id': client_id,
                                   'username': username,
@@ -37,14 +31,14 @@ class KeyCloakApi(PrintLogger):
 
     def refresh(self, client, refresh_token):
         data = {'refresh_token': refresh_token, 'grant_type': 'refresh_token', 'client_id': client}
-        r = self.session_provider().post(self.well_known['token_endpoint'], data=data)
+        r = super().session().post(self.well_known['token_endpoint'], data=data)
         r.raise_for_status()
         res = r.json()
         return res['access_token'], res['refresh_token']
 
     def auth(self, client: Client, username: str, password: str, redirect_uri: str) -> requests.Response:
 
-        session = self.session_provider()
+        session = super().session()
 
         url = self.well_known['authorization_endpoint']
 
