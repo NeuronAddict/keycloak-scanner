@@ -1,5 +1,4 @@
 import argparse
-import json
 import sys
 
 import requests
@@ -16,6 +15,7 @@ from keycloak_scanner.masterscanner import MasterScanner
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
 from keycloak_scanner.scanners.session_holder import SessionProvider
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
+from keycloak_scanner._version import __version__
 
 
 def parser():
@@ -51,7 +51,7 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
     parser.add_argument('--no-fail', action='store_true',
                         help='Always exit with code 0 (by default, fail with an exit code 4 if a vulnerability is discovered). '
                              'Do NOT fail before all test are done.')
-
+    parser.add_argument('--version', action='version', version=f'keycloak-scanner {__version__}. https://github.com/NeuronAddict/keycloak-scanner.')
     return parser
 
 
