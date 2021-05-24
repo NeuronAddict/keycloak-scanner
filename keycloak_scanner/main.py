@@ -66,18 +66,22 @@ def start(args, session: requests.Session):
     realms = args.realms.split(',') if args.realms else []
     clients = args.clients.split(',') if args.clients else []
 
+    def session_provider() -> requests.session():
+
+        session = requests.session()
+
+        if args.proxy:
+            session.proxies = {'http': args.proxy, 'https': args.proxy}
+
+        if args.ssl_noverify:
+            session.verify = False
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     common_args = {
         'base_url': args.base_url,
         'verbose': args.verbose,
-        'session_spec': {}
+        'session_provider': session_provider
     }
-
-    if args.proxy:
-        common_args['session_spec']['proxies'] = {'http': args.proxy, 'https': args.proxy}
-
-    if args.ssl_noverify:
-        common_args['session_spec']['verify'] = False
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     scanner = MasterScanner(scans=[
         RealmScanner(realms=realms, **common_args),
