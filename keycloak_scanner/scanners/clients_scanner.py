@@ -48,7 +48,7 @@ class ClientScanner(Need2[Realms, WellKnownDict], Scanner[Clients]):
                     r.raise_for_status()
 
                 except Exception as e:
-                    super().info('f [ClientScanner]: {e}')
+                    super().info(f'[ClientScanner]: {e}')
                     url = None
 
                 try:

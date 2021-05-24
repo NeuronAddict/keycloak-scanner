@@ -57,7 +57,7 @@ class FormPostXssScanner(Need3[Realms, Clients, WellKnownDict], Scanner[FormPost
                             'state': payload,
                             'response_type': 'token',
                             'response_mode': 'form_post',
-                            'client_id': client,
+                            'client_id': client.name,
                             'nonce': 'csa3hMlvybERqcieLH'
                          })
 

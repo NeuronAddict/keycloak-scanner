@@ -50,7 +50,7 @@ class OpenRedirectScanner(Need3[WellKnownDict, Realms, Clients], Scanner[OpenRed
 
                     r = super().session().get(url, params={
                         'response_type': 'code',
-                        'client_id': client,
+                        'client_id': client.name,
                         'redirect_uri': f'https://devops-devsecops.org/auth/{realm.name}/{client.name}/'
                     })
 
