@@ -19,7 +19,9 @@ def test_start(base_url: str, session: Session, capsys):
 
     captured = capsys.readouterr()
 
-    assert captured.err == ''
+    assert captured.err == '[WARN] Result of LoginScanner as no results (void list), subsequent scans can be void too.\n' \
+                           '[WARN] Result of SecurityConsoleScanner as no results (void list), subsequent scans can be void too.\n'
+
     assert 'Find realm master' in captured.out
 
     assert 'Public key for realm master : ' in captured.out
