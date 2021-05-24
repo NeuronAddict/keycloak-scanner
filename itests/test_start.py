@@ -12,7 +12,7 @@ def test_start(base_url: str, session: Session, capsys):
 
     p = parser()
 
-    args = p.parse_args([base_url, '--realms', 'master', '--clients', 'account,account-console,admin-cli,broker,master-realm,security-admin-console', '--proxy', 'http://localhost:8118',
+    args = p.parse_args([base_url, '--realms', 'master', '--clients', 'account,account-console,admin-cli,broker,master-realm,security-admin-console',
                          '--username', 'admin', '--password', 'pa55w0rd', '--verbose'])
 
     start(args, lambda: session)
