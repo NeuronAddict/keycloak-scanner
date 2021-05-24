@@ -1,5 +1,9 @@
 # changelog
 
+## Version 1.0.2
+
+- hotfix : issue #20
+
 ## Version 1.0.1
 
 - Script available in pip (pip install keycloak-scanner)
