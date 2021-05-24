@@ -4,6 +4,7 @@ import requests
 from requests import HTTPError
 
 from keycloak_scanner.keycloak_api import KeyCloakApi
+from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.clients_scanner import Clients, Client
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
@@ -40,7 +41,8 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
         self.password = password
         super().__init__(**kwargs)
 
-    def perform(self, realms: Realms, clients: Clients, well_known_dict: WellKnownDict, **kwargs) -> CredentialDict:
+    def perform(self, realms: Realms, clients: Clients, well_known_dict: WellKnownDict, **kwargs) \
+            -> (CredentialDict, VulnFlag):
 
         results = CredentialDict()
 
@@ -65,4 +67,4 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
                 except HTTPError as e:
                     super().warn(f'HTTP error when login : {e}')
 
-        return results
+        return results, VulnFlag(False)
