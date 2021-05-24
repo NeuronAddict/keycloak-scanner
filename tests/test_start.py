@@ -1,29 +1,17 @@
-import argparse
-from unittest.mock import MagicMock
+import pytest
+from requests import Session
 
-import requests
-from pytest import fixture
-
-from keycloak_scanner.main import start
 from keycloak_scanner.main import parser
-
-class MockResponse:
-    status_code = 200
-
-    text = 'coucou'
-
-    def json(self):
-        return {'response_types_supported': ['code'],
-                'authorization_endpoint': 'http://testscan/auth',
-                'response_modes_supported': ['form_post']
-                }
+from keycloak_scanner.main import start
 
 
-
-def test_start(full_scan_mock_session):
+def test_start(base_url: str, full_scan_mock_session: Session):
 
     p = parser()
 
-    args = p.parse_args(['http://testscan', '--realms', 'other', '--clients', 'client1,client2', '--username', 'username', '--password', 'password', '--no-fail', '--verbose'])
+    args = p.parse_args([base_url, '--realms', 'other', '--clients', 'client1,client2',
+                         '--username', 'username', '--password', 'password', '--verbose'])
 
-    start(args, full_scan_mock_session)
+    with pytest.raises(SystemExit):
+
+        start(args, full_scan_mock_session)
