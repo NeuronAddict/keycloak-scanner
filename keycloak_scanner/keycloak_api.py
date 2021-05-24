@@ -1,8 +1,9 @@
+import requests
 
 
 class KeyCloakApi:
 
-    def __init__(self, session, well_known):
+    def __init__(self, session: requests.Session, well_known: dict):
         self.session = session
         self.well_known = well_known
 
