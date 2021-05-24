@@ -17,15 +17,20 @@ from tests.mock_response import MockResponse
 
 def test_start(base_url: str, full_scan_mock_session: Session):
 
+    common_args = {
+        'base_url': base_url,
+        'session_provider': lambda: full_scan_mock_session
+    }
+
     ms = MasterScanner(scans=[
-        RealmScanner(base_url=base_url, session=full_scan_mock_session, realms=['master', 'other']),
-        WellKnownScanner(base_url=base_url, session=full_scan_mock_session),
-        ClientScanner(base_url=base_url, session=full_scan_mock_session, clients=['client1', 'client2']),
-        LoginScanner(base_url=base_url, session=full_scan_mock_session, username='admin', password='admin'),
-        SecurityConsoleScanner(base_url=base_url, session=full_scan_mock_session),
-        OpenRedirectScanner(base_url=base_url, session=full_scan_mock_session),
-        FormPostXssScanner(base_url=base_url, session=full_scan_mock_session),
-        NoneSignScanner(base_url=base_url, session=full_scan_mock_session)
+        RealmScanner(**common_args, realms=['master', 'other']),
+        WellKnownScanner(**common_args),
+        ClientScanner(**common_args, clients=['client1', 'client2']),
+        LoginScanner(**common_args, username='admin', password='admin'),
+        SecurityConsoleScanner(**common_args),
+        OpenRedirectScanner(**common_args),
+        FormPostXssScanner(**common_args),
+        NoneSignScanner(**common_args)
     ])
 
     status = ms.start()
@@ -39,7 +44,7 @@ def test_start_open_redirect(well_known_dict):
     session = requests.Session()
     session.get = MagicMock(return_value=MockResponse(status_code=200, response={}))
 
-    open_redirect_scanner = OpenRedirectScanner(base_url='http://localhost', session=session)
+    open_redirect_scanner = OpenRedirectScanner(base_url='http://localhost', session_provider=lambda: session)
 
     ms = MasterScanner(scans=[open_redirect_scanner], previous_deps={
         'realms': ['master'],

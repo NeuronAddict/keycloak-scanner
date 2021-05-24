@@ -8,7 +8,7 @@ from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
 def test_perform(base_url, full_scan_mock_session: Session, all_realms: Realms, all_clients: Clients,
                  well_known_dict: WellKnownDict, master_realm: Realm, other_realm: Realm):
-    scanner = FormPostXssScanner(base_url=base_url, session=full_scan_mock_session)
+    scanner = FormPostXssScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session)
 
     result, vf = scanner.perform(realms=all_realms, clients=all_clients, well_known_dict=well_known_dict)
 

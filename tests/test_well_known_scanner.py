@@ -6,7 +6,7 @@ from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner, WellK
 
 def test_perform(base_url: str, all_realms: Realms, full_scan_mock_session: Session, well_known_dict: WellKnownDict):
 
-    scanner = WellKnownScanner(base_url=base_url, session=full_scan_mock_session)
+    scanner = WellKnownScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session)
 
     result, vf = scanner.perform(all_realms)
 
