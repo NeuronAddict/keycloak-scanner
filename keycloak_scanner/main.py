@@ -66,22 +66,28 @@ def start(args, session: requests.Session):
     realms = args.realms.split(',') if args.realms else []
     clients = args.clients.split(',') if args.clients else []
 
+    common_args = {
+        'base_url': args.base_url,
+        'verbose': args.verbose,
+        'session_spec': {}
+    }
+
     if args.proxy:
         session = {'http': args.proxy, 'https': args.proxy}
 
     if args.ssl_noverify:
-        session.verify = False
+        common_args['session_spec']['verify'] = False
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     scanner = MasterScanner(scans=[
-        RealmScanner(base_url=args.base_url, session=session, realms=realms, verbose=args.verbose),
-        WellKnownScanner(base_url=args.base_url, session=session, verbose=args.verbose),
-        ClientScanner(base_url=args.base_url, session=session, clients=clients, verbose=args.verbose),
-        LoginScanner(base_url=args.base_url, session=session, username=args.username, password=args.password, verbose=args.verbose),
-        SecurityConsoleScanner(base_url=args.base_url, session=session, verbose=args.verbose),
-        OpenRedirectScanner(base_url=args.base_url, session=session, verbose=args.verbose),
-        FormPostXssScanner(base_url=args.base_url, session=session, verbose=args.verbose),
-        NoneSignScanner(base_url=args.base_url, session=session, verbose=args.verbose)
+        RealmScanner(realms=realms, **common_args),
+        WellKnownScanner(**common_args),
+        ClientScanner(clients=clients, **common_args),
+        LoginScanner(username=args.username, password=args.password, **common_args),
+        SecurityConsoleScanner(**common_args),
+        OpenRedirectScanner(**common_args),
+        FormPostXssScanner(**common_args),
+        NoneSignScanner(**common_args)
     ], verbose=args.verbose)
     status = scanner.start()
 
