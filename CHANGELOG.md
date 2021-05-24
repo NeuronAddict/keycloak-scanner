@@ -4,7 +4,9 @@
 
 - Script available in pip (pip install keycloak-scanner)
 - Fix error on verbose mode
-
+- Support for scan dependencies
+- Return code 4 when vuln, 8 when no vuln but errors
+- Fix bugs
 
 ## version 0.2.0
 
