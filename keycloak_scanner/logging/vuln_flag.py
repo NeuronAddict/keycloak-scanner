@@ -12,7 +12,7 @@ class VoidFlag:
 
 class VulnFlag(VoidFlag):
 
-    def __init__(self, **kwargs):
+    def __init__(self, has_vuln=False, **kwargs):
         self.has_vuln = False
         super().__init__(**kwargs)
 

@@ -1,6 +1,6 @@
 from typing import Dict
 
-from keycloak_scanner.custom_logging import find
+from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need
@@ -37,9 +37,10 @@ class SecurityConsoleScanner(Need[Realms], Scanner[SecurityConsoleResult]):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def perform(self, realms: Realms, **kwargs) -> SecurityConsoleResults:
+    def perform(self, realms: Realms, **kwargs) -> (SecurityConsoleResults, VulnFlag):
 
         results = SecurityConsoleResults()
+        vf = VulnFlag()
 
         for realm in realms:
             url = URL_PATTERN.format(super().base_url(), realm.name)
@@ -48,12 +49,12 @@ class SecurityConsoleScanner(Need[Realms], Scanner[SecurityConsoleResult]):
                 super().verbose('Bad status code for {}: {}'.format(url, r.status_code))
 
             else:
-                find('SecurityAdminConsole', 'Find a security-admin-console {}: {}'.format(url, r.status_code))
+                super().find('SecurityAdminConsole', 'Find a security-admin-console {}: {}'.format(url, r.status_code))
                 results[realm.name] = SecurityConsoleResult(realm, url, r.json())
-
+                vf.set_vuln()
                 if 'secret' in r.json():
                     secret = r.json()["secret"]
                     super().info(f'find a secret in security console (realm {realm.name}) : {secret}')
                     results[realm.name].secret = secret
 
-        return results
+        return results, vf

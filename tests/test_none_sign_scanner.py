@@ -18,7 +18,7 @@ def test_perform(base_url: str, full_scan_mock_session: Session, all_realms: Rea
                                   session=full_scan_mock_session)
 
     scanner.init_scan()
-    result = scanner.perform(realms=all_realms, clients=all_clients, well_known_dict=well_known_dict,
+    result, vf = scanner.perform(realms=all_realms, clients=all_clients, well_known_dict=well_known_dict,
                              security_console_results=security_console_results)
 
     assert result == NoneSignResults({
@@ -36,3 +36,5 @@ def test_perform(base_url: str, full_scan_mock_session: Session, all_realms: Rea
 
     assert scanner.verboses == [{'color': 'grey',
                                  'message': 'No secret for realm master'}]
+
+    assert vf.has_vuln

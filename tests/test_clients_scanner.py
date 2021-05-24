@@ -12,8 +12,10 @@ def test_perform(base_url: str, full_scan_mock_session: Session, master_realm: R
 
     realms = Realms([master_realm])
 
-    result = client_scanner.perform(realms=realms, well_known_dict=well_known_dict)
+    result, vf = client_scanner.perform(realms=realms, well_known_dict=well_known_dict)
 
     assert result == [
         client1, client2
     ]
+
+    assert not vf.has_vuln
