@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.json_result import JsonResult
@@ -14,6 +14,11 @@ class WellKnown(JsonResult):
     def __init__(self, realm: Realm, **kwargs):
         self.realm = realm
         super().__init__(**kwargs)
+
+    def allowed_grants(self) -> List[str]:
+        if 'grant_types_supported' in self.json:
+            return self.json['grant_types_supported']
+        raise Exception('Unable to get allowed grants')
 
     def __repr__(self):
         return f"WellKnown({repr(self.realm)}, name='{self.name}', url='{self.url}', json={self.json})"
