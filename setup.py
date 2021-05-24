@@ -1,10 +1,10 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='keycloak-scanner',
-      version='1.0.1',
+      version='1.0.2',
       description='Keycloak vulnerabilities scanner',
       url='http://github.com/neuronaddict/keycloak-scanner',
       author='neuronaddict',
@@ -17,7 +17,7 @@ setup(name='keycloak-scanner',
           ]
       },
       license='Apache 2.0',
-      packages=['keycloak_scanner'],
+      packages=find_packages(),
       zip_safe=False, install_requires=['requests', 'termcolor', 'pyjwt', 'urllib3'],
       classifiers=[
         "Programming Language :: Python :: 3",
