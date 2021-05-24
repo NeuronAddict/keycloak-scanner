@@ -19,7 +19,7 @@ jobs:
         - '3.7'
         - '3.8'
         - '3.9'
-    - script: pytest -k itests/
+    - script: pytest -k itests
       python:
         - 3.8
       env: ITESTS=true
