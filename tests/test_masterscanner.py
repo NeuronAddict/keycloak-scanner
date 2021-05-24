@@ -6,6 +6,7 @@ from requests import Session
 from keycloak_scanner.masterscanner import MasterScanner, to_camel_case
 from keycloak_scanner.scanners.clients_scanner import ClientScanner
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
+from keycloak_scanner.scanners.login_scanner import LoginScanner
 from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
 from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
 from keycloak_scanner.scanners.realm_scanner import RealmScanner
@@ -20,6 +21,7 @@ def test_start(base_url: str, full_scan_mock_session: Session):
         RealmScanner(base_url=base_url, session=full_scan_mock_session, realms=['master', 'other']),
         WellKnownScanner(base_url=base_url, session=full_scan_mock_session),
         ClientScanner(base_url=base_url, session=full_scan_mock_session, clients=['client1', 'client2']),
+        LoginScanner(base_url=base_url, session=full_scan_mock_session, username='admin', password='admin'),
         SecurityConsoleScanner(base_url=base_url, session=full_scan_mock_session),
         OpenRedirectScanner(base_url=base_url, session=full_scan_mock_session),
         FormPostXssScanner(base_url=base_url, session=full_scan_mock_session),
