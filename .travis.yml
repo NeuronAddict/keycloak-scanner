@@ -3,9 +3,7 @@ language: python
 git:
   quiet: true
 
-cache:
-  directories:
-    - $HOME/.cache/pip
+cache: pip
 
 python:
 - '3.6'
