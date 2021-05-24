@@ -55,7 +55,6 @@ class MasterScanner(PrintLogger):
     def start(self) -> ScanStatus:
 
         has_errors = False
-        has_vuln = False
 
         for scanner in self.scans:
 
@@ -63,7 +62,7 @@ class MasterScanner(PrintLogger):
 
             try:
 
-                result = scanner.perform(**self.results.results)
+                result, has_vuln = scanner.perform(**self.results.results)
 
                 if result is None:
                     super().warn(f'None result for scanner {scanner.name()}')
@@ -84,4 +83,4 @@ class MasterScanner(PrintLogger):
                 print(f'Failed scan : {scanner.__class__.__name__}: ({str(e)}). ')
                 has_errors = True
 
-        return ScanStatus(has_errors, has_vuln)
+        return ScanStatus(has_errors, has_vuln.has_vuln)

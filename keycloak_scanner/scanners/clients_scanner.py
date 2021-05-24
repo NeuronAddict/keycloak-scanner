@@ -1,5 +1,6 @@
 from typing import List
 
+from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need2
@@ -34,7 +35,7 @@ class ClientScanner(Need2[Realms, WellKnownDict], Scanner[Clients]):
         self.clients = clients
         super().__init__(**kwargs)
 
-    def perform(self, realms: Realms, well_known_dict: WellKnownDict, **kwargs) -> Clients:
+    def perform(self, realms: Realms, well_known_dict: WellKnownDict, **kwargs) -> (Clients, VulnFlag):
 
         result: Clients = Clients()
 
@@ -67,4 +68,4 @@ class ClientScanner(Need2[Realms, WellKnownDict], Scanner[Clients]):
 
                 result.append(Client(name=client_name, auth_endpoint=auth_url, url=url))
 
-        return result
+        return result, VulnFlag(False)
