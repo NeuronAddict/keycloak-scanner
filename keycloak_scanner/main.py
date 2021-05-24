@@ -8,6 +8,7 @@ import urllib3
 
 from keycloak_scanner.scanners.clients_scanner import ClientScanner
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
+from keycloak_scanner.scanners.login_scanner import LoginScanner
 from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
 from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
 from keycloak_scanner.scanners.realm_scanner import RealmScanner
@@ -76,6 +77,7 @@ def start(args, session: requests.Session):
         RealmScanner(base_url=args.base_url, session=session, realms=realms),
         WellKnownScanner(base_url=args.base_url, session=session),
         ClientScanner(base_url=args.base_url, session=session, clients=clients),
+        LoginScanner(base_url=args.base_url, session=session, username=args.username, password=args.password),
         SecurityConsoleScanner(base_url=args.base_url, session=session),
         OpenRedirectScanner(base_url=args.base_url, session=session),
         FormPostXssScanner(base_url=args.base_url, session=session),
