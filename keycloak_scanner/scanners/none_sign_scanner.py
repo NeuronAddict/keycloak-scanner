@@ -50,7 +50,7 @@ class NoneSignScanner(Need4[Realms, Clients, WellKnownDict, SecurityConsoleResul
 
             api = KeyCloakApi(super().session(), well_known_dict[realm.name].json)
 
-            if security_console_results[realm.name].secret:
+            if realm.name in security_console_results and security_console_results[realm.name].secret:
                 client_secret = security_console_results[realm.name].secret
 
                 for client in clients:
