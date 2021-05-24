@@ -10,7 +10,7 @@ class KeyCloakApi(PrintLogger):
         self.well_known = well_known
         super().__init__(**kwargs)
 
-    def get_token(self, client_id, client_secret, username, password):
+    def get_token(self, client_id: str, client_secret: str, username: str, password: str):
         r = self.session.post(self.well_known['token_endpoint'],
                               data={
                                   'client_id': client_id,
