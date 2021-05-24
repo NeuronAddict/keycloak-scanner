@@ -2,6 +2,7 @@ from typing import Dict
 
 from keycloak_scanner.jwt_attack import change_to_none
 from keycloak_scanner.keycloak_api import KeyCloakApi
+from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.clients_scanner import Clients
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
@@ -37,9 +38,11 @@ class NoneSignScanner(Need4[Realms, Clients, WellKnownDict, SecurityConsoleResul
         super().__init__(**kwars)
 
     def perform(self, realms: Realms, clients: Clients, well_known_dict: WellKnownDict,
-                security_console_results: SecurityConsoleResults, **kwargs) -> NoneSignResults:
+                security_console_results: SecurityConsoleResults, **kwargs) -> (NoneSignResults, VulnFlag):
 
         results = NoneSignResults()
+
+        vf = VulnFlag()
 
         for realm in realms:
 
@@ -54,8 +57,10 @@ class NoneSignScanner(Need4[Realms, Clients, WellKnownDict, SecurityConsoleResul
                     if self.username is not None:
                         if self.password is not None:
                             is_vulnerable = self.test_none(api, client, client_secret, self.username, self.password)
+                            vf.set_vuln()
                         else:
                             is_vulnerable = self.test_none(api, client, client_secret, self.username, self.username)
+                            vf.set_vuln()
                     else:
                         super().info('No none scan, provide credentials to test jwt none signature')
             else:
@@ -63,7 +68,7 @@ class NoneSignScanner(Need4[Realms, Clients, WellKnownDict, SecurityConsoleResul
 
             results[realm.name] = NoneSignResult(realm, is_vulnerable)
 
-        return results
+        return results, vf
 
     def test_none(self, api, client, client_secret, username, password):
 

@@ -1,5 +1,6 @@
 from typing import Dict
 
+from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.scanner import Scanner
@@ -32,7 +33,7 @@ class WellKnownScanner(Need[Realms], Scanner):
     def __init__(self, **kwars):
         super().__init__(**kwars)
 
-    def perform(self, realms: Realms, **kwargs):
+    def perform(self, realms: Realms, **kwargs) -> (WellKnownDict, VulnFlag):
 
         result: WellKnownDict = WellKnownDict()
 
@@ -48,4 +49,4 @@ class WellKnownScanner(Need[Realms], Scanner):
                 super().info('Find a well known for realm {} {}'.format(realm, url))
                 result[realm.name] = WellKnown(realm, name=realm.name, url=url, json=r.json())
 
-        return result
+        return result, VulnFlag()
