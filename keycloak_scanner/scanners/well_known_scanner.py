@@ -1,6 +1,5 @@
 from typing import Dict
 
-from keycloak_scanner.logging.vuln_flag import VoidFlag
 from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.scanner import Scanner
@@ -24,7 +23,7 @@ class WellKnown(JsonResult):
         return NotImplemented
 
 
-class WellKnownDict(Dict[str, WellKnown], VoidFlag):
+class WellKnownDict(Dict[str, WellKnown]):
     pass
 
 
