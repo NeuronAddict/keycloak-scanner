@@ -11,8 +11,10 @@ def test_perform(base_url: str, full_scan_mock_session: Session, master_realm: R
 
     open_redirect_scanner = OpenRedirectScanner(base_url=base_url, session=full_scan_mock_session)
 
-    result = open_redirect_scanner.perform(realms=Realms([master_realm, other_realm]),
+    result, vf = open_redirect_scanner.perform(realms=Realms([master_realm, other_realm]),
                                            clients=Clients([client1, client1]),
                                            well_known_dict=well_known_dict)
 
     assert result.results == {'master-client1': True, 'other-client1': True}
+
+    assert vf.has_vuln

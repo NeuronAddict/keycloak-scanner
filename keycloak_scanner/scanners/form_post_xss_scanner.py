@@ -1,5 +1,6 @@
 from typing import Dict
 
+from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.clients_scanner import Clients
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
@@ -31,9 +32,11 @@ class FormPostXssScanner(Need3[Realms, Clients, WellKnownDict], Scanner[FormPost
     def __init__(self, **kwars):
         super().__init__(**kwars)
 
-    def perform(self, realms: Realms, clients: Clients, well_known_dict: WellKnownDict, **kwargs) -> FormPostXssResults:
+    def perform(self, realms: Realms, clients: Clients, well_known_dict: WellKnownDict, **kwargs) -> (FormPostXssResults, VulnFlag):
 
         results = FormPostXssResults()
+
+        vf = VulnFlag()
 
         for realm in realms:
 
@@ -62,7 +65,8 @@ class FormPostXssScanner(Need3[Realms, Clients, WellKnownDict], Scanner[FormPost
                         if payload in r.text:
                             super().find('XSS-CVE2018-14655', 'Vulnerable to CVE 2018 14655 realm:{}, client:{}'.format(realm, client))
                             vulnerable = True
+                            vf.set_vuln()
 
             results[realm.name] = FormPostXssResult(realm, vulnerable)
 
-        return results
+        return results, vf

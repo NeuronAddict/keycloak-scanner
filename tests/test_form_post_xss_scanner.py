@@ -10,12 +10,14 @@ def test_perform(base_url, full_scan_mock_session: Session, all_realms: Realms, 
                  well_known_dict: WellKnownDict, master_realm: Realm, other_realm: Realm):
     scanner = FormPostXssScanner(base_url=base_url, session=full_scan_mock_session)
 
-    result = scanner.perform(realms=all_realms, clients=all_clients, well_known_dict=well_known_dict)
+    result, vf = scanner.perform(realms=all_realms, clients=all_clients, well_known_dict=well_known_dict)
 
     assert result == FormPostXssResults({
         'master': FormPostXssResult(master_realm, False),
         'other': FormPostXssResult(other_realm, False)
     })
+
+    assert not vf.has_vuln
 
 
 ## TODO: test when vulnerable

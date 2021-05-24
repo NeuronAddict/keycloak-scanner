@@ -1,5 +1,6 @@
 from typing import List, NewType
 
+from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.scanner import Scanner
 
@@ -24,7 +25,7 @@ class RealmScanner(Scanner[Realms]):
         self.realms = realms
         super().__init__(**kwargs)
 
-    def perform(self):
+    def perform(self) -> (Realms, VulnFlag):
 
         realms: Realms = Realms([])
 
@@ -44,4 +45,4 @@ class RealmScanner(Scanner[Realms]):
                     super().info(f'Public key for realm {realm_name} : {realm.json["public_key"]}')
                 realms.append(realm)
 
-        return realms
+        return realms, VulnFlag()
