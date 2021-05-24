@@ -74,7 +74,7 @@ class NoneSignScanner(Need4[Realms, Clients, WellKnownDict, SecurityConsoleResul
 
         try:
 
-            access_token, refresh_token = api.get_token(client, client_secret, username, password)
+            access_token, refresh_token = api.get_token(client.name, client_secret, username, password)
             super().info(
                 'Got token via password method. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
             none_refresh_token = change_to_none(refresh_token)
