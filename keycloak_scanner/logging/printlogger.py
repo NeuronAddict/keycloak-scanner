@@ -23,4 +23,5 @@ class PrintLogger(RootLogger):
         super().verbose(message, color)
 
     def find(self, scanner: str, message: str, color='red'):
+        print(colored(f'[+] {scanner} - {message}', 'green'))
         super().find(scanner, message, color)
