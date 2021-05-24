@@ -48,7 +48,8 @@ class NoneSignScanner(Need4[Realms, Clients, WellKnownDict, SecurityConsoleResul
 
             is_vulnerable = False
 
-            api = KeyCloakApi(super().session(), well_known_dict[realm.name].json)
+            api = KeyCloakApi(well_known=well_known_dict[realm.name].json, session_provider=super().session,
+                              verbose=super().is_verbose())
 
             if realm.name in security_console_results and security_console_results[realm.name].secret:
                 client_secret = security_console_results[realm.name].secret
