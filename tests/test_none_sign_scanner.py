@@ -15,7 +15,7 @@ def test_perform(base_url: str, full_scan_mock_session: Session, all_realms: Rea
         pass
 
     scanner = TestNoneSignScanner(username='user', password='password', base_url=base_url,
-                                  session=full_scan_mock_session)
+                                  session_provider=lambda: full_scan_mock_session)
 
     scanner.init_scan()
     result, vf = scanner.perform(realms=all_realms, clients=all_clients, well_known_dict=well_known_dict,
