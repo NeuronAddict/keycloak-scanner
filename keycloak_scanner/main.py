@@ -73,7 +73,7 @@ def start(args, session: requests.Session):
     }
 
     if args.proxy:
-        session = {'http': args.proxy, 'https': args.proxy}
+        common_args['session_spec']['proxies'] = {'http': args.proxy, 'https': args.proxy}
 
     if args.ssl_noverify:
         common_args['session_spec']['verify'] = False
