@@ -1,6 +1,6 @@
 from typing import Dict
 
-from keycloak_scanner.logging.vuln_flag import VulnFlag
+from keycloak_scanner.custom_logging import find
 from keycloak_scanner.scanners.clients_scanner import Clients
 from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.scanner import Scanner
@@ -10,13 +10,12 @@ from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 URL_PATTERN = '{}/auth/realms/{}/{}'
 
 
-class OpenRedirect(VulnFlag):
+class OpenRedirect:
 
-    def __init__(self, results=None, **kwargs):
+    def __init__(self, results=None):
         if results is None:
             results = {}
         self.results: Dict[str, bool] = results
-        super().__init__(**kwargs)
 
     def find(self, realm: str, value: bool):
         self.results[realm] = value
@@ -54,7 +53,7 @@ class OpenRedirectScanner(Need3[WellKnownDict, Realms, Clients], Scanner[OpenRed
                     })
 
                     if r.status_code == 200:
-                        super().find('OpenRedirection', f'Open redirection for realm {realm.name} and clientid {client.name}')
+                        find('OpenRedirection', f'Open redirection for realm {realm.name} and clientid {client.name}')
                         ret.find(f'{realm.name}-{client.name}', True)
                     else:
                         ret.find(f'{realm.name}-{client.name}', False)

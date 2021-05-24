@@ -2,7 +2,6 @@ from typing import Dict
 
 from keycloak_scanner.jwt_attack import change_to_none
 from keycloak_scanner.keycloak_api import KeyCloakApi
-from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.clients_scanner import Clients
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
@@ -26,7 +25,7 @@ class NoneSignResult:
         return NotImplemented
 
 
-class NoneSignResults(Dict[str, NoneSignResult], VulnFlag):
+class NoneSignResults(Dict[str, NoneSignResult]):
     pass
 
 

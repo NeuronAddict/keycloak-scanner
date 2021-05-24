@@ -1,6 +1,5 @@
 from typing import Dict
 
-from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.clients_scanner import Clients
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
@@ -23,7 +22,7 @@ class FormPostXssResult:
         return NotImplemented
 
 
-class FormPostXssResults(Dict[str, FormPostXssResult], VulnFlag):
+class FormPostXssResults(Dict[str, FormPostXssResult]):
     pass
 
 

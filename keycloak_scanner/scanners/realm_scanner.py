@@ -1,6 +1,5 @@
 from typing import List, NewType
 
-from keycloak_scanner.logging.vuln_flag import VoidFlag
 from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.scanner import Scanner
 
@@ -11,7 +10,7 @@ class Realm(JsonResult):
     pass
 
 
-class Realms(List[Realm], VoidFlag):
+class Realms(List[Realm]):
     pass
 
 
