@@ -1,5 +1,12 @@
 language: python
 
+git:
+  quiet: true
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
 python:
 - '3.6'
 - '3.7'
@@ -19,6 +26,7 @@ deploy:
     username: __token__
     server: https://test.pypi.org/legacy/
     skip_existing: true
+    skip_cleanup: true
     on:
       branch: develop
     password:
