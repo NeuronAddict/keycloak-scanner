@@ -13,3 +13,6 @@ class RootLogger:
 
     def warn(self, message: str):
         assert not hasattr(super(), 'warn')
+
+    def _is_verbose(self):
+        assert not hasattr(super(), '_is_verbose')
