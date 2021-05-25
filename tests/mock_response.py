@@ -3,10 +3,11 @@ from keycloak_scanner.logging.printlogger import PrintLogger
 
 class MockResponse:
 
-    def __init__(self, status_code, response=None):
+    def __init__(self, status_code, response=None, headers={}):
         self.status_code = status_code
         self.response = response
         self.text = response
+        self.headers = headers
 
     def raise_for_status(self):
         if self.status_code > 399:
