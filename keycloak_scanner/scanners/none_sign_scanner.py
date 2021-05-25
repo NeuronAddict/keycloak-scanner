@@ -48,7 +48,8 @@ class NoneSignScanner(Need4[Realms, Clients, WellKnownDict, SecurityConsoleResul
 
             is_vulnerable = False
 
-            api = KeyCloakApi(super().session(), well_known_dict[realm.name].json)
+            api = KeyCloakApi(well_known=well_known_dict[realm.name].json, session_provider=super().session,
+                              verbose=super().is_verbose())
 
             if realm.name in security_console_results and security_console_results[realm.name].secret:
                 client_secret = security_console_results[realm.name].secret
@@ -74,7 +75,7 @@ class NoneSignScanner(Need4[Realms, Clients, WellKnownDict, SecurityConsoleResul
 
         try:
 
-            access_token, refresh_token = api.get_token(client, client_secret, username, password)
+            access_token, refresh_token = api.get_token(client.name, client_secret, username, password)
             super().info(
                 'Got token via password method. access_token:{}, refresh_token:{}'.format(access_token, refresh_token))
             none_refresh_token = change_to_none(refresh_token)

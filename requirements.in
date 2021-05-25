@@ -2,3 +2,4 @@ requests
 urllib3
 termcolor
 pyjwt
+beautifulsoup4

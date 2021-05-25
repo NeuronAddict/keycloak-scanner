@@ -46,7 +46,7 @@ class TestMasterScanner(MasterScanner, MockPrintLogger):
 def test_start():
     session = requests.Session()
     session.get = MagicMock()
-    scanner = MasterScanner([TestScanner(base_url='https://testscan', session=session)])
+    scanner = MasterScanner([TestScanner(base_url='https://testscan', session_provider=lambda: session)])
     scanner.start()
     session.get.assert_called_with('https://testscan')
 
@@ -54,7 +54,7 @@ def test_start():
 def test_should_fail_when_scanner_return_empty_list():
     session = requests.Session()
     session.get = MagicMock()
-    test_scanner = TestScannerList(base_url='https://testscan', session=session)
+    test_scanner = TestScannerList(base_url='https://testscan', session_provider=lambda: session)
     scanner = TestMasterScanner(scans=[test_scanner])
     scanner.start()
     assert scanner.warns == [
@@ -63,14 +63,20 @@ def test_should_fail_when_scanner_return_empty_list():
 
 
 def test_full_scan(base_url: str, full_scan_mock_session: Session):
+
+    common_args = {
+        'base_url': base_url,
+        'session_provider': lambda: full_scan_mock_session
+    }
+
     scans = [
-        RealmScanner(base_url=base_url, session=full_scan_mock_session, realms=['master', 'other']),
-        WellKnownScanner(base_url=base_url, session=full_scan_mock_session),
-        ClientScanner(base_url=base_url, session=full_scan_mock_session, clients=['client1', 'client2']),
-        SecurityConsoleScanner(base_url=base_url, session=full_scan_mock_session),
-        OpenRedirectScanner(base_url=base_url, session=full_scan_mock_session),
-        FormPostXssScanner(base_url=base_url, session=full_scan_mock_session),
-        NoneSignScanner(base_url=base_url, session=full_scan_mock_session)
+        RealmScanner(realms=['master', 'other'], **common_args),
+        WellKnownScanner(**common_args),
+        ClientScanner(clients=['client1', 'client2'], **common_args),
+        SecurityConsoleScanner(**common_args),
+        OpenRedirectScanner(**common_args),
+        FormPostXssScanner(**common_args),
+        NoneSignScanner(**common_args)
     ]
 
     scanner = MasterScanner(scans=scans, verbose=True)
