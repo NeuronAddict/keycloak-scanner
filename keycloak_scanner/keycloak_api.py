@@ -8,6 +8,10 @@ from keycloak_scanner.scanners.clients_scanner import Client
 from keycloak_scanner.scanners.session_holder import SessionHolder
 
 
+class FailedAuthException(Exception):
+    pass
+
+
 class KeyCloakApi(PrintLogger, SessionHolder):
 
     def __init__(self, well_known: dict, **kwargs):
@@ -54,41 +58,32 @@ class KeyCloakApi(PrintLogger, SessionHolder):
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, 'html.parser')
-        link = soup.find('form').attrs['action']
-        o = urlparse(link)
-        q = parse_qs(o.query)
 
-        auth_params = {'session_code': q['session_code'],
-                       'execution': q['execution'],
-                       'client_id': client.name,
-                       'tab_id': q['tab_id']
-                       }
+        try:
+            link = soup.find('form').attrs['action']
+            o = urlparse(link)
+            q = parse_qs(o.query)
 
-        auth_headers = {"Connection": "close", "Cache-Control": "max-age=0", "Upgrade-Insecure-Requests": "1",
-                        "Origin": url,
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
-                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                        "Sec-Fetch-Site": "same-origin", "Sec-Fetch-Mode": "navigate", "Sec-Fetch-User": "?1",
-                        "Sec-Fetch-Dest": "document",
-                        "Referer": url,
-                        "Accept-Encoding": "gzip, deflate", "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7"}
+            auth_params = {'session_code': q['session_code'],
+                           'execution': q['execution'],
+                           'client_id': client.name,
+                           'tab_id': q['tab_id']
+                           }
 
-        auth_data = {"username": username, "password": password}
+            auth_headers = {"Connection": "close", "Cache-Control": "max-age=0", "Upgrade-Insecure-Requests": "1",
+                            "Origin": url,
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
+                            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                            "Sec-Fetch-Site": "same-origin", "Sec-Fetch-Mode": "navigate", "Sec-Fetch-User": "?1",
+                            "Sec-Fetch-Dest": "document",
+                            "Referer": url,
+                            "Accept-Encoding": "gzip, deflate", "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7"}
 
-        return session.post(link, headers=auth_headers, data=auth_data, params=auth_params, allow_redirects=False)
+            auth_data = {"username": username, "password": password}
 
-        # if r.status_code == 302:
-        #     redirect = r.headers['Location']
-        #     if redirect_uri in redirect:
-        #         print(f'[+] find login for user {username}')
-        #         return Result.SUCCESS
-        #     else:
-        #         print(f'[?] unconfirmed login for username {username} ({redirect})')
-        #         return Result.UNCONFIRMED
-        # else:
-        #     if r.status_code == 200:
-        #         return Result.INVALID_CREDENTIALS
-        #     else:
-        #         print(f'[-] Got error for username {username}. HTTP status: {r.status_code}')
-        #         return Result.ERROR
+            return session.post(link, headers=auth_headers, data=auth_data, params=auth_params, allow_redirects=False)
+
+        except Exception as e:
+            raise FailedAuthException(e)
+
