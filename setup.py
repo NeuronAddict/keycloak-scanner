@@ -25,7 +25,7 @@ setup(name='keycloak-scanner',
       },
       license='Apache 2.0',
       packages=find_packages(),
-      zip_safe=False, install_requires=['requests', 'termcolor', 'pyjwt', 'urllib3'],
+      zip_safe=False, install_requires=['requests', 'termcolor', 'pyjwt', 'urllib3', 'beautifulsoup4'],
       classifiers=[
           "Programming Language :: Python :: 3",
           "License :: OSI Approved :: Apache Software License",
