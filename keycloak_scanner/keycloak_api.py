@@ -36,7 +36,7 @@ class KeyCloakApi(PrintLogger, SessionHolder):
         res = r.json()
         return res['access_token'], res['refresh_token']
 
-    def auth(self, client: Client, username: str, password: str, redirect_uri: str) -> requests.Response:
+    def auth(self, client: Client, username: str, password: str, redirect_uri: str = None) -> requests.Response:
 
         session = super().session()
 
