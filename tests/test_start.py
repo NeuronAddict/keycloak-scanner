@@ -12,6 +12,8 @@ def test_start(base_url: str, full_scan_mock_session: Session):
     args = p.parse_args([base_url, '--realms', 'other', '--clients', 'client1,client2',
                          '--username', 'username', '--password', 'password', '--verbose'])
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit) as e:
 
-        start(args, full_scan_mock_session)
+        start(args, lambda: full_scan_mock_session)
+
+    assert e.value.code == 4
