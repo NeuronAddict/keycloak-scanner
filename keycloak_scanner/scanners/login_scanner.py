@@ -74,4 +74,20 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
                     except HTTPError as e:
                         super().verbose(f'HTTP error when login : {e}')
 
+                kapi = KeyCloakApi(well_known.json, verbose=super().is_verbose(),
+                                   session_provider=self.give_session)
+
+                # TODO: refactor
+
+                try:
+                    r = kapi.auth(client, self.username, self.password)
+
+                    if r.status_code == 302:
+                        results[f'{realm.name}-{client.name}'] = Credential(realm, client, self.username, self.password)
+
+                        super().find(self.name(), f'Form login work for {self.username} on realm {realm.name}, '
+                                                  f'client {client.name}, ({r.headers["Location"]})')
+                except HTTPError as e:
+                    super().verbose(f'HTTP error when login : {e}')
+
         return results, VulnFlag(False)
