@@ -30,5 +30,9 @@ def test_start(base_url: str, session: Session, capsys):
 
     assert "[INFO] Find a client for realm master: account" in captured.out
 
+    assert "[+] LoginScanner - Form login work for admin on realm master, client security-admin-console" in captured.out
+
+    assert "[+] LoginScanner - Can login with username admin on realm master, client admin-cli, grant_type: password" in captured.out
+
     # TODO: add other tests when vulns are on itest
 
