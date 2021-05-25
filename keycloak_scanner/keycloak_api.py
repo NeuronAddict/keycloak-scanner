@@ -34,14 +34,17 @@ class KeyCloakApi(PrintLogger, SessionHolder):
         return res['access_token'], res['refresh_token']
 
     def refresh(self, client, refresh_token):
+
         data = {'refresh_token': refresh_token, 'grant_type': 'refresh_token', 'client_id': client}
         r = super().session().post(self.well_known['token_endpoint'], data=data)
         r.raise_for_status()
         res = r.json()
         return res['access_token'], res['refresh_token']
 
-    def auth(self, client: Client, username: str, password: str, redirect_uri: str = None) -> requests.Response:
+    def auth(self, client: Client, username: str, password: str, redirect_uri: str = None, auth_headers=None) -> requests.Response:
 
+        if auth_headers is None:
+            auth_headers = {}
         session = super().session()
 
         url = self.well_known['authorization_endpoint']
@@ -69,16 +72,6 @@ class KeyCloakApi(PrintLogger, SessionHolder):
                            'client_id': client.name,
                            'tab_id': q['tab_id']
                            }
-
-            auth_headers = {"Connection": "close", "Cache-Control": "max-age=0", "Upgrade-Insecure-Requests": "1",
-                            "Origin": url,
-                            "Content-Type": "application/x-www-form-urlencoded",
-                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
-                            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                            "Sec-Fetch-Site": "same-origin", "Sec-Fetch-Mode": "navigate", "Sec-Fetch-User": "?1",
-                            "Sec-Fetch-Dest": "document",
-                            "Referer": url,
-                            "Accept-Encoding": "gzip, deflate", "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7"}
 
             auth_data = {"username": username, "password": password}
 
