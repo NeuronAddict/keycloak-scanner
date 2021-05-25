@@ -1,5 +1,15 @@
 # changelog
 
+# version 1.0.3
+
+- Add login scanner
+- Fix bad requests with Client(...) or Realm(...) in queries
+- Fix proxy option
+- Send warn in stderr
+- Fix various bugs
+- Better log when find something
+- Provide version (--version option)
+
 ## Version 1.0.2
 
 - hotfix : issue #20

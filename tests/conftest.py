@@ -3,12 +3,18 @@ from unittest.mock import MagicMock
 import requests
 from _pytest.fixtures import fixture
 from requests import Session
+import logging
+import http.client
 
+from keycloak_scanner.logging.http_logging import httpclient_logging_patch
 from keycloak_scanner.scanners.clients_scanner import Client, Clients
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults, SecurityConsoleResult
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
 from tests.mock_response import MockResponse
+
+
+#httpclient_logging_patch()
 
 
 @fixture
@@ -206,10 +212,100 @@ def security_console_results(master_realm: Realm, other_realm: Realm) -> Securit
                                        json={}, secret={'secret': 'secretdata'}),
     })
 
+@fixture
+def login_html_page():
+    return '''
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="login-pf">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="robots" content="noindex, nofollow">
+
+            <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Sign in to Keycloak</title>
+    <link rel="icon" href="/auth/resources/p4o5n/login/keycloak/img/favicon.ico" />
+            <link href="/auth/resources/p4o5n/common/keycloak/web_modules/@patternfly/react-core/dist/styles/base.css" rel="stylesheet" />
+            <link href="/auth/resources/p4o5n/common/keycloak/web_modules/@patternfly/react-core/dist/styles/app.css" rel="stylesheet" />
+            <link href="/auth/resources/p4o5n/common/keycloak/node_modules/patternfly/dist/css/patternfly.min.css" rel="stylesheet" />
+            <link href="/auth/resources/p4o5n/common/keycloak/node_modules/patternfly/dist/css/patternfly-additions.min.css" rel="stylesheet" />
+            <link href="/auth/resources/p4o5n/common/keycloak/lib/pficon/pficon.css" rel="stylesheet" />
+            <link href="/auth/resources/p4o5n/login/keycloak/css/login.css" rel="stylesheet" />
+            <link href="/auth/resources/p4o5n/login/keycloak/css/tile.css" rel="stylesheet" />
+</head>
+
+<body class="">
+<div class="login-pf-page">
+    <div id="kc-header" class="login-pf-page-header">
+        <div id="kc-header-wrapper"
+             class=""><div class="kc-logo-text"><span>Keycloak</span></div></div>
+    </div>
+    <div class="card-pf">
+        <header class="login-pf-header">
+                <h1 id="kc-page-title">        Sign in to your account
+
+</h1>
+      </header>
+      <div id="kc-content">
+        <div id="kc-content-wrapper">
+
+
+    <div id="kc-form">
+      <div id="kc-form-wrapper">
+            <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="http://localhost:8080/auth/realms/master/login-actions/authenticate?session_code=bR4rBd0QNGsd_kGuqiyLEuYuY6FK3Lx9HCYJEltUQBk&amp;execution=de13838a-ee3d-404e-b16d-b0d7aa320844&amp;client_id=account-console&amp;tab_id=GXMjAPR3DsQ" method="post">
+                <div class="form-group">
+                    <label for="username" class="pf-c-form__label pf-c-form__label-text">Username or email</label>
+
+                        <input tabindex="1" id="username" class="pf-c-form-control" name="username" value=""  type="text" autofocus autocomplete="off"
+                               aria-invalid=""
+                        />
+
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="pf-c-form__label pf-c-form__label-text">Password</label>
+
+                    <input tabindex="2" id="password" class="pf-c-form-control" name="password" type="password" autocomplete="off"
+                           aria-invalid=""
+                    />
+                </div>
+
+                <div class="form-group login-pf-settings">
+                    <div id="kc-form-options">
+                        </div>
+                        <div class="">
+                        </div>
+
+                  </div>
+
+                  <div id="kc-form-buttons" class="form-group">
+                      <input type="hidden" id="id-hidden-input" name="credentialId" />
+                      <input tabindex="4" class="pf-c-button pf-m-primary pf-m-block btn-lg" name="login" id="kc-login" type="submit" value="Sign In"/>
+                  </div>
+            </form>
+        </div>
+
+
+    </div>
+
+
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
+   
+    '''
+
+
 
 @fixture
 def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json_master: dict,
-                           well_known_json_other: dict) -> Session:
+                           well_known_json_other: dict, login_html_page: str) -> Session:
     def get_mock_response(url, **kwargs):
         responses = {
             'http://localhost:8080/auth/realms/master/.well-known/openid-configuration': MockResponse(status_code=200,
@@ -229,14 +325,15 @@ def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json_
                 status_code=401, response={"error": "invalid_token",
                                            "error_description": "Not authorized to view client. Not valid token or client credentials provided."}),
             'http://localhost:8080/auth': MockResponse(status_code=400),
-            'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth': MockResponse(200, response='test'),
-            'http://localhost:8080/auth/realms/other/protocol/openid-connect/auth': MockResponse(200, response='test')
+            'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth': MockResponse(200, response=login_html_page),
+            'http://localhost:8080/auth/realms/other/protocol/openid-connect/auth': MockResponse(200, response=login_html_page),
+            'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth?client_id=account-console&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauth%2Frealms%2Fmaster%2Faccount%2F%23%2F&state=310f298c-f3d8-4c42-8ebc-44484febf84c&response_mode=fragment&response_type=code&scope=openid&nonce=a6be5274-15e4-4ffe-9905-ffb038b20a8e&code_challenge=Nd1svU3YNT0r6eWHkSmNeX_cxgUPQUVzPfZFXRWaJmY&code_challenge_method=S256': MockResponse(200, login_html_page)
         }
         if url not in responses:
             raise Exception(f'bad url test (GET) : {url}')
         return responses[url]
 
-    def post_mock_response(url, data=None):
+    def post_mock_response(url, data=None, **kwargs):
         if data is None:
             data = {}
         token_response = {
@@ -249,7 +346,9 @@ def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json_
                                                                                                    response=token_response),
             'http://localhost:8080/other/token': MockResponse(status_code=200, response=token_response),
             'http://localhost:8080/auth/realms/other/protocol/openid-connect/token': MockResponse(status_code=200,
-                                                                                                  response=token_response)
+                                                                                                  response=token_response),
+            'http://localhost:8080/auth/realms/master/login-actions/authenticate?session_code=bR4rBd0QNGsd_kGuqiyLEuYuY6FK3Lx9HCYJEltUQBk&execution=de13838a-ee3d-404e-b16d-b0d7aa320844&client_id=account-console&tab_id=GXMjAPR3DsQ': MockResponse(
+                302, response=None, headers={'Location': '<openid location>'})
         }
         if url not in responses:
             raise Exception(f'bad url test (POST) : {url}')

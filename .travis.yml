@@ -1,17 +1,34 @@
 language: python
 
-python:
-- '3.6'
-- '3.7'
-- '3.8'
-- '3.9'
+git:
+  quiet: true
+
+cache: pip
+
+
 
 install:
 - pip install -r dev-requirements.txt
 - pip install -r requirements.txt
 
+jobs:
+  include:
+    - script: pytest tests/
+      python:
+        - '3.6'
+        - '3.7'
+        - '3.8'
+        - '3.9'
+    - script: pytest -k itests
+      python:
+        - 3.8
+      env: ITESTS=true
+      before_script: docker-compose -f itests/docker-compose.yml up -d && python itests/wait-docker-compose.py
+      after_script: docker-compose -f itests/docker-compose.yml down
+
+
 script:
-- pytest
+- pytest tests/
 - pip install . && keycloak-scanner --help
 
 deploy:
@@ -19,11 +36,13 @@ deploy:
     username: __token__
     server: https://test.pypi.org/legacy/
     skip_existing: true
+    skip_cleanup: true
     on:
       branch: develop
     password:
       secure: K9RclpiLIRzOqbnVDNcNZgJCBr4cwoWpecR3IpKlRkj99lRDkc5mt+ovIPwld54AhBY/FkaWZ/1dFIXXAPLOcAfutaLq6vboj2A+fItn0MNV9vQU1alZNL3fhVSn5oMvXB7+N+G2o3vIS6baNYUzvbmlRSpbUpBgRMdBPq3IE+0n12iwPkbvw7o9YCzfBKQyXh0zCTFkAskEL8OgbSZO1V9BbfyKMu0MMIO0S/eltvk8dwbGs2SaL0cPehvhRANdFh4pTpYld29QBYzSuaSJdys9D94tmxodL8dYD5DCznxNM1aDAhBztlH+4olR4GkIhwaSZ7BWmwRTv5NiyBIH2/PcbUh4MkAxvV1ybV4yRcH2e9WG6x53cPNMSvrhSxibbXOEc135qr6HGq69ZEKDxT+2uO/iMjYoeJJ5GjGD28KQ/jk7GdijCaOqjsZ37p7yzMnuaEQ7dZG7G9jiBbpzKkN3P2390kAPaqBnBDH0LZR2zrbgbAohYXCFfu4jZNyxBLfN1cPCHTjyBl7hlGpYYzqggGwV7V/2Bc+v52rZ9DrMuYQJfGkxOWDlT5D2ZGFWLMtL1haS6R5dmg+w9213SNw/onBD3dAP9QqKwwRJA4c3xvt7f2JblOoNpYkAXuSbOgt0CfJXQOyaCDtVTdHzIP1JMqm0ljcQrLUkaO9UhGs=
   - provider: pypi
+    skip_existing: true
     username: __token__
     on:
       tags: true
