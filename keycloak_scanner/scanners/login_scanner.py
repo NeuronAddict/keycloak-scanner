@@ -41,8 +41,6 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
         self.password = password
         super().__init__(**kwargs)
 
-    def give_session(self):
-        return super().session()
 
     def perform(self, realms: Realms, clients: Clients, well_known_dict: WellKnownDict, **kwargs) \
             -> (CredentialDict, VulnFlag):
@@ -58,7 +56,7 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
                 for grant_type in well_known.allowed_grants():
 
                     kapi = KeyCloakApi(well_known.json, verbose=super().is_verbose(),
-                                       session_provider=self.give_session)
+                                       session_provider=super().session)
 
                     # TODO : get client secret
                     try:
@@ -75,7 +73,7 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
                         super().verbose(f'HTTP error when login : {e}')
 
                 kapi = KeyCloakApi(well_known.json, verbose=super().is_verbose(),
-                                   session_provider=self.give_session)
+                                   session_provider=super().session)
 
                 # TODO: refactor
 
