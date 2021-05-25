@@ -86,7 +86,7 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
                         results[f'{realm.name}-{client.name}'] = Credential(realm, client, self.username, self.password)
 
                         super().find(self.name(), f'Form login work for {self.username} on realm {realm.name}, '
-                                                  f'client {client.name}, ({r.headers["Location"]})')
+                                                  f'client {client.name}, ({r.headers.get("Location", "<unable to get header>")})')
                 except HTTPError as e:
                     super().verbose(f'HTTP error when login : {e}')
 
