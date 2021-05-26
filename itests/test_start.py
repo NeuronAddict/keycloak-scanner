@@ -33,7 +33,7 @@ def test_should_start_scan_fail_security_console_exit_8(base_url: str, capsys):
 
     assert "[INFO] Find a client for realm master: account" in captured.out
 
-    assert "[INFO] Find a client for realm master: security-admin-console" in captured.out
+    assert "[INFO] Find a client auth endpoint for realm master: security-admin-console" in captured.out
 
     assert "[+] LoginScanner - Form login work for admin on realm master, client security-admin-console" in captured.out
 
