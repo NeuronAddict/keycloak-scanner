@@ -1,4 +1,4 @@
-from typing import Dict, Callable
+from typing import Dict, Callable, Any
 from unittest.mock import MagicMock
 
 import requests
@@ -50,10 +50,17 @@ class MockPrintLogger(PrintLogger):
 
 class RequestSpec:
 
-    def __init__(self, response: MockResponse, assertion: Callable[..., bool] = (lambda **kwargs: True), assertion_message = None):
+    def __init__(self, response: MockResponse, assertion: Callable[..., bool] = (lambda **kwargs: True),
+                 assertion_value: Any = None):
+        """
+
+        :param response: mocked response
+        :param assertion: assertion that must be true
+        :param assertion_value: the assertion message was {assertion_value} == {request args}
+        """
         self.assertion = assertion
         self.response = response
-        self.assertion_message = assertion_message
+        self.assertion_value = assertion_value
 
 
 class MockSpec:
@@ -70,14 +77,14 @@ class MockSpec:
 
         if url not in self.get:
             raise Exception(f'[make_mock_session] Bad url test (GET) : {url}')
-        assert self.get[url].assertion(**kwargs), self.get[url].assertion_message + repr(kwargs)
+        assert self.get[url].assertion(**kwargs), repr(self.get[url].assertion_value) + ' == ' + repr(kwargs)
         return self.get[url].response
 
     def post_mock_response(self, url, **kwargs):
 
         if url not in self.post:
             raise Exception(f'[make_mock_session] Bad url test (POST) : {url}')
-        assert self.post[url].assertion(**kwargs), self.post[url].assertion_message + repr(kwargs)
+        assert self.post[url].assertion(**kwargs), repr(self.post[url].assertion_value) + ' == ' + repr(kwargs)
         return self.post[url].response
 
     def session(self):
