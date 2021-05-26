@@ -11,10 +11,10 @@ from keycloak_scanner.scanners.clients_scanner import Client, Clients
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults, SecurityConsoleResult
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
-from tests.mock_response import MockResponse
+from tests.mock_response import MockResponse, mock_session, RequestSpec
 
 
-#httpclient_logging_patch()
+# httpclient_logging_patch()
 
 
 @fixture
@@ -212,6 +212,7 @@ def security_console_results(master_realm: Realm, other_realm: Realm) -> Securit
                                        json={}, secret={'secret': 'secretdata'}),
     })
 
+
 @fixture
 def login_html_page():
     return '''
@@ -302,62 +303,63 @@ def login_html_page():
     '''
 
 
-
 @fixture
 def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json_master: dict,
                            well_known_json_other: dict, login_html_page: str) -> Session:
-    def get_mock_response(url, **kwargs):
-        responses = {
-            'http://localhost:8080/auth/realms/master/.well-known/openid-configuration': MockResponse(status_code=200,
-                                                                                                      response=well_known_json_master),
-            'http://localhost:8080/auth/realms/master': MockResponse(status_code=200, response=master_realm_json),
-            'http://localhost:8080/auth/realms/other': MockResponse(status_code=200, response=other_realm_json),
-            'http://localhost:8080/auth/realms/other/.well-known/openid-configuration': MockResponse(status_code=200,
-                                                                                                     response=well_known_json_other),
-            'http://localhost:8080/auth/realms/master/client1': MockResponse(status_code=200, response='coucou'),
-            'http://localhost:8080/auth/realms/master/client2': MockResponse(status_code=200, response='coucou'),
-            'http://localhost:8080/auth/realms/other/client1': MockResponse(status_code=200, response='coucou'),
-            'http://localhost:8080/auth/realms/other/client2': MockResponse(status_code=200, response='coucou'),
-            'http://localhost:8080/auth/realms/master/clients-registrations/default/security-admin-console': MockResponse(
+    token_response = {
+        'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI',
+        'refresh_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI'
+    }
+
+    return mock_session(get={
+        'http://localhost:8080/auth/realms/master/.well-known/openid-configuration': RequestSpec(
+            MockResponse(status_code=200, response=well_known_json_master)
+        ),
+        'http://localhost:8080/auth/realms/master': RequestSpec(
+            MockResponse(status_code=200, response=master_realm_json)),
+        'http://localhost:8080/auth/realms/other': RequestSpec(
+            MockResponse(status_code=200, response=other_realm_json)),
+        'http://localhost:8080/auth/realms/other/.well-known/openid-configuration': RequestSpec(
+            MockResponse(status_code=200,
+                         response=well_known_json_other)),
+        'http://localhost:8080/auth/realms/master/client1': RequestSpec(
+            MockResponse(status_code=200, response='coucou')),
+        'http://localhost:8080/auth/realms/master/client2': RequestSpec(
+            MockResponse(status_code=200, response='coucou')),
+        'http://localhost:8080/auth/realms/other/client1': RequestSpec(
+            MockResponse(status_code=200, response='coucou')),
+        'http://localhost:8080/auth/realms/other/client2': RequestSpec(
+            MockResponse(status_code=200, response='coucou')),
+        'http://localhost:8080/auth/realms/master/clients-registrations/default/security-admin-console':
+            RequestSpec(MockResponse(status_code=401, response={"error": "invalid_token",
+                                                                "error_description": "Not authorized to view client. Not valid token or client credentials provided."})),
+        'http://localhost:8080/auth/realms/other/clients-registrations/default/security-admin-console': RequestSpec(
+            MockResponse(
                 status_code=401, response={"error": "invalid_token",
-                                           "error_description": "Not authorized to view client. Not valid token or client credentials provided."}),
-            'http://localhost:8080/auth/realms/other/clients-registrations/default/security-admin-console': MockResponse(
-                status_code=401, response={"error": "invalid_token",
-                                           "error_description": "Not authorized to view client. Not valid token or client credentials provided."}),
-            'http://localhost:8080/auth': MockResponse(status_code=400),
-            'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth': MockResponse(200, response=login_html_page),
-            'http://localhost:8080/auth/realms/other/protocol/openid-connect/auth': MockResponse(200, response=login_html_page),
-            'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth?client_id=account-console&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauth%2Frealms%2Fmaster%2Faccount%2F%23%2F&state=310f298c-f3d8-4c42-8ebc-44484febf84c&response_mode=fragment&response_type=code&scope=openid&nonce=a6be5274-15e4-4ffe-9905-ffb038b20a8e&code_challenge=Nd1svU3YNT0r6eWHkSmNeX_cxgUPQUVzPfZFXRWaJmY&code_challenge_method=S256': MockResponse(200, login_html_page)
-        }
-        if url not in responses:
-            raise Exception(f'bad url test (GET) : {url}')
-        return responses[url]
+                                           "error_description": "Not authorized to view client. Not valid token or client credentials provided."})),
+        'http://localhost:8080/auth': RequestSpec(MockResponse(status_code=400)),
+        'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth': RequestSpec(MockResponse(200,
+                                                                                                          response=login_html_page)),
+        'http://localhost:8080/auth/realms/other/protocol/openid-connect/auth': RequestSpec(MockResponse(200,
+                                                                                                         response=login_html_page)),
+        'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth?client_id=account-console&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauth%2Frealms%2Fmaster%2Faccount%2F%23%2F&state=310f298c-f3d8-4c42-8ebc-44484febf84c&response_mode=fragment&response_type=code&scope=openid&nonce=a6be5274-15e4-4ffe-9905-ffb038b20a8e&code_challenge=Nd1svU3YNT0r6eWHkSmNeX_cxgUPQUVzPfZFXRWaJmY&code_challenge_method=S256':
+            RequestSpec(MockResponse(
+                200, login_html_page))
+    },
+        post={
+            'http://localhost:8080/master/token': RequestSpec(MockResponse(status_code=200, response=token_response)),
+            'http://localhost:8080/auth/realms/master/protocol/openid-connect/token': RequestSpec(
+                MockResponse(status_code=200,
+                             response=token_response)),
+            'http://localhost:8080/other/token': RequestSpec(MockResponse(status_code=200, response=token_response)),
+            'http://localhost:8080/auth/realms/other/protocol/openid-connect/token': RequestSpec(
+                MockResponse(status_code=200,
+                             response=token_response)),
+            'http://localhost:8080/auth/realms/master/login-actions/authenticate?session_code'
+            '=bR4rBd0QNGsd_kGuqiyLEuYuY6FK3Lx9HCYJEltUQBk&execution=de13838a-ee3d-404e-b16d-b0d7aa320844&client_id'
+            '=account-console&tab_id=GXMjAPR3DsQ':
+                RequestSpec(MockResponse(
+                    302, response=None, headers={'Location': '<openid location>'}))
+        })
 
-    def post_mock_response(url, data=None, **kwargs):
-        if data is None:
-            data = {}
-        token_response = {
-            'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI',
-            'refresh_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI'
-        }
-        responses = {
-            'http://localhost:8080/master/token': MockResponse(status_code=200, response=token_response),
-            'http://localhost:8080/auth/realms/master/protocol/openid-connect/token': MockResponse(status_code=200,
-                                                                                                   response=token_response),
-            'http://localhost:8080/other/token': MockResponse(status_code=200, response=token_response),
-            'http://localhost:8080/auth/realms/other/protocol/openid-connect/token': MockResponse(status_code=200,
-                                                                                                  response=token_response),
-            'http://localhost:8080/auth/realms/master/login-actions/authenticate?session_code=bR4rBd0QNGsd_kGuqiyLEuYuY6FK3Lx9HCYJEltUQBk&execution=de13838a-ee3d-404e-b16d-b0d7aa320844&client_id=account-console&tab_id=GXMjAPR3DsQ': MockResponse(
-                302, response=None, headers={'Location': '<openid location>'})
-        }
-        if url not in responses:
-            raise Exception(f'bad url test (POST) : {url}')
-        return responses[url]
 
-    session = requests.Session()
-    session.get = MagicMock(side_effect=get_mock_response)
-    session.post = MagicMock(side_effect=post_mock_response)
-    session.put = MagicMock()
-    session.delete = MagicMock()
-
-    return session
