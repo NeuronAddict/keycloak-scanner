@@ -21,13 +21,12 @@ from keycloak_scanner._version import __version__
 def parser():
     parser = argparse.ArgumentParser(description='KeyCloak vulnerabilities scanner.',
                                      epilog='''
-By default, master realm is already tested.
-Clients always tested : account, admin-cli, broker, realm-management, security-admin-console.
 
 Scans : 
 - list realms
 - Search well-known files
 - Search for clients
+- Search for valid logins
 - Search for security-admin-console and secret inside
 - Search for open redirect via unvalidated redirect_uri
 - Search for CVE-2018-14655 (reflected XSS)
@@ -40,8 +39,9 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument('base_url', help='URL to scan. ex http://localhost:8080')
-    parser.add_argument('--realms', help='Comma separated list of custom realms to test')
-    parser.add_argument('--clients', help='Comma separated list of custom clients to test')
+    parser.add_argument('--realms', help='Comma separated list of custom realms to test. ie : master')
+    parser.add_argument('--clients', help='Comma separated list of custom clients to test. On default installation, '
+                                          'use account,admin-cli,broker,realm-management,security-admin-console')
     parser.add_argument('--proxy', help='Use a great proxy like BURP ;)')
     parser.add_argument('--username', help='If a username is specified, try to connect and attack a token. If no '
                                            'password, try username as password.')
@@ -49,9 +49,11 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
     parser.add_argument('--ssl-noverify', help='Do not verify ssl certificates', action='store_true')
     parser.add_argument('--verbose', help='Verbose mode', action='store_true')
     parser.add_argument('--no-fail', action='store_true',
-                        help='Always exit with code 0 (by default, fail with an exit code 4 if a vulnerability is discovered). '
+                        help='Always exit with code 0 (by default, fail with an exit code 4 if a vulnerability is '
+                             'discovered or 8 if an error occur). '
                              'Do NOT fail before all test are done.')
-    parser.add_argument('--version', action='version', version=f'keycloak-scanner {__version__}. https://github.com/NeuronAddict/keycloak-scanner.')
+    parser.add_argument('--version', action='version', version=f'keycloak-scanner {__version__}. '
+                                                               f'https://github.com/NeuronAddict/keycloak-scanner.')
     return parser
 
 
