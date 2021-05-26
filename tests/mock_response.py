@@ -50,9 +50,10 @@ class MockPrintLogger(PrintLogger):
 
 class RequestSpec:
 
-    def __init__(self, response: MockResponse, assertion: Callable[..., bool] = (lambda **kwargs: True)):
+    def __init__(self, response: MockResponse, assertion: Callable[..., bool] = (lambda **kwargs: True), assertion_message = None):
         self.assertion = assertion
         self.response = response
+        self.assertion_message = assertion_message
 
 
 def mock_session(get=None, post=None) -> requests.session():
@@ -66,14 +67,14 @@ def mock_session(get=None, post=None) -> requests.session():
 
         if url not in get:
             raise Exception(f'[make_mock_session] Bad url test (GET) : {url}')
-        assert get[url].assertion(**kwargs)
+        assert get[url].assertion(**kwargs), get[url].assertion_message + repr(kwargs)
         return get[url].response
 
     def post_mock_response(url, **kwargs):
 
         if url not in post:
             raise Exception(f'[make_mock_session] Bad url test (POST) : {url}')
-        assert post[url].assertion(**kwargs)
+        assert post[url].assertion(**kwargs), post[url].assertion_message + repr(kwargs)
         return post[url].response
 
     session = requests.Session()
