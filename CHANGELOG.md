@@ -1,5 +1,10 @@
 # changelog
 
+# version 1.0.4
+
+- fail fast mode
+- Examples in doc
+
 # version 1.0.3
 
 - Add login scanner
