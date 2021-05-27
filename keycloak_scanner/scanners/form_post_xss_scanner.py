@@ -63,7 +63,7 @@ class FormPostXssScanner(Need3[Realms, Clients, WellKnownDict], Scanner[FormPost
 
                     if r.status_code == 200:
                         if payload in r.text:
-                            super().find('XSS-CVE2018-14655', 'Vulnerable to CVE 2018 14655 realm:{}, client:{}'.format(realm, client))
+                            super().find(f'XSS-CVE2018-14655', f'Vulnerable to CVE 2018 14655 realm:{realm.name}, client:{client.name}')
                             vulnerable = True
                             vf.set_vuln()
 
