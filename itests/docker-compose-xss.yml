@@ -1,0 +1,37 @@
+# From https://github.com/keycloak/keycloak-containers.git
+# THIS IS A TEST FOR AN XSS VULN. DON'T DEPLOY THIS SERVER ON PRODUCTION
+version: '3'
+
+volumes:
+  mysql_data:
+      driver: local
+
+services:
+  mariadb:
+      image: mariadb
+      volumes:
+        - mysql_data:/var/lib/mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: keycloak
+        MYSQL_USER: keycloak
+        MYSQL_PASSWORD: password
+      # Copy-pasted from https://github.com/docker-library/mariadb/issues/94
+      healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "--silent"]
+  keycloak:
+      image: jboss/keycloak:3.4.3.Final # DON'T USE IN PRODUCTION
+      environment:
+        DB_VENDOR: mariadb
+        DB_ADDR: mariadb
+        DB_DATABASE: keycloak
+        DB_USER: keycloak
+        DB_PASSWORD: password
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: Pa55w0rd
+        JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
+        JGROUPS_DISCOVERY_PROPERTIES: datasource_jndi_name=java:jboss/datasources/KeycloakDS,info_writer_sleep_time=500
+      depends_on:
+        - mariadb
+      ports:
+        - 127.0.0.1:8080:8080
