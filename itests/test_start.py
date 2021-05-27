@@ -29,7 +29,7 @@ def test_should_start_scan_fail_security_console_exit_8(base_url: str, capsys):
 
     assert 'Public key for realm master : ' in captured.out
 
-    assert "Find a well known for realm Realm('master'," in captured.out
+    assert "Find a well known for realm master" in captured.out
 
     assert "[INFO] Find a client for realm master: account" in captured.out
 
