@@ -1,7 +1,7 @@
 from _pytest.capture import CaptureFixture
 from requests import Session
 
-from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client, Clients
+from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client, Clients, ClientRegistration
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 from tests.mock_response import MockSpec, RequestSpec, MockResponse
@@ -22,8 +22,11 @@ def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
                                                RequestSpec(response=MockResponse(status_code=404)),
 
                                            'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth':
-                                               RequestSpec(response=MockResponse(302), assertion=assert0)
-
+                                               RequestSpec(response=MockResponse(302), assertion=assert0),
+                                            'http://localhost:8080/realms/master/clients-registrations/default/client1':
+                                                RequestSpec(response=MockResponse(200, response={'data': 'coucou'})),
+                                           'http://localhost:8080/realms/master/clients-registrations/default/client2':
+                                               RequestSpec(response=MockResponse(200, response={'data': 'coucou'}))
                                        }
                                    ).session())
 
@@ -37,9 +40,19 @@ def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
     print(capture.err)
 
     assert result == Clients([Client('client1', 'http://localhost:8080/auth/realms/master/client1',
-                                     'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth'),
+                                     'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth',
+                                     client_registration=ClientRegistration(name='client1',
+                                                                            url='http://localhost:8080/realms/master/clients-registrations/default/client1',
+                                                                            json={'data': 'coucou'}
+                                                                            )
+                                     ),
                               Client('client2', None,
-                                     'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth')])
+                                     'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth',
+                                     client_registration=ClientRegistration(name='client2',
+                                                                            url='http://localhost:8080/realms/master/clients-registrations/default/client2',
+                                                                            json={'data': 'coucou'}
+                                                                            )
+                                     )])
 
     assert not vf.has_vuln
 
