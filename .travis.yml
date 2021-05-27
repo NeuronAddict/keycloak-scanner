@@ -26,6 +26,12 @@ jobs:
       before_script: docker-compose -f itests/docker-compose.yml up -d && python itests/wait-docker-compose.py
       after_script: docker-compose -f itests/docker-compose.yml down
 
+    - script: pytest -k itests
+      python:
+        - 3.8
+      env: ITESTS_XSS=true
+      before_script: docker-compose -f itests/docker-compose-xss.yml up -d && python itests/wait-docker-compose.py
+      after_script: docker-compose -f itests/docker-compose-xss.yml down
 
 script:
 - pytest tests/
