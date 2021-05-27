@@ -5,7 +5,7 @@ from keycloak_scanner.main import parser
 from keycloak_scanner.main import start
 
 
-def test_start(base_url: str, full_scan_mock_session: Session):
+def test_should_full_scan_exit_code_4_when_vuln(base_url: str, full_scan_mock_session: Session):
 
     p = parser()
 
