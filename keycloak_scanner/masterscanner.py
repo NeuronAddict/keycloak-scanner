@@ -46,11 +46,12 @@ class ScanStatus:
 
 class MasterScanner(PrintLogger):
 
-    def __init__(self, scans: List[Scanner], previous_deps: Dict[str, Any] = None, verbose=False, **kwargs):
+    def __init__(self, scans: List[Scanner], previous_deps: Dict[str, Any] = None, verbose=False, fail_fast=False, **kwargs):
         if previous_deps is None:
             previous_deps = {}
         self.scans = scans
         self.results = ScanResults(previous_deps, verbose=verbose)
+        self.fail_fast = True
         super().__init__(verbose=verbose, **kwargs)
 
     def start(self) -> ScanStatus:
@@ -86,5 +87,7 @@ class MasterScanner(PrintLogger):
             except Exception as e:
                 print(f'Failed scan : {scanner.__class__.__name__}: ({str(e)}). ')
                 has_errors = True
+                if self.fail_fast:
+                    raise e
 
         return ScanStatus(has_errors, vf.has_vuln)

@@ -1,4 +1,4 @@
-from typing import Dict, Callable
+from typing import Dict, Callable, Any
 from unittest.mock import MagicMock
 
 import requests
@@ -50,34 +50,71 @@ class MockPrintLogger(PrintLogger):
 
 class RequestSpec:
 
-    def __init__(self, response: MockResponse, assertion: Callable[..., bool] = (lambda **kwargs: True)):
+    def __init__(self, response: MockResponse, assertion: Callable[..., bool] = (lambda **kwargs: True),
+                 assertion_value: Any = None):
+        """
+
+        :param response: mocked response
+        :param assertion: assertion that must be true
+        :param assertion_value: the assertion message was {assertion_value} == {request args}
+        """
         self.assertion = assertion
         self.response = response
+        self.assertion_value = assertion_value
 
 
-def mock_session(get=None, post=None) -> requests.session():
+class MockSpec:
 
+    def __init__(self, get: Dict[str, RequestSpec] = None, post: Dict[str, RequestSpec] = None):
+        if post is None:
+            post = {}
+        if get is None:
+            get = {}
+        self.get = get
+        self.post = post
+
+    def get_mock_response(self, url, **kwargs):
+
+        if url not in self.get:
+            raise Exception(f'[make_mock_session] Bad url test (GET) : {url}')
+        assert self.get[url].assertion(**kwargs), repr(self.get[url].assertion_value) + ' == ' + repr(kwargs)
+        return self.get[url].response
+
+    def post_mock_response(self, url, **kwargs):
+
+        if url not in self.post:
+            raise Exception(f'[make_mock_session] Bad url test (POST) : {url}')
+        assert self.post[url].assertion(**kwargs), repr(self.post[url].assertion_value) + ' == ' + repr(kwargs)
+        return self.post[url].response
+
+    def session(self):
+
+        session = requests.Session()
+        session.get = MagicMock(side_effect=self.get_mock_response)
+        session.post = MagicMock(side_effect=self.post_mock_response)
+
+        return session
+
+    def merge(self, get: Dict[str, RequestSpec] = None, post: Dict[str, RequestSpec] = None):
+
+        if post is None:
+            post = {}
+        if get is None:
+            get = {}
+
+        self.get.update(get)
+        self.post.update(post)
+
+
+def mock_session(get: Dict[str, RequestSpec] = None, post: Dict[str, RequestSpec] = None) -> requests.session():
+
+    if get is None:
+        get = {}
+    if post is None:
+        post = {}
     if post is None:
         post = {}
     if get is None:
         get = {}
 
-    def get_mock_response(url, **kwargs):
-
-        if url not in get:
-            raise Exception(f'[make_mock_session] Bad url test (GET) : {url}')
-        assert get[url].assertion(**kwargs)
-        return get[url].response
-
-    def post_mock_response(url, **kwargs):
-
-        if url not in post:
-            raise Exception(f'[make_mock_session] Bad url test (POST) : {url}')
-        assert post[url].assertion(**kwargs)
-        return post[url].response
-
-    session = requests.Session()
-    session.get = MagicMock(side_effect=get_mock_response)
-    session.post = MagicMock(side_effect=post_mock_response)
-
-    return session
+    return MockSpec(get=get, post=post).session()
