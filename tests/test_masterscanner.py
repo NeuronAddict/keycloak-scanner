@@ -49,7 +49,7 @@ def test_start(base_url: str, full_scan_mock_session: Session, capsys: CaptureFi
 
     assert 'Public key for realm master : ' in captured.out
 
-    assert "[INFO] Find a well known for realm Realm('master'" in captured.out
+    assert "[INFO] Find a well known for realm master" in captured.out
 
     assert "[INFO] Find a client for realm master: client1" in captured.out
 
@@ -155,7 +155,7 @@ def test_should_fail_fast(base_url: str, full_scan_mock: MockSpec, capsys: Captu
 
     assert 'Public key for realm master : ' in captured.out
 
-    assert "[INFO] Find a well known for realm Realm('master'" in captured.out
+    assert "[INFO] Find a well known for realm master" in captured.out
 
     assert "[INFO] Find a client for realm master: client1" not in captured.out
 
