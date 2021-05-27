@@ -8,7 +8,7 @@ from keycloak_scanner.main import start
 
 
 @pytest.mark.skipif(os.getenv('ITESTS_XSS') != 'true', reason='integration tests')
-def test_should_start_scan_fail_security_console_exit_8(base_url: str, capsys):
+def test_should_start_scan_xss_fail_security_console_exit_4(base_url: str, capsys):
 
     p = parser()
 
