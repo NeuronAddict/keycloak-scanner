@@ -4,6 +4,7 @@
 
 - fail fast mode
 - Examples in doc
+- Don't display all objects on logs for better readability
 
 # version 1.0.3
 
