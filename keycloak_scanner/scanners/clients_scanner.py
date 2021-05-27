@@ -1,27 +1,36 @@
 from typing import List
 
+from requests import HTTPError
+
 from keycloak_scanner.logging.vuln_flag import VulnFlag
+from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need2
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
 
+class ClientRegistration(JsonResult):
+    pass
 
 
 class Client:
 
-    def __init__(self, name: str, url: str, auth_endpoint: str = None):
+    def __init__(self, name: str, url: str, auth_endpoint: str = None, client_registration: ClientRegistration = None):
         self.name = name
         self.url = url
         self.auth_endpoint = auth_endpoint
+        self.client_registration = client_registration
 
     def __repr__(self):
-        return f"Client('{self.name}', '{self.url}', '{self.auth_endpoint}')"
+        return f"Client('{self.name}', '{self.url}', '{self.auth_endpoint}', {repr(self.client_registration)})"
 
     def __eq__(self, other):
         if isinstance(other, Client):
-            return self.name == other.name and self.url == other.url and self.auth_endpoint == other.auth_endpoint
+            return self.name == other.name \
+                   and self.url == other.url \
+                   and self.auth_endpoint == other.auth_endpoint \
+                   and self.client_registration == other.client_registration
         return NotImplemented
 
 
@@ -46,7 +55,6 @@ class ClientScanner(Need2[Realms, WellKnownDict], Scanner[Clients]):
         except Exception as e:
             super().info(f'[ClientScanner]: {e}')
 
-
     def perform(self, realms: Realms, well_known_dict: WellKnownDict, **kwargs) -> (Clients, VulnFlag):
 
         result: Clients = Clients()
@@ -59,12 +67,27 @@ class ClientScanner(Need2[Realms, WellKnownDict], Scanner[Clients]):
                 # TODO: auth endpoint in other scanner ?
                 auth_url = self.has_auth_endpoint(client_name, realm, well_known_dict)
 
-                if auth_url is not None or url is not None:
-                    result.append(Client(name=client_name, auth_endpoint=auth_url, url=url))
+                registration = self.get_registration(client_name, realm)
+
+                if auth_url is not None or url is not None or registration is not None:
+                    result.append(Client(name=client_name, auth_endpoint=auth_url, url=url, client_registration=registration))
 
         return result, VulnFlag(False)
 
-    def has_auth_endpoint(self, client_name, realm, well_known_dict) -> str:
+    def get_registration(self, client_name, realm: Realm) -> ClientRegistration:
+        url = f'{super().base_url()}/realms/{realm.name}/clients-registrations/default/{client_name}'
+
+        try:
+            r = super().session().get(url)
+            r.raise_for_status()
+            if r.status_code == 200:
+                return ClientRegistration(client_name, url, r.json())
+        except HTTPError as e:
+            super().verbose(str(e))
+        except ValueError as e:
+            super().warn(f'{url} is not json but status is 200. It\'s weird. {e}')
+
+    def has_auth_endpoint(self, client_name: str, realm: Realm, well_known_dict: WellKnownDict) -> str:
         try:
 
             auth_url = well_known_dict[realm.name].json['authorization_endpoint']
