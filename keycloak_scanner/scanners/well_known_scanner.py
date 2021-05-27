@@ -48,10 +48,10 @@ class WellKnownScanner(Need[Realms], Scanner):
             r = super().session().get(url)
 
             if r.status_code != 200:
-                super().verbose('Bad status code for realm {} {}: {}'.format(realm, url, r.status_code))
+                super().verbose('Bad status code for realm {} {}: {}'.format(realm.name, url, r.status_code))
 
             else:
-                super().info('Find a well known for realm {} {}'.format(realm, url))
+                super().info('Find a well known for realm {} {}'.format(realm.name, url))
                 result[realm.name] = WellKnown(realm, name=realm.name, url=url, json=r.json())
 
         return result, VulnFlag()
