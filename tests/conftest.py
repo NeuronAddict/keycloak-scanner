@@ -11,7 +11,7 @@ from keycloak_scanner.scanners.clients_scanner import Client, Clients
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults, SecurityConsoleResult
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
-from tests.mock_response import MockResponse, mock_session, RequestSpec
+from tests.mock_response import MockResponse, mock_session, RequestSpec, MockSpec
 
 
 # httpclient_logging_patch()
@@ -302,16 +302,15 @@ def login_html_page():
    
     '''
 
-
 @fixture
-def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json_master: dict,
-                           well_known_json_other: dict, login_html_page: str) -> Session:
+def full_scan_mock(master_realm_json, other_realm_json, well_known_json_master: dict,
+                           well_known_json_other: dict, login_html_page: str) -> MockSpec:
     token_response = {
         'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI',
         'refresh_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI'
     }
 
-    return mock_session(get={
+    return MockSpec(get={
         'http://localhost:8080/auth/realms/master/.well-known/openid-configuration': RequestSpec(
             MockResponse(status_code=200, response=well_known_json_master)
         ),
@@ -363,3 +362,6 @@ def full_scan_mock_session(master_realm_json, other_realm_json, well_known_json_
         })
 
 
+@fixture
+def full_scan_mock_session(full_scan_mock: MockSpec) -> Session:
+    return full_scan_mock.session()
