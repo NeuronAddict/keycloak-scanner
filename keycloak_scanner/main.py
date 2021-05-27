@@ -52,6 +52,7 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
                         help='Always exit with code 0 (by default, fail with an exit code 4 if a vulnerability is '
                              'discovered or 8 if an error occur). '
                              'Do NOT fail before all test are done.')
+    parser.add_argument('--fail-fast', action='store_true', help='Fail immediately if an error occur.')
     parser.add_argument('--version', action='version', version=f'keycloak-scanner {__version__}. '
                                                                f'https://github.com/NeuronAddict/keycloak-scanner.')
     return parser
@@ -97,7 +98,7 @@ def start(args, initial_session_provider: SessionProvider):
         OpenRedirectScanner(**common_args),
         FormPostXssScanner(**common_args),
         NoneSignScanner(**common_args)
-    ], verbose=args.verbose)
+    ], verbose=args.verbose, fail_fast=True)
     status = scanner.start()
 
     if not args.no_fail and status.has_vulns:
