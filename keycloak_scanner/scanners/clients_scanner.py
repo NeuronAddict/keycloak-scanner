@@ -10,13 +10,13 @@ from keycloak_scanner.scanners.scanner_pieces import Need2
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
 
-class ClientRegistration(JsonResult):
+class ClientConfig(JsonResult):
     pass
 
 
 class Client:
 
-    def __init__(self, name: str, url: str, auth_endpoint: str = None, client_registration: ClientRegistration = None):
+    def __init__(self, name: str, url: str, auth_endpoint: str = None, client_registration: ClientConfig = None):
         self.name = name
         self.url = url
         self.auth_endpoint = auth_endpoint
@@ -74,14 +74,14 @@ class ClientScanner(Need2[Realms, WellKnownDict], Scanner[Clients]):
 
         return result, VulnFlag(False)
 
-    def get_registration(self, client_name, realm: Realm) -> ClientRegistration:
+    def get_registration(self, client_name, realm: Realm) -> ClientConfig:
         url = f'{super().base_url()}/realms/{realm.name}/clients-registrations/default/{client_name}'
 
         try:
             r = super().session().get(url)
             r.raise_for_status()
             if r.status_code == 200:
-                return ClientRegistration(client_name, url, r.json())
+                return ClientConfig(client_name, url, r.json())
         except HTTPError as e:
             super().verbose(str(e))
         except ValueError as e:
