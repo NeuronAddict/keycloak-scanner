@@ -23,7 +23,7 @@ class Client:
         self.client_registration = client_registration
 
     def __repr__(self):
-        return f"Client('{self.name}', '{self.url}', '{self.auth_endpoint}', {repr(self.client_registration)})"
+        return f"Client({repr(self.name)}, {repr(self.url)}, {repr(self.auth_endpoint)}, {repr(self.client_registration)})"
 
     def __eq__(self, other):
         if isinstance(other, Client):
