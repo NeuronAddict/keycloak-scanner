@@ -1,5 +1,3 @@
-import uuid
-
 from keycloak_scanner.scanners.clientregistration_scanner import ClientRegistrationScanner, ClientRegistrations, \
     ClientRegistration, RandomStr
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
@@ -7,7 +5,7 @@ from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 from tests.mock_response import RequestSpec, MockResponse, MockSpec
 
 
-def check_reponse(**kwargs):
+def check_request(**kwargs):
     return kwargs['json'] == {
         "application_type": "web",
         "redirect_uris": [
@@ -18,7 +16,7 @@ def check_reponse(**kwargs):
     }
 
 
-def test_client_registration_scanner_should_register(monkeypatch, master_realm: Realm, well_known_dict: WellKnownDict):
+def test_client_registration_scanner_should_register(master_realm: Realm, well_known_dict: WellKnownDict):
 
     class TestRandomStr(RandomStr):
 
@@ -52,7 +50,7 @@ def test_client_registration_scanner_should_register(monkeypatch, master_realm: 
         post={
             'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect':
                 RequestSpec(response=MockResponse(status_code=201, response=response),
-                            assertion=check_reponse, assertion_value={'json': {
+                            assertion=check_request, assertion_value={'json': {
                                 "application_type": "web",
                                 "redirect_uris": [
                                     "http://callback/callback"],
@@ -72,3 +70,37 @@ def test_client_registration_scanner_should_register(monkeypatch, master_realm: 
             response
         )
     ])
+
+    assert vf.has_vuln
+
+
+def test_client_registration_scanner_should_not_register(master_realm: Realm, well_known_dict: WellKnownDict):
+
+    class TestRandomStr(RandomStr):
+
+        def random_str(self) -> str:
+            return '456789'
+
+    class TestClientRegistrationScanner(ClientRegistrationScanner, TestRandomStr):
+        pass
+
+    session_provider = lambda: MockSpec(
+        post={
+            'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect':
+                RequestSpec(response=MockResponse(status_code=403),
+                            assertion=check_request, assertion_value={'json': {
+                                "application_type": "web",
+                                "redirect_uris": [
+                                    "http://callback/callback"],
+                                "client_name": "keycloak-client-456789",
+                                "logo_uri": "http://callback/logo.png",
+                                "jwks_uri": "http://callback/public_keys.jwks"
+                            }})}).session()
+
+    scanner = TestClientRegistrationScanner('http://callback', base_url='http://localhost:8080', session_provider=session_provider)
+
+    result, vf = scanner.perform(Realms([master_realm]), well_known_dict)
+
+    assert result == ClientRegistrations([])
+
+    assert not vf.has_vuln
