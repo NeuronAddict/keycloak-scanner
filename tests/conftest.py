@@ -302,9 +302,10 @@ def login_html_page():
    
     '''
 
+
 @fixture
 def full_scan_mock(master_realm_json, other_realm_json, well_known_json_master: dict,
-                           well_known_json_other: dict, login_html_page: str) -> MockSpec:
+                   well_known_json_other: dict, login_html_page: str) -> MockSpec:
     token_response = {
         'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI',
         'refresh_token': 'eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3ODM4MGM2ZS1iODhmLTQ5NDQtOGRkZS03NTQyMDNkMjFhODEifQ.eyJleHAiOjE2MjE2NzU5NzIsImlhdCI6MTYyMTYzOTk3MiwianRpIjoiMGU2NDcxOTItMzU5ZS00NmU4LWFkYWQtNTQzNmQyNjMyZjA1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjJjMTZhY2Y1LWMwOTYtNDg5ZC1iYjFjLTU4ZTc0ZTJiZjAzMiIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiZWY3ZjNjZmItMDAzZS00YzViLWEzMWQtYmI0OGFhZjAzNzk3Iiwic3RhdGVfY2hlY2tlciI6ImtKNy05MURtNVEwVXktT1JfVlJnT1d5eF91Wkh3M0ZfczktTVdlUjZRTlEifQ.6yZvyGKEH0NXmLY8nKRQMLsMQYPXq5dYCsIF3LRiOxI'
@@ -343,7 +344,44 @@ def full_scan_mock(master_realm_json, other_realm_json, well_known_json_master: 
                                                                                                          response=login_html_page)),
         'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth?client_id=account-console&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauth%2Frealms%2Fmaster%2Faccount%2F%23%2F&state=310f298c-f3d8-4c42-8ebc-44484febf84c&response_mode=fragment&response_type=code&scope=openid&nonce=a6be5274-15e4-4ffe-9905-ffb038b20a8e&code_challenge=Nd1svU3YNT0r6eWHkSmNeX_cxgUPQUVzPfZFXRWaJmY&code_challenge_method=S256':
             RequestSpec(MockResponse(
-                200, login_html_page))
+                200, login_html_page)),
+        'http://localhost:8080/realms/master/clients-registrations/default/client1': RequestSpec(
+            MockResponse(200, response={"id": "899e2dc1-5fc0-4eaf-bedb-f81a3f9e9313", "clientId": "admin-cli",
+                                        "name": "${client_admin-cli}", "surrogateAuthRequired": False, "enabled": True,
+                                        "alwaysDisplayInConsole": False, "clientAuthenticatorType": "client-secret",
+                                        "redirectUris": [], "webOrigins": [], "notBefore": 0, "bearerOnly": False,
+                                        "consentRequired": False, "standardFlowEnabled": False,
+                                        "implicitFlowEnabled": False, "directAccessGrantsEnabled": False,
+                                        "serviceAccountsEnabled": False, "publicClient": False,
+                                        "frontchannelLogout": False, "protocol": "openid-connect", "attributes": {},
+                                        "authenticationFlowBindingOverrides": {}, "fullScopeAllowed": False,
+                                        "nodeReRegistrationTimeout": 0,
+                                        "defaultClientScopes": ["web-origins", "roles", "profile", "email"],
+                                        "optionalClientScopes": ["address", "phone", "offline_access",
+                                                                 "microprofile-jwt"]})
+        ),
+        'http://localhost:8080/realms/other/clients-registrations/default/client1': RequestSpec(
+            MockResponse(200, response={"id": "899e2dc1-5fc0-4eaf-bedb-f81a3f9e9313", "clientId": "admin-cli",
+                                        "name": "${client_admin-cli}", "surrogateAuthRequired": False, "enabled": True,
+                                        "alwaysDisplayInConsole": False, "clientAuthenticatorType": "client-secret",
+                                        "redirectUris": [], "webOrigins": [], "notBefore": 0, "bearerOnly": False,
+                                        "consentRequired": False, "standardFlowEnabled": False,
+                                        "implicitFlowEnabled": False, "directAccessGrantsEnabled": False,
+                                        "serviceAccountsEnabled": False, "publicClient": False,
+                                        "frontchannelLogout": False, "protocol": "openid-connect", "attributes": {},
+                                        "authenticationFlowBindingOverrides": {}, "fullScopeAllowed": False,
+                                        "nodeReRegistrationTimeout": 0,
+                                        "defaultClientScopes": ["web-origins", "roles", "profile", "email"],
+                                        "optionalClientScopes": ["address", "phone", "offline_access",
+                                                                 "microprofile-jwt"]})
+        ),
+        'http://localhost:8080/realms/master/clients-registrations/default/client2': RequestSpec(
+            MockResponse(400)
+        ),
+        'http://localhost:8080/realms/other/clients-registrations/default/client2': RequestSpec(
+            MockResponse(400)
+        ),
+
     },
         post={
             'http://localhost:8080/master/token': RequestSpec(MockResponse(status_code=200, response=token_response)),
@@ -358,7 +396,47 @@ def full_scan_mock(master_realm_json, other_realm_json, well_known_json_master: 
             '=bR4rBd0QNGsd_kGuqiyLEuYuY6FK3Lx9HCYJEltUQBk&execution=de13838a-ee3d-404e-b16d-b0d7aa320844&client_id'
             '=account-console&tab_id=GXMjAPR3DsQ':
                 RequestSpec(MockResponse(
-                    302, response=None, headers={'Location': '<openid location>'}))
+                    302, response=None, headers={'Location': '<openid location>'})),
+            'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect':
+                RequestSpec(response=MockResponse(status_code=201, response={
+                    "redirect_uris":
+                        ["http://localhost:8080/callback"],
+                    "token_endpoint_auth_method": "client_secret_basic",
+                    "grant_types": ["authorization_code", "refresh_token"],
+                    "response_types": ["code", "none"],
+                    "client_id": "539ce782-5d15-4256-a5fa-1a46609d056b",
+                    "client_secret": "c94f5fc0-0a04-4e2f-aec6-b1f5edad1d44",
+                    "client_name": "keycloak-client-456789",
+                    "scope": "address phone offline_access microprofile-jwt",
+                    "jwks_uri": "http://localhost:8080/public_keys.jwks",
+                    "subject_type": "pairwise",
+                    "request_uris": ["http://localhost:8080/rf.txt"],
+                    "tls_client_certificate_bound_access_tokens": False,
+                    "client_id_issued_at": 1622306364,
+                    "client_secret_expires_at": 0,
+                    "registration_client_uri": "http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b",
+                    "backchannel_logout_session_required": False
+                })),
+            'http://localhost:8080/auth/realms/other/clients-registrations/openid-connect':
+                RequestSpec(response=MockResponse(status_code=201, response={
+                    "redirect_uris":
+                        ["http://localhost:8080/callback"],
+                    "token_endpoint_auth_method": "client_secret_basic",
+                    "grant_types": ["authorization_code", "refresh_token"],
+                    "response_types": ["code", "none"],
+                    "client_id": "539ce782-5d15-4256-a5fa-1a46609d056b",
+                    "client_secret": "c94f5fc0-0a04-4e2f-aec6-b1f5edad1d44",
+                    "client_name": "keycloak-client-456789",
+                    "scope": "address phone offline_access microprofile-jwt",
+                    "jwks_uri": "http://localhost:8080/public_keys.jwks",
+                    "subject_type": "pairwise",
+                    "request_uris": ["http://localhost:8080/rf.txt"],
+                    "tls_client_certificate_bound_access_tokens": False,
+                    "client_id_issued_at": 1622306364,
+                    "client_secret_expires_at": 0,
+                    "registration_client_uri": "http://localhost:8080/auth/realms/other/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b",
+                    "backchannel_logout_session_required": False
+                }))
         })
 
 
