@@ -2,6 +2,7 @@ from typing import Dict, Callable, Any
 from unittest.mock import MagicMock
 
 import requests
+from requests import HTTPError
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 
@@ -18,7 +19,7 @@ class MockResponse:
 
     def raise_for_status(self):
         if self.status_code > 399:
-            raise Exception('Mock raise for status')
+            raise HTTPError('Mock raise for status')
 
     def json(self):
         if isinstance(self.response, dict):
