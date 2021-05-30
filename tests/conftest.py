@@ -1,17 +1,13 @@
-from unittest.mock import MagicMock
+from pathlib import Path
 
-import requests
 from _pytest.fixtures import fixture
 from requests import Session
-import logging
-import http.client
 
-from keycloak_scanner.logging.http_logging import httpclient_logging_patch
 from keycloak_scanner.scanners.clients_scanner import Client, Clients
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults, SecurityConsoleResult
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
-from tests.mock_response import MockResponse, mock_session, RequestSpec, MockSpec
+from tests.mock_response import MockResponse, RequestSpec, MockSpec
 
 
 # httpclient_logging_patch()
@@ -443,3 +439,10 @@ def full_scan_mock(master_realm_json, other_realm_json, well_known_json_master: 
 @fixture
 def full_scan_mock_session(full_scan_mock: MockSpec) -> Session:
     return full_scan_mock.session()
+
+
+@fixture
+def callback_file(tmp_path: Path) -> Path:
+    p = tmp_path / 'callback.txt'
+    p.write_text('http://callback\nhttp://callback2\n')
+    return p

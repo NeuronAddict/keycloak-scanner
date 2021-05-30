@@ -14,7 +14,7 @@ def test_should_start_scan_xss_fail_security_console_exit_4(base_url: str, capsy
 
     base_args = [base_url, '--realms', 'master', '--clients',
                  'account,account-console,admin-cli,broker,master-realm,security-admin-console',
-                 '--username', 'admin', '--password', 'Pa55w0rd']
+                 '--username', 'admin', '--password', 'Pa55w0rd', '--registration-callback', 'http://localhost:8080']
 
     if os.getenv('ITESTS_VERBOSE') == 'true':
         base_args.append('--verbose')

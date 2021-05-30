@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from _pytest.fixtures import fixture
 
@@ -17,3 +18,10 @@ def base_url() -> str:
 def proxy() -> str:
     if os.getenv('PROXY'):
         return os.getenv('PROXY')
+
+
+@fixture
+def callback_file(tmp_path: Path) -> Path:
+    p = tmp_path / 'callback.txt'
+    p.write_text('http://localhost:8080\nhttps://localhost:8443\n')
+    return p
