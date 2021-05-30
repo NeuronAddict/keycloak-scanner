@@ -27,6 +27,7 @@ Scans :
 - Search well-known files
 - Search for clients
 - Search for valid logins
+- Try client registration
 - Search for security-admin-console and secret inside
 - Search for open redirect via unvalidated redirect_uri
 - Search for CVE-2018-14655 (reflected XSS)

@@ -53,6 +53,7 @@ $ #--password Pa55w0rd  # password to test a password auth
 * client : check if a client exists in all realms
 * well_known : get well_known for all realms
 * login : test login against all clients / realms 
+* client registration : try to add a new client (WARNING, client is deleted after test, if its not the case, be sure to make it manually)
 * OpenRedirect : check if attack authorization flow via open redirection (unvalidated redirect_uri) is possible
 * form post : check CVE 2018 14655 
 * none sign : check if none sign algorithm is supported
@@ -62,34 +63,88 @@ $ #--password Pa55w0rd  # password to test a password auth
 
 ```
 $ keycloak-scanner --help
-usage: keycloak-scanner [-h] [--realms REALMS] [--clients CLIENTS] [--proxy PROXY] [--username USERNAME] [--password PASSWORD] [--ssl-noverify] [--verbose] [--no-fail] base_url
+usage: keycloak-scanner [-h] --realms REALMS --clients CLIENTS [--proxy PROXY]
+
+                        [--username USERNAME] [--password PASSWORD]
+
+                        [--ssl-noverify] [--verbose] [--no-fail] [--fail-fast]
+
+                        [--version]
+
+                        (--registration-callback REGISTRATION_CALLBACK | --registration-callback-list REGISTRATION_CALLBACK_LIST)
+
+                        base_url
 
 KeyCloak vulnerabilities scanner.
 
 positional arguments:
-  base_url             URL to scan. ex http://localhost:8080
+
+  base_url              URL to scan. ex http://localhost:8080
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --realms REALMS      Comma separated list of custom realms to test
-  --clients CLIENTS    Comma separated list of custom clients to test
-  --proxy PROXY        Use a great proxy like BURP ;)
-  --username USERNAME  If a username is specified, try to connect and attack a token. If no password, try username as password.
-  --password PASSWORD  password to test with username
-  --ssl-noverify       Do not verify ssl certificates
-  --verbose            Verbose mode
-  --no-fail            Always exit with code 0 (by default, fail with an exit code 4 if a vulnerability is discovered). Do NOT fail before all test are done.
 
-By default, master realm is already tested.
-Clients always tested : account, admin-cli, broker, realm-management, security-admin-console.
+  -h, --help            show this help message and exit
 
-Scans :
+  --realms REALMS       Comma separated list of custom realms to test. ie :
+
+                        master
+
+  --clients CLIENTS     Comma separated list of custom clients to test. On
+
+                        default installation, use account,admin-
+
+                        cli,broker,realm-management,security-admin-console
+
+  --proxy PROXY         Use a great proxy like BURP ;)
+
+  --username USERNAME   If a username is specified, try to connect and attack
+
+                        a token. If no password, try username as password.
+
+  --password PASSWORD   password to test with username
+
+  --ssl-noverify        Do not verify ssl certificates
+
+  --verbose             Verbose mode
+
+  --no-fail             Always exit with code 0 (by default, fail with an exit
+
+                        code 4 if a vulnerability is discovered or 8 if an
+
+                        error occur). Do NOT fail before all test are done.
+
+  --fail-fast           Fail immediately if an error occur.
+
+  --version             show program's version number and exit
+
+  --registration-callback REGISTRATION_CALLBACK
+
+                        Callback url to use on client registration test
+
+  --registration-callback-list REGISTRATION_CALLBACK_LIST
+
+                        File with one callback to test for registration by
+
+                        line
+
+Scans : 
+
 - list realms
+
 - Search well-known files
+
 - Search for clients
+
+- Search for valid logins
+
+- Try client registration
+
 - Search for security-admin-console and secret inside
+
 - Search for open redirect via unvalidated redirect_uri
+
 - Search for CVE-2018-14655 (reflected XSS)
+
 - None alg in refresh token
 
 Bugs, feature requests, request another scan, questions : https://github.com/NeuronAddict/keycloak-scanner.
@@ -117,3 +172,10 @@ cd keycloak-scanner
 sudo pip3 install . # use sudo for install for all users
 keycloak-scanner
 ```
+
+
+## TODO
+
+- Use secret to test auth 
+- Username/password files support
+- integrated documentation on scanner via base methods

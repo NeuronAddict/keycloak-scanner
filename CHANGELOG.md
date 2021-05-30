@@ -8,6 +8,7 @@
 - client registration scanner
 - improve client scanner
 - callback list support for client registration scanner
+- delete client after client registration scan
 
 # version 1.0.3
 
