@@ -31,7 +31,7 @@ def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys):
 
     print(captured.err)
 
-    assert captured.err == ''
+    assert captured.err == '[WARN] Result of SecurityConsoleScanner as no results (void list), subsequent scans can be void too.\n'
 
     assert 'Find realm master' in captured.out
 

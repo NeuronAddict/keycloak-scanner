@@ -8,7 +8,7 @@ volumes:
 
 services:
   mariadb:
-      image: mariadb
+      image: mariadb:10.5
       volumes:
         - mysql_data:/var/lib/mysql
       environment:
