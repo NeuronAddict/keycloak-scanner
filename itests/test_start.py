@@ -9,14 +9,18 @@ from keycloak_scanner.main import start
 
 @pytest.mark.skipif(os.getenv('ITESTS') != 'true', reason='integration tests')
 def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys):
-
     p = parser()
 
-    args = p.parse_args([base_url, '--realms', 'master,other', '--clients', 'account,account-console,admin-cli,broker,master-realm,security-admin-console',
-                         '--username', 'admin', '--password', 'Pa55w0rd'])
+    base_args = [base_url, '--realms', 'master,other', '--clients',
+                 'account,account-console,admin-cli,broker,master-realm,security-admin-console',
+                 '--username', 'admin', '--password', 'Pa55w0rd']
+
+    if os.getenv('ITESTS_VERBOSE') == 'true':
+        base_args.append('--verbose')
+
+    args = p.parse_args(base_args)
 
     with pytest.raises(SystemExit) as e:
-
         start(args, lambda: requests.Session())
 
     assert e.value.code == 4
@@ -46,4 +50,3 @@ def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys):
     assert "[+] ClientRegistrationScanner - Registering a client keycloak-client-" in captured.out
 
     assert "Fail with exit code 4 because vulnerabilities are discovered" in captured.out
-
