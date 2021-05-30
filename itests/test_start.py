@@ -2,13 +2,14 @@ import os
 
 import pytest
 import requests
+from _pytest.capture import CaptureFixture
 
 from keycloak_scanner.main import parser
 from keycloak_scanner.main import start
 
 
 @pytest.mark.skipif(os.getenv('ITESTS') != 'true', reason='integration tests')
-def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys):
+def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys: CaptureFixture, proxy: str):
     p = parser()
 
     base_args = [base_url, '--realms', 'master,other', '--clients',
@@ -17,6 +18,10 @@ def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys):
 
     if os.getenv('ITESTS_VERBOSE') == 'true':
         base_args.append('--verbose')
+
+    if proxy:
+        base_args.append('--proxy')
+        base_args.append(proxy)
 
     args = p.parse_args(base_args)
 
