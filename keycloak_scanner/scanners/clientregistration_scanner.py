@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.json_result import JsonResult
-from keycloak_scanner.scanners.realm_scanner import Realms
+from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need2
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
@@ -49,10 +49,10 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
 
             if registration_endpoint is not None:
 
-                cr = self.registration(registration_endpoint, self.callback_url)
+                cr = self.registration(realm, registration_endpoint, self.callback_url)
 
             else:
-                cr = self.registration(f'{super().base_url()}/auth/realms/{realm.name}/clients-registrations/openid'
+                cr = self.registration(realm, f'{super().base_url()}/auth/realms/{realm.name}/clients-registrations/openid'
                                        f'-connect', self.callback_url)
 
             if cr is not None:
@@ -60,7 +60,7 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
 
         return result, VulnFlag(len(result) > 0)
 
-    def registration(self, url: str, base_url: str, application_type: str = 'web') -> ClientRegistration:
+    def registration(self, realm: Realm, url: str, base_url: str, application_type: str = 'web') -> ClientRegistration:
 
         client_name = f'keycloak-client-{super().random_str()}'
 
@@ -78,7 +78,7 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
             cr = ClientRegistration(client_name,
                                     r.json()['registration_client_uri'] if 'registration_client_uri' in r.json() else '',
                                     r.json())
-            super().find('ClientRegistrationScanner',  f'Registering a client {client_name}')
+            super().find('ClientRegistrationScanner',  f'Registering a client {client_name} for realm {realm.name}')
             return cr
         else:
             super().info(f'status code {r.status_code} for client registration')
