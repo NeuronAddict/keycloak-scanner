@@ -2,13 +2,14 @@ import os
 
 import pytest
 import requests
+from _pytest.capture import CaptureFixture
 
 from keycloak_scanner.main import parser
 from keycloak_scanner.main import start
 
 
 @pytest.mark.skipif(os.getenv('ITESTS_XSS') != 'true', reason='integration tests')
-def test_should_start_scan_xss_fail_security_console_exit_4(base_url: str, capsys):
+def test_should_start_scan_xss_fail_security_console_exit_4(base_url: str, capsys: CaptureFixture, proxy: str):
     p = parser()
 
     base_args = [base_url, '--realms', 'master', '--clients',
@@ -17,6 +18,10 @@ def test_should_start_scan_xss_fail_security_console_exit_4(base_url: str, capsy
 
     if os.getenv('ITESTS_VERBOSE') == 'true':
         base_args.append('--verbose')
+
+    if proxy:
+        base_args.append('--proxy')
+        base_args.append(proxy)
 
     args = p.parse_args(base_args)
 
@@ -31,7 +36,7 @@ def test_should_start_scan_xss_fail_security_console_exit_4(base_url: str, capsy
 
     print(captured.err)
 
-    assert captured.err == ''
+    assert captured.err == '[WARN] Result of ClientRegistrationScanner as no results (void list), subsequent scans can be void too.\n'
 
     assert 'Find realm master' in captured.out
 
