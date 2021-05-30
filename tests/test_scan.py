@@ -25,22 +25,29 @@ class TestResult:
 
 
 class TestResultList(List[str], MockPrintLogger):
-    pass
+    __test__ = False
 
 
 class TestScanner(Scanner[TestResult], MockPrintLogger):
+    __test__ = False
+
     def perform(self):
         super().session().get(super().base_url())
         return TestResult()
 
 
 class TestScannerList(Scanner[TestResultList], MockPrintLogger):
+
+    __test__ = False
+
     def perform(self):
         super().session().get(super().base_url())
         return TestResultList(), VulnFlag(True)
 
 
 class TestMasterScanner(MasterScanner, MockPrintLogger):
+
+    __test__ = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
