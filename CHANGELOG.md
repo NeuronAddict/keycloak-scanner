@@ -7,6 +7,7 @@
 - Don't display all objects on logs for better readability
 - client registration scanner
 - improve client scanner
+- callback list support for client registration scanner
 
 # version 1.0.3
 
