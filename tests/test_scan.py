@@ -98,9 +98,9 @@ def test_full_scan(base_url: str, full_scan_mock_session: Session, monkeypatch):
     print(repr(scanner.results))
 
     assert scanner.results.results == {
-        'client_registrations': ClientRegistrations([ClientRegistration('keycloak-client-456789',
-                                                    'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b',
-                                                    {'redirect_uris': ['http://localhost:8080/callback'],
+        'client_registrations': ClientRegistrations([ClientRegistration('http://callback', name='keycloak-client-456789',
+                                                    url='http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b',
+                                                    json={'redirect_uris': ['http://localhost:8080/callback'],
                                                      'token_endpoint_auth_method': 'client_secret_basic',
                                                      'grant_types': ['authorization_code', 'refresh_token'],
                                                      'response_types': ['code', 'none'],
@@ -115,9 +115,9 @@ def test_full_scan(base_url: str, full_scan_mock_session: Session, monkeypatch):
                                                      'client_id_issued_at': 1622306364, 'client_secret_expires_at': 0,
                                                      'registration_client_uri': 'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b',
                                                      'backchannel_logout_session_required': False}),
-                                 ClientRegistration('keycloak-client-456789',
-                                                    'http://localhost:8080/auth/realms/other/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b',
-                                                    {'redirect_uris': ['http://localhost:8080/callback'],
+                                 ClientRegistration('http://callback',  name='keycloak-client-456789',
+                                                    url='http://localhost:8080/auth/realms/other/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b',
+                                                    json={'redirect_uris': ['http://localhost:8080/callback'],
                                                      'token_endpoint_auth_method': 'client_secret_basic',
                                                      'grant_types': ['authorization_code', 'refresh_token'],
                                                      'response_types': ['code', 'none'],
