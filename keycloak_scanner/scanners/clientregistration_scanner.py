@@ -1,6 +1,5 @@
 import uuid
 from typing import List, Union
-from uuid import uuid4
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.json_result import JsonResult
@@ -24,6 +23,7 @@ class ClientRegistration(JsonResult):
         return f"{self.__class__.__name__}({repr(self.callback_url)}, name={repr(self.name)}', " \
                f"url={repr(self.url)}, json={repr(self.json)})"
 
+
 class ClientRegistrations(List[ClientRegistration]):
     pass
 
@@ -44,6 +44,8 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
     """
 
     def __init__(self, callback_url: Union[str, List[str]], **kwargs):
+        if callback_url is None or callback_url == '' or len(callback_url) == 0:
+            raise Exception('please provide a callback url for client registration scanner')
         self.callback_url = callback_url
         super().__init__(**kwargs)
 
@@ -65,9 +67,14 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
                         result.append(cr)
 
             else:
-                cr = self.check_registration_endpoint(realm, registration_endpoint, self.callback_url)
-                if cr is not None:
-                    result.append(cr)
+
+                with open(self.callback_url)as file:
+                    for callback_url in file:
+                        # TODO : maybe fail with windows and '\r'
+                        callback_url = callback_url.strip('\n')
+                        cr = self.check_registration_endpoint(realm, registration_endpoint, callback_url)
+                        if cr is not None:
+                            result.append(cr)
 
         return result, VulnFlag(len(result) > 0)
 
