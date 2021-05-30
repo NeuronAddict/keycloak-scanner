@@ -1,5 +1,5 @@
 import uuid
-from typing import List, Union, Callable, Any
+from typing import List, Union
 
 import requests
 
@@ -8,7 +8,7 @@ from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need2
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
+from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
 
 class ClientRegistration(JsonResult):
@@ -41,6 +41,17 @@ class RandomStr:
         return str(uuid.uuid4())
 
 
+def callbackurl_iterator(callback_url: Union[str, List[str]]):
+    if isinstance(callback_url, str):
+        with open(callback_url) as file:
+            for line in file:
+                line = line.strip('\n')
+                yield line
+    else:
+        for cb in callback_url:
+            yield cb
+
+
 class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegistrations], RandomStr):
     """
     This scanner add a client registration, with and without credentials, if provideds.
@@ -50,7 +61,11 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
     """
 
     def __init__(self, callback_url: Union[str, List[str]], **kwargs):
-
+        """
+        Create a ClientRegistrationScanner
+        :param callback_url: a filename (str) or a list of callback to test. if filename, one callback by line (with http://)
+        :param kwargs:
+        """
         # callback url can be a filename or a list of items
         if callback_url is None or callback_url == '' or len(callback_url) == 0:
             raise Exception('please provide a callback url for client registration scanner')
@@ -76,24 +91,14 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
 
             registration_endpoint = well_known.json['registration_endpoint']
 
-            if isinstance(self.callback_url, list):
+            # callback url is a file, open the file and test each line
+            for callback_url in callbackurl_iterator(self.callback_url):
 
-                # callback_url is a list, iterate
-                for c in self.callback_url:
-                    cr = self.check_registration_endpoint(realm, registration_endpoint, c)
-                    if cr is not None:
-                        result.append(cr)
-
-            else:
-
-                # callback url is a file, open the file and test each line
-                with open(self.callback_url)as file:
-                    for callback_url in file:
-                        # TODO : maybe fail with windows and '\r'
-                        callback_url = callback_url.strip('\n')
-                        cr = self.check_registration_endpoint(realm, registration_endpoint, callback_url)
-                        if cr is not None:
-                            result.append(cr)
+                cr = self.check_registration_endpoint(realm, registration_endpoint, callback_url)
+                if cr is not None:
+                    result.append(cr)
+                # else:
+                    # check with credentials
 
         # clean all clients
         for client_registration in result:
