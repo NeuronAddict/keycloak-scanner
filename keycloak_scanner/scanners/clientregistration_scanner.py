@@ -1,5 +1,7 @@
 import uuid
-from typing import List, Union
+from typing import List, Union, Callable, Any
+
+import requests
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.json_result import JsonResult
@@ -22,6 +24,9 @@ class ClientRegistration(JsonResult):
     def __repr__(self):
         return f"{self.__class__.__name__}({repr(self.callback_url)}, name={repr(self.name)}', " \
                f"url={repr(self.url)}, json={repr(self.json)})"
+
+    def delete(self, session: requests.Session):
+        session.delete(self.url, headers={'Authorization': f'Bearer {self.json["registration_access_token"]}'})
 
 
 class ClientRegistrations(List[ClientRegistration]):
@@ -75,6 +80,13 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
                         cr = self.check_registration_endpoint(realm, registration_endpoint, callback_url)
                         if cr is not None:
                             result.append(cr)
+
+        for client_registration in result:
+            try:
+                client_registration.delete(super().session())
+                super().info(f'Deleted client {client_registration.name}')
+            except Exception as e:
+                super().warn(f'Unable to delete client {client_registration.name} at {client_registration.url} {e}')
 
         return result, VulnFlag(len(result) > 0)
 

@@ -56,4 +56,6 @@ def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys: C
 
     assert "[+] ClientRegistrationScanner - Registering a client keycloak-client-" in captured.out
 
+    assert "[INFO] Deleted client keycloak-client-"
+
     assert "Fail with exit code 4 because vulnerabilities are discovered" in captured.out
