@@ -4,7 +4,7 @@ import sys
 import requests
 import urllib3
 
-
+from keycloak_scanner.scanners.clientregistration_scanner import ClientRegistrationScanner
 from keycloak_scanner.scanners.clients_scanner import ClientScanner
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
 from keycloak_scanner.scanners.login_scanner import LoginScanner
@@ -55,6 +55,7 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
     parser.add_argument('--fail-fast', action='store_true', help='Fail immediately if an error occur.')
     parser.add_argument('--version', action='version', version=f'keycloak-scanner {__version__}. '
                                                                f'https://github.com/NeuronAddict/keycloak-scanner.')
+    parser.add_argument('--registration-callback', help='callback url to use on client registration test', default='http://localhost:8080')
     return parser
 
 
@@ -94,6 +95,7 @@ def start(args, initial_session_provider: SessionProvider):
         WellKnownScanner(**common_args),
         ClientScanner(clients=clients, **common_args),
         LoginScanner(username=args.username, password=args.password, **common_args),
+        ClientRegistrationScanner(**common_args, callback_url=args.registration_callback),
         SecurityConsoleScanner(**common_args),
         OpenRedirectScanner(**common_args),
         FormPostXssScanner(**common_args),

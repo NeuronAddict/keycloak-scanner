@@ -7,15 +7,19 @@ from keycloak_scanner.main import parser
 from keycloak_scanner.main import start
 
 
-@pytest.mark.skipif(os.getenv('ITESTS') != 'true', reason='integration tests')
-def test_should_start_scan_fail_security_console_exit_8(base_url: str, capsys):
+#@pytest.mark.skipif(os.getenv('ITESTS') != 'true', reason='integration tests')
+def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys):
 
     p = parser()
 
-    args = p.parse_args([base_url, '--realms', 'master', '--clients', 'account,account-console,admin-cli,broker,master-realm,security-admin-console',
-                         '--username', 'admin', '--password', 'Pa55w0rd'])
+    args = p.parse_args([base_url, '--realms', 'master,other', '--clients', 'account,account-console,admin-cli,broker,master-realm,security-admin-console',
+                         '--username', 'admin', '--password', 'Pa55w0rd', '--proxy', 'http://localhost:8118'])
 
-    start(args, lambda: requests.Session())
+    with pytest.raises(SystemExit) as e:
+
+        start(args, lambda: requests.Session())
+
+    assert e.value.code == 4
 
     captured = capsys.readouterr()
 
@@ -23,7 +27,7 @@ def test_should_start_scan_fail_security_console_exit_8(base_url: str, capsys):
 
     print(captured.err)
 
-    assert captured.err == '[WARN] Result of SecurityConsoleScanner as no results (void list), subsequent scans can be void too.\n'
+    assert captured.err == ''
 
     assert 'Find realm master' in captured.out
 
@@ -39,6 +43,7 @@ def test_should_start_scan_fail_security_console_exit_8(base_url: str, capsys):
 
     assert "[+] LoginScanner - Can login with username admin on realm master, client admin-cli, grant_type: password" in captured.out
 
-    # TODO: add other tests when vulns are on itest
+    assert "[+] ClientRegistrationScanner - Registering a client keycloak-client-" in captured.out
 
+    assert "Fail with exit code 4 because vulnerabilities are discovered" in captured.out
 
