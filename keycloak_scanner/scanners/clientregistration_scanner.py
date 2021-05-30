@@ -43,18 +43,30 @@ class RandomStr:
 
 class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegistrations], RandomStr):
     """
-    This scanner check for :
-    - add a client registration, with and without credentials, if provideds
+    This scanner add a client registration, with and without credentials, if provideds.
+    After scan, client is deleted.
+
     https://openid.net/specs/openid-connect-registration-1_0.html
     """
 
     def __init__(self, callback_url: Union[str, List[str]], **kwargs):
+
+        # callback url can be a filename or a list of items
         if callback_url is None or callback_url == '' or len(callback_url) == 0:
             raise Exception('please provide a callback url for client registration scanner')
         self.callback_url = callback_url
         super().__init__(**kwargs)
 
     def perform(self, realms: Realms, well_known_dict: WellKnownDict, **kwargs) -> (ClientRegistrations, VulnFlag):
+        """
+        Perform scan.
+
+        For each realm, search for registration endpoint in well known
+        :param realms: realms to test
+        :param well_known_dict: well known dictionary
+        :param kwargs:
+        :return: a list of ClientRegistration and a vuln flag. vulnerable if a client can be registered
+        """
 
         result = ClientRegistrations()
 
@@ -66,6 +78,7 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
 
             if isinstance(self.callback_url, list):
 
+                # callback_url is a list, iterate
                 for c in self.callback_url:
                     cr = self.check_registration_endpoint(realm, registration_endpoint, c)
                     if cr is not None:
@@ -73,6 +86,7 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
 
             else:
 
+                # callback url is a file, open the file and test each line
                 with open(self.callback_url)as file:
                     for callback_url in file:
                         # TODO : maybe fail with windows and '\r'
@@ -81,6 +95,7 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
                         if cr is not None:
                             result.append(cr)
 
+        # clean all clients
         for client_registration in result:
             try:
                 client_registration.delete(super().session())
@@ -91,17 +106,34 @@ class ClientRegistrationScanner(Need2[Realms, WellKnownDict], Scanner[ClientRegi
         return result, VulnFlag(len(result) > 0)
 
     def check_registration_endpoint(self, realm, registration_endpoint, callback_url: str):
+        """
+        check if an endpoint support register
+
+        :param realm: realm to test
+        :param registration_endpoint: registration endpoint to test
+        :param callback_url: callback url to test. policy can forbit some callbacks
+        :return: ClientRegistration if success, or None
+        """
         if registration_endpoint is not None:
 
             cr = self.registration(realm, registration_endpoint, callback_url)
 
         else:
+            # we try to guess the url
+            # TODO: use multiples urls
             cr = self.registration(realm, f'{super().base_url()}/auth/realms/{realm.name}/clients-registrations/openid'
                                           f'-connect', callback_url)
         return cr
 
     def registration(self, realm: Realm, url: str, callback_url: str, application_type: str = 'web') -> ClientRegistration:
-
+        """
+        Perform the registration
+        :param realm: realm to test
+        :param url: url of the registration endpoint
+        :param callback_url: callback url
+        :param application_type: usually 'web'. see https://openid.net/specs/openid-connect-registration-1_0.html
+        :return: ClientRegistration, or None if can't register
+        """
         client_name = f'keycloak-client-{super().random_str()}'
 
         super().info(f'try to register client {client_name}')
