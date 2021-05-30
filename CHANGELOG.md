@@ -5,6 +5,8 @@
 - fail fast mode
 - Examples in doc
 - Don't display all objects on logs for better readability
+- client registration scanner
+- improve client scanner
 
 # version 1.0.3
 
