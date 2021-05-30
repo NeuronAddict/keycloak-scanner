@@ -85,7 +85,7 @@ def test_full_scan(base_url: str, full_scan_mock_session: Session, monkeypatch):
         RealmScanner(realms=['master', 'other'], **common_args),
         WellKnownScanner(**common_args),
         ClientScanner(clients=['client1', 'client2'], **common_args),
-        ClientRegistrationScanner(**common_args, callback_url='http://callback'),
+        ClientRegistrationScanner(**common_args, callback_url=['http://callback']),
         SecurityConsoleScanner(**common_args),
         OpenRedirectScanner(**common_args),
         FormPostXssScanner(**common_args),
