@@ -41,7 +41,7 @@ def test_get_token(master_realm: Realm, client1: Client, well_known_dict: WellKn
 
     session_provider: SessionProvider = get_mock_session
 
-    credential.get_token(session_provider, well_known_dict)
+    credential.get_token(session_provider, well_known_dict['master'])
 
     session.post.assert_called_once_with('http://localhost:8080/auth/realms/master/protocol/openid-connect/token',
         data={
