@@ -1,8 +1,11 @@
+from unittest.mock import MagicMock
+
 import requests
 
 from keycloak_scanner.scanners.clients_scanner import Clients, Client
 from keycloak_scanner.scanners.login_scanner import LoginScanner, Credential
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
+from keycloak_scanner.scanners.session_holder import SessionProvider
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
 
@@ -25,3 +28,27 @@ def test_perform(base_url: str, all_realms: Realms, all_clients: Clients, well_k
 
 
     assert "[+] LoginScanner - Form login work for admin on realm other, client client2, (<openid location>)" in captured.out
+
+
+def test_get_token(master_realm: Realm, client1: Client, well_known_dict: WellKnownDict):
+    session = requests.session()
+    session.post = MagicMock()
+
+    def get_mock_session() -> requests.Session:
+        return session
+
+    credential = Credential(master_realm, client1, username='admin', password='pa55w0rd')
+
+    session_provider: SessionProvider = get_mock_session
+
+    credential.get_token(session_provider, well_known_dict)
+
+    session.post.assert_called_once_with('http://localhost:8080/auth/realms/master/protocol/openid-connect/token',
+        data={
+            'client_id': 'client1',
+            'username': 'admin',
+            'password': 'pa55w0rd',
+            'grant_type': 'password',
+            'client_secret': ''
+        }
+    )
