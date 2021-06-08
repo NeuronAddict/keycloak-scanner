@@ -1,4 +1,4 @@
-from typing import Dict, Callable, Any
+from typing import Dict, Callable, Any, Union
 from unittest.mock import MagicMock
 
 import requests
@@ -7,9 +7,12 @@ from requests import HTTPError
 from keycloak_scanner.logging.printlogger import PrintLogger
 
 
+
 class MockResponse:
 
-    def __init__(self, status_code, response=None, headers=None):
+    def __init__(self, status_code: Union[int, Callable[..., int]],
+                 response: Union[Union[str, dict], Callable[..., Union[str, dict]]] = None,
+                 headers=None):
         if headers is None:
             headers = {}
         self.status_code = status_code
@@ -74,14 +77,14 @@ class MockSpec:
         self.get = get
         self.post = post
 
-    def get_mock_response(self, url, **kwargs):
+    def get_mock_response(self, url, **kwargs) -> MockResponse:
 
         if url not in self.get:
             raise Exception(f'[make_mock_session] Bad url test (GET) : {url}')
         assert self.get[url].assertion(**kwargs), repr(self.get[url].assertion_value) + ' == ' + repr(kwargs)
         return self.get[url].response
 
-    def post_mock_response(self, url, **kwargs):
+    def post_mock_response(self, url, **kwargs) -> MockResponse:
 
         if url not in self.post:
             raise Exception(f'[make_mock_session] Bad url test (POST) : {url}')
