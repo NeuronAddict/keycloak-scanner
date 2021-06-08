@@ -4,7 +4,7 @@ import sys
 import requests
 import urllib3
 
-
+from keycloak_scanner.scanners.clientregistration_scanner import ClientRegistrationScanner
 from keycloak_scanner.scanners.clients_scanner import ClientScanner
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
 from keycloak_scanner.scanners.login_scanner import LoginScanner
@@ -27,6 +27,7 @@ Scans :
 - Search well-known files
 - Search for clients
 - Search for valid logins
+- Try client registration
 - Search for security-admin-console and secret inside
 - Search for open redirect via unvalidated redirect_uri
 - Search for CVE-2018-14655 (reflected XSS)
@@ -39,9 +40,9 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument('base_url', help='URL to scan. ex http://localhost:8080')
-    parser.add_argument('--realms', help='Comma separated list of custom realms to test. ie : master')
+    parser.add_argument('--realms', help='Comma separated list of custom realms to test. ie : master', required=True)
     parser.add_argument('--clients', help='Comma separated list of custom clients to test. On default installation, '
-                                          'use account,admin-cli,broker,realm-management,security-admin-console')
+                                          'use account,admin-cli,broker,realm-management,security-admin-console', required=True)
     parser.add_argument('--proxy', help='Use a great proxy like BURP ;)')
     parser.add_argument('--username', help='If a username is specified, try to connect and attack a token. If no '
                                            'password, try username as password.')
@@ -55,6 +56,11 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
     parser.add_argument('--fail-fast', action='store_true', help='Fail immediately if an error occur.')
     parser.add_argument('--version', action='version', version=f'keycloak-scanner {__version__}. '
                                                                f'https://github.com/NeuronAddict/keycloak-scanner.')
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--registration-callback', help='Callback url to use on client registration test', action='append')
+    group.add_argument('--registration-callback-list', help='File with one callback to test for registration by line')
+
     return parser
 
 
@@ -94,6 +100,8 @@ def start(args, initial_session_provider: SessionProvider):
         WellKnownScanner(**common_args),
         ClientScanner(clients=clients, **common_args),
         LoginScanner(username=args.username, password=args.password, **common_args),
+        ClientRegistrationScanner(**common_args,
+                                  callback_url=args.registration_callback if args.registration_callback else args.registration_callback_list),
         SecurityConsoleScanner(**common_args),
         OpenRedirectScanner(**common_args),
         FormPostXssScanner(**common_args),
