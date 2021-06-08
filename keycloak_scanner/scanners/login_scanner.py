@@ -9,7 +9,8 @@ from keycloak_scanner.scanners.clients_scanner import Clients, Client
 from keycloak_scanner.scanners.realm_scanner import Realms, Realm
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need3
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
+from keycloak_scanner.scanners.session_holder import SessionProvider
+from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
 
 
 class Credential:
@@ -28,6 +29,24 @@ class Credential:
             return self.realm == other.realm and self.client == other.client and self.username == other.username \
                    and self.password == other.password
         return NotImplemented
+
+    def get_token(self, session_provider: SessionProvider,
+                  weel_known: WellKnown,
+                  grant_type='password',
+                  client_secret: str = ''):
+
+        r = session_provider().post(weel_known.json['token_endpoint'],
+                                   data={
+                                       'client_id': self.client.name,
+                                       'username': self.username,
+                                       'password': self.password,
+                                       'grant_type': grant_type,
+                                       'client_secret': client_secret
+                                   })
+
+        r.raise_for_status()
+        res = r.json()
+        return res['access_token'], res['refresh_token']
 
 
 class CredentialDict(Dict[str, Credential]):
