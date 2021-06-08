@@ -1,21 +1,36 @@
 import os
+from pathlib import Path
 
 import pytest
 import requests
+from _pytest.capture import CaptureFixture
 
 from keycloak_scanner.main import parser
 from keycloak_scanner.main import start
 
 
 @pytest.mark.skipif(os.getenv('ITESTS') != 'true', reason='integration tests')
-def test_should_start_scan_fail_security_console_exit_8(base_url: str, capsys):
-
+def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys: CaptureFixture, proxy: str, callback_file: Path):
     p = parser()
 
-    args = p.parse_args([base_url, '--realms', 'master', '--clients', 'account,account-console,admin-cli,broker,master-realm,security-admin-console',
-                         '--username', 'admin', '--password', 'Pa55w0rd'])
+    base_args = [base_url, '--realms', 'master,other', '--clients',
+                 'account,account-console,admin-cli,broker,master-realm,security-admin-console',
+                 '--username', 'admin', '--password', 'Pa55w0rd',
+                 '--registration-callback-list', str(callback_file.absolute())]
 
-    start(args, lambda: requests.Session())
+    if os.getenv('ITESTS_VERBOSE') == 'true':
+        base_args.append('--verbose')
+
+    if proxy:
+        base_args.append('--proxy')
+        base_args.append(proxy)
+
+    args = p.parse_args(base_args)
+
+    with pytest.raises(SystemExit) as e:
+        start(args, lambda: requests.Session())
+
+    assert e.value.code == 4
 
     captured = capsys.readouterr()
 
@@ -39,6 +54,8 @@ def test_should_start_scan_fail_security_console_exit_8(base_url: str, capsys):
 
     assert "[+] LoginScanner - Can login with username admin on realm master, client admin-cli, grant_type: password" in captured.out
 
-    # TODO: add other tests when vulns are on itest
+    assert "[+] ClientRegistrationScanner - Registering a client keycloak-client-" in captured.out
 
+    assert "[INFO] Deleted client keycloak-client-"
 
+    assert "Fail with exit code 4 because vulnerabilities are discovered" in captured.out
