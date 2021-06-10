@@ -1,17 +1,10 @@
-import re
 from typing import List, Dict, Any, Sized
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.scanner import Scanner
-
-
-def to_camel_case(text: str):
-    return re.sub('([a-z]+)([A-Z])', r'\1_\2', text).lower()
-
-
-class DuplicateResultException(Exception):
-    pass
+from keycloak_scanner.scanners.scanner_exceptions import DuplicateResultException
+from keycloak_scanner.utils import to_camel_case
 
 
 class ScanResults(PrintLogger):
@@ -31,10 +24,6 @@ class ScanResults(PrintLogger):
 
     def __repr__(self):
         return repr(self.results)
-
-
-class NoneResultException(Exception):
-    pass
 
 
 class ScanStatus:
