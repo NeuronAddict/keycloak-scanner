@@ -4,9 +4,10 @@ from requests import HTTPError
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.json_result import JsonResult
-from keycloak_scanner.scanners.realm_scanner import Realms, Realm
+from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need2
+from keycloak_scanner.scanners.types import Realm
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 
 
@@ -38,7 +39,7 @@ class Clients(List[Client]):
     pass
 
 
-class ClientScanner(Need2[Realms, WellKnownDict], Scanner[Clients]):
+class ClientScanner(Scanner[Clients], Need2[Realms, WellKnownDict]):
 
     def __init__(self, clients: List[str], **kwargs):
         self.clients = clients
