@@ -4,8 +4,9 @@ from _pytest.fixtures import fixture
 from requests import Session
 
 from keycloak_scanner.scanners.clients_scanner import Client, Clients
-from keycloak_scanner.scanners.realm_scanner import Realm, Realms
+from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults, SecurityConsoleResult
+from keycloak_scanner.scanners.types import Realm
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
 from tests.mock_response import MockResponse, RequestSpec, MockSpec
 

@@ -1,9 +1,10 @@
 from typing import Dict
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.realm_scanner import Realms, Realm
+from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need
+from keycloak_scanner.scanners.types import Realm
 
 URL_PATTERN = '{}/auth/realms/{}/clients-registrations/default/security-admin-console'
 

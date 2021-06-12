@@ -1,6 +1,7 @@
 from _pytest.capture import CaptureFixture
 
 from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client, Clients, ClientConfig
+from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.realm_scanner import Realm, Realms
 from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
 from tests.mock_response import MockSpec, RequestSpec, MockResponse
@@ -12,7 +13,9 @@ def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
         print(kwargs)
         return kwargs['params']['client_id'] in ['client1', 'client2']
 
-    client_scanner = ClientScanner(clients=['client1', 'client2'], base_url=base_url,
+    mediator = Mediator()
+
+    client_scanner = ClientScanner(mediator=mediator, clients=['client1', 'client2'], base_url=base_url,
                                    session_provider=lambda: MockSpec(
                                        get={
                                            'http://localhost:8080/auth/realms/master/client1':
@@ -31,7 +34,9 @@ def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
 
     realms = Realms([master_realm])
 
-    result, vf = client_scanner.perform(realms=realms, well_known_dict=well_known_dict)
+    client_scanner.perform_base(realms=realms, well_known_dict=well_known_dict)
+
+
 
     capture = capsys.readouterr()
 

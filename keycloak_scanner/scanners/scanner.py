@@ -6,6 +6,8 @@ from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.scanner_exceptions import NoneResultException
 from keycloak_scanner.scanners.session_holder import SessionHolder
+from keycloak_scanner.scanners.types import ScannerType
+from keycloak_scanner.utils import to_camel_case
 
 Tco = TypeVar('Tco', covariant=True)
 
@@ -44,10 +46,27 @@ class ScannerStatus:
             self.dict[name] = [value]
 
 
+class InvalidResultTypeException(Exception):
+    pass
+
+
+T = TypeVar('T')
+
+
 class Scanner(Generic[Tco], SessionHolder, PrintLogger):
 
-    def __init__(self, base_url: str, **kwargs):
+    def __init__(self, mediator: Mediator, base_url: str, result_type: ScannerType, needs=None, **kwargs):
+        if needs is None:
+            needs = []
         self.base_url_ = base_url
+        self.mediator = mediator
+        self.status = ScannerStatus(len(needs))
+
+        self.result_type = result_type
+
+        for need in needs:
+            self.mediator.subscribe(self, need)
+
         super().__init__(**kwargs)
 
     def base_url(self):
@@ -62,9 +81,31 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
         super().info(f'Start logger {self.name()}')
         assert not hasattr(super(), 'init_scan')
 
+    def receive(self, name, value) -> None:
+        for scan_kwargs in self.status.args(name, value):
+            self.perform_base(**scan_kwargs)
+
+    def send(self, value: T):
+        if not isinstance(value, self.result_type.simple_type):
+            raise InvalidResultTypeException()
+        self.mediator.send(self.result_type.name, value)
+
+    def perform_base(self, **kwargs) -> None:
+
+        result, vf = self.perform(**kwargs)
+
+        if result is None:
+            raise NoneResultException()
+        result_type = to_camel_case(self.get_name(result))
+
+        self.mediator.send(**{result_type: result})
+
     def perform(self, **kwargs) -> (Tco, VulnFlag):
         """
         Perform the scan
         :return: scan result (json)
         """
         assert not hasattr(super(), 'perform')
+
+    def get_name(self, result: Tco):
+        return result.__class__.__name__

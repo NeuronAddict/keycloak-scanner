@@ -2,9 +2,10 @@ from typing import Dict, List
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.json_result import JsonResult
-from keycloak_scanner.scanners.realm_scanner import Realm, Realms
+from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need
+from keycloak_scanner.scanners.types import Realm
 
 URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 
