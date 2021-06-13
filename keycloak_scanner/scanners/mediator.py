@@ -28,3 +28,4 @@ class Mediator:
             self.scanners[scanner_type.name].append(scanner)
         else:
             self.scanners[scanner_type.name] = [scanner]
+
