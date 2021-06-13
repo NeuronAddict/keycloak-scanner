@@ -12,8 +12,8 @@ def test_perform(base_url: str, full_scan_mock_session: Session, master_realm: R
     scanner = RealmScanner(mediator=mediator, result_type=RealmType, base_url=base_url, realms=['master', 'other'],
                            session_provider=lambda: full_scan_mock_session)
 
-    result, vf = scanner.perform()
+    scanner.perform_base()
 
-    assert result == [master_realm, other_realm]
+    assert mediator.scan_results.results['realm'] == [master_realm, other_realm]
 
     assert not vf.has_vuln
