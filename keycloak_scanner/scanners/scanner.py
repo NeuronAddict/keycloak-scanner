@@ -7,7 +7,6 @@ from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.scanner_exceptions import NoneResultException
 from keycloak_scanner.scanners.session_holder import SessionHolder
 from keycloak_scanner.scanners.types import ScannerType
-from keycloak_scanner.utils import to_camel_case
 
 Tco = TypeVar('Tco', covariant=True)
 
@@ -97,14 +96,15 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
         super().info(f'Start logger {self.name()}')
         assert not hasattr(super(), 'init_scan')
 
-    def receive(self, result_type: ScannerType, value) -> None:
+    # TODO: receive iterable
+    def receive(self, result_type: ScannerType[T], value: List[T]) -> None:
         for scan_kwargs in self.status.args(result_type.name, value):
             self.perform_base(**scan_kwargs)
 
     def send(self, value: T):
-        if not isinstance(value, self.result_type.is_simple_type):
+        if not self.result_type.is_simple_type(value):
             raise InvalidResultTypeException()
-        self.mediator.send(self.result_type.name, value)
+        self.mediator.send(self.result_type, value)
 
     def perform_base(self, **kwargs) -> None:
 
@@ -120,4 +120,4 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
         Perform the scan
         :return: scan result (json)
         """
-        assert not hasattr(super(), 'perform')
+        raise NotImplementedError()
