@@ -1,23 +1,27 @@
+from typing import List
+
 from requests import Session
 
+from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.realm_scanner import Realms
-from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner, WellKnownDict
+from keycloak_scanner.scanners.types import RealmType, WellKnown, wellKnownType
+from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
 
 
-def test_perform(base_url: str, all_realms: Realms, full_scan_mock_session: Session, well_known_dict: WellKnownDict):
+def test_perform_with_event(base_url: str, all_realms: Realms,
+                            full_scan_mock_session: Session,
+                            well_known_list: List[WellKnown]):
 
-    scanner = WellKnownScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session)
+    mediator = Mediator()
 
-    result, vf = scanner.perform(all_realms)
+    scanner = WellKnownScanner(mediator=mediator, base_url=base_url, session_provider=lambda: full_scan_mock_session)
 
-    assert result == well_known_dict
+    for realm in all_realms:
+        scanner.receive(RealmType, realm)
 
-    assert well_known_dict['master'].allowed_grants() == ['authorization_code',
-                                                          'implicit',
-                                                          'refresh_token',
-                                                          'password',
-                                                          'client_credentials',
-                                                          'urn:ietf:params:oauth:grant-type:device_code',
-                                                          'urn:openid:params:grant-type:ciba']
+    # TODO : remove list type
+    assert mediator.scan_results.get(wellKnownType) == well_known_list
 
-    assert not vf.has_vuln
+
+    # TODO : keep vf ?
+    #assert not vf.has_vuln

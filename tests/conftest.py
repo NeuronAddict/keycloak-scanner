@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 from _pytest.fixtures import fixture
 from requests import Session
@@ -6,8 +7,8 @@ from requests import Session
 from keycloak_scanner.scanners.clients_scanner import Client, Clients
 from keycloak_scanner.scanners.realm_scanner import Realms
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults, SecurityConsoleResult
-from keycloak_scanner.scanners.types import Realm
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
+from keycloak_scanner.scanners.types import Realm, WellKnownDict
+from keycloak_scanner.scanners.well_known_scanner import WellKnown
 from tests.mock_response import MockResponse, RequestSpec, MockSpec
 
 
@@ -147,6 +148,18 @@ def well_known_dict(master_realm: Realm, other_realm: Realm, well_known_json_mas
                            url='http://localhost:8080/auth/realms/other/.well-known/openid-configuration',
                            json=well_known_json_other)
     })
+
+
+@fixture()
+def well_known_list(master_realm: Realm, other_realm: Realm, well_known_json_master: dict,
+                    well_known_json_other: dict) -> List[WellKnown]:
+    # TODO: master wk json in all
+    return [WellKnown(realm=master_realm, name='master',
+                      url='http://localhost:8080/auth/realms/master/.well-known/openid-configuration',
+                      json=well_known_json_master),
+            WellKnown(realm=other_realm, name='other',
+                      url='http://localhost:8080/auth/realms/other/.well-known/openid-configuration',
+                      json=well_known_json_other)]
 
 
 @fixture
