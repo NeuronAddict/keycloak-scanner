@@ -55,7 +55,7 @@ class ScannerType(Generic[SimpleType]):
         return isinstance(a, b)
 
 
-RealmType = ScannerType('realm', Realm)
+realmType = ScannerType('realm', Realm)
 
 
 wellKnownType = ScannerType('well_known', WellKnown)
