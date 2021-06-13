@@ -1,7 +1,6 @@
-from typing import List, NewType
+from typing import List
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.types import Realms, Realm
 
