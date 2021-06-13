@@ -81,12 +81,12 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
         super().info(f'Start logger {self.name()}')
         assert not hasattr(super(), 'init_scan')
 
-    def receive(self, name, value) -> None:
-        for scan_kwargs in self.status.args(name, value):
+    def receive(self, result_type: ScannerType, value) -> None:
+        for scan_kwargs in self.status.args(result_type.name, value):
             self.perform_base(**scan_kwargs)
 
     def send(self, value: T):
-        if not isinstance(value, self.result_type.simple_type):
+        if not isinstance(value, self.result_type.is_simple_type):
             raise InvalidResultTypeException()
         self.mediator.send(self.result_type.name, value)
 
@@ -96,9 +96,8 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
 
         if result is None:
             raise NoneResultException()
-        result_type = to_camel_case(self.get_name(result))
 
-        self.mediator.send(**{result_type: result})
+        self.mediator.send(self.result_type, result)
 
     def perform(self, **kwargs) -> (Tco, VulnFlag):
         """
@@ -106,6 +105,3 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
         :return: scan result (json)
         """
         assert not hasattr(super(), 'perform')
-
-    def get_name(self, result: Tco):
-        return result.__class__.__name__
