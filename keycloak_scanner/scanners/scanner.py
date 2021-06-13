@@ -26,16 +26,18 @@ class ScannerStatus:
         self.size = size
         self.dict: Dict[str, List[Any]] = {}
 
-    def args(self, name: str, value) -> Optional[Iterator[Any]]:
+    def args(self, name: str, value) -> Optional[Iterator[Dict[str, Any]]]:
         self.merge(name, value)
         if len(self.dict) == self.size:
             iterables = []
+            names: List[str] = []
             for name_, value_ in self.dict.items():
+                names.append(name_)
                 if name_ != name:
                     iterables.append(value_)
                 else:
                     iterables.append([value])
-            return itertools.product(*iterables)
+            return self.convert(names, itertools.product(*iterables))
 
     def merge(self, name: str, value):
         if name in self.dict:
@@ -45,6 +47,20 @@ class ScannerStatus:
                 raise TooManyResultsException(name, value)
             self.dict[name] = [value]
 
+    def convert(self, names: List[str], param: Iterator[Tuple[Any, ...]]) -> Iterator[Dict[str, Any]]:
+        results = []
+        for tuple_ in param:
+            results.append(self.tuple_with_names(names, tuple_))
+        return results.__iter__()
+
+    def tuple_with_names(self, names: List[str], tuple_):
+        assert len(tuple_) == len(names)
+        result = {}
+        i = 0
+        for name in names:
+            result[name] = tuple_[i]
+            i += 1
+        return result
 
 class InvalidResultTypeException(Exception):
     pass
