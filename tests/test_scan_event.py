@@ -14,9 +14,12 @@ def test_perform_with_event(base_url: str, all_realms: List[Realm],
 
     mediator = Mediator()
 
-    realms_scanner = RealmScanner(mediator=mediator, realms=['master', 'other'], base_url=base_url, session_provider=lambda: full_scan_mock_session)
+    realms_scanner = RealmScanner(realms=['master', 'other'], base_url=base_url, session_provider=lambda: full_scan_mock_session)
 
-    well_known_scanner = WellKnownScanner(mediator=mediator, base_url=base_url, session_provider=lambda: full_scan_mock_session)
+    well_known_scanner = WellKnownScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session)
+
+    mediator.add(realms_scanner)
+    mediator.add(well_known_scanner)
 
     realms_scanner.perform_base()
 

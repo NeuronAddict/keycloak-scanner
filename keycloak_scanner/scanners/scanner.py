@@ -68,21 +68,29 @@ class InvalidResultTypeException(Exception):
 T = TypeVar('T')
 
 
+class UndefinedMediatorException(Exception):
+    pass
+
+
 class Scanner(Generic[Tco], SessionHolder, PrintLogger):
 
-    def __init__(self, mediator: Mediator, base_url: str, result_type: ScannerType, needs=None, **kwargs):
+    def __init__(self, base_url: str, result_type: ScannerType, needs=None, **kwargs):
         if needs is None:
             needs = []
         self.base_url_ = base_url
-        self.mediator = mediator
-        self.status = ScannerStatus(len(needs))
 
+        self.mediator = None
+
+        self.status = ScannerStatus(len(needs))
+        self.needs = needs
         self.result_type = result_type
 
-        for need in needs:
-            self.mediator.subscribe(self, need)
-
         super().__init__(**kwargs)
+
+    def set_mediator(self, mediator: Mediator):
+        self.mediator = mediator
+        for need in self.needs:
+            self.mediator.subscribe(self, need)
 
     def base_url(self):
         assert not hasattr(super(), 'base_url')
@@ -98,6 +106,9 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
             self.perform_base(**scan_kwargs)
 
     def perform_base(self, **kwargs) -> None:
+
+        if self.mediator is None:
+            raise UndefinedMediatorException()
 
         result, vf = self.perform(**kwargs)
 
