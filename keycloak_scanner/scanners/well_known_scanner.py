@@ -7,7 +7,7 @@ from keycloak_scanner.scanners.types import Realm, wellKnownType, WellKnown, rea
 URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 
 
-class WellKnownScanner(Scanner):
+class WellKnownScanner(Scanner[WellKnown]):
 
     def __init__(self, **kwargs):
         super().__init__(result_type=wellKnownType, needs=[realmType], **kwargs)
