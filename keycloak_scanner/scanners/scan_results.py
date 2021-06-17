@@ -21,7 +21,7 @@ class ScanResults(PrintLogger):
             self.results[name] = result
         super().verbose(f'new result with key: {name} ({result})')
 
-    def get(self, t: ScannerType[T]) -> T:
+    def get(self, t: ScannerType[T]) -> List[T]:
         return self.results.get(t.name)
 
     def __repr__(self):
