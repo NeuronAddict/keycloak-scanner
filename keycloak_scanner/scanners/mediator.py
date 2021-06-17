@@ -13,15 +13,16 @@ class Mediator:
         self.scan_results = ScanResults()
         super().__init__(**kwargs)
 
-    def send(self, result_type: ScannerType, value: T) -> None:
+    def send(self, result_type: ScannerType[T], value_list: List[T]) -> None:
 
-        assert result_type.is_list_type(value)
+        assert result_type.is_list_type(value_list)
 
-        self.scan_results.add(result_type.name, value)
+        self.scan_results.add(result_type.name, value_list)
 
         if result_type.name in self.scanners:
             for scanner in self.scanners[result_type.name]:
-                scanner.receive(result_type, value)
+                for value in value_list:
+                    scanner.receive(result_type, value)
 
     def subscribe(self, scanner, scanner_type: ScannerType):
         if scanner_type.name in self.scanners:
