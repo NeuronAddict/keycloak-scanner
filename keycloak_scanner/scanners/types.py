@@ -71,10 +71,34 @@ class SecurityConsole:
     def __repr__(self):
         return f"SecurityConsoleResult({repr(self.realm)}, '{self.url}', '{self.json}', '{self.secret}')"
 
+class ClientConfig(JsonResult):
+    pass
+
+
+class Client:
+
+    def __init__(self, name: str, url: str, auth_endpoint: str = None, client_registration: ClientConfig = None):
+        self.name = name
+        self.url = url
+        self.auth_endpoint = auth_endpoint
+        self.client_registration = client_registration
+
+    def __repr__(self):
+        return f"Client({repr(self.name)}, {repr(self.url)}, {repr(self.auth_endpoint)}, {repr(self.client_registration)})"
+
+    def __eq__(self, other):
+        if isinstance(other, Client):
+            return self.name == other.name \
+                   and self.url == other.url \
+                   and self.auth_endpoint == other.auth_endpoint \
+                   and self.client_registration == other.client_registration
+        return NotImplemented
 
 
 realmType = ScannerType('realm', Realm)
 
 wellKnownType = ScannerType('well_known', WellKnown)
 
-securityConsoleType = ScannerType('securityConsole', SecurityConsole)
+securityConsoleType = ScannerType('security_console', SecurityConsole)
+
+clientType = ScannerType('client_scanner', Client)

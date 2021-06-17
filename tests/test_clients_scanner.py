@@ -1,21 +1,22 @@
+from typing import List
+
 from _pytest.capture import CaptureFixture
 
-from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client, Clients, ClientConfig
-from keycloak_scanner.scanners.mediator import Mediator
-from keycloak_scanner.scanners.realm_scanner import Realm, Realms
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
+from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client, ClientConfig
+from keycloak_scanner.scanners.realm_scanner import Realm
+from keycloak_scanner.scanners.types import WellKnown
+
 from tests.mock_response import MockSpec, RequestSpec, MockResponse
 
 
 def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
-                 well_known_dict: WellKnownDict, capsys: CaptureFixture):
+                 capsys: CaptureFixture, well_known_list: List[WellKnown]):
+
     def assert0(**kwargs) -> bool:
         print(kwargs)
         return kwargs['params']['client_id'] in ['client1', 'client2']
 
-    mediator = Mediator()
-
-    client_scanner = ClientScanner(mediator=mediator, clients=['client1', 'client2'], base_url=base_url,
+    client_scanner = ClientScanner(clients=['client1', 'client2'], base_url=base_url,
                                    session_provider=lambda: MockSpec(
                                        get={
                                            'http://localhost:8080/auth/realms/master/client1':
@@ -32,18 +33,14 @@ def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
                                        }
                                    ).session())
 
-    realms = Realms([master_realm])
-
-    client_scanner.perform_base(realms=realms, well_known_dict=well_known_dict)
-
-
+    result, vf = client_scanner.perform(realm=master_realm, well_known=well_known_list[0])
 
     capture = capsys.readouterr()
 
     print(capture.out)
     print(capture.err)
 
-    assert result == Clients([Client('client1', 'http://localhost:8080/auth/realms/master/client1',
+    assert result == [Client('client1', 'http://localhost:8080/auth/realms/master/client1',
                                      'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth',
                                      client_registration=ClientConfig(name='client1',
                                                                       url='http://localhost:8080/realms/master/clients-registrations/default/client1',
@@ -56,7 +53,7 @@ def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
                                                                       url='http://localhost:8080/realms/master/clients-registrations/default/client2',
                                                                       json={'data': 'coucou'}
                                                                       )
-                                     )])
+                                     )]
 
     assert not vf.has_vuln
 
