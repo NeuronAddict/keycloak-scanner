@@ -24,6 +24,9 @@ class Mediator:
                 for value in value_list:
                     scanner.receive(result_type, value)
 
+    def add(self, scanner):
+        scanner.set_mediator(self)
+
     def subscribe(self, scanner, scanner_type: ScannerType):
         if scanner_type.name in self.scanners:
             self.scanners[scanner_type.name].append(scanner)
