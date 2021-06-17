@@ -92,19 +92,10 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
         assert not hasattr(super(), 'name')
         return self.__class__.__name__
 
-    def init_scan(self):
-        super().info(f'Start logger {self.name()}')
-        assert not hasattr(super(), 'init_scan')
-
     # TODO: receive iterable
-    def receive(self, result_type: ScannerType[T], value: List[T]) -> None:
+    def receive(self, result_type: ScannerType[T], value: T) -> None:
         for scan_kwargs in self.status.args(result_type.name, value):
             self.perform_base(**scan_kwargs)
-
-    def send(self, value: T):
-        if not self.result_type.is_simple_type(value):
-            raise InvalidResultTypeException()
-        self.mediator.send(self.result_type, value)
 
     def perform_base(self, **kwargs) -> None:
 
@@ -115,7 +106,7 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
 
         self.mediator.send(self.result_type, result)
 
-    def perform(self, **kwargs) -> (Tco, VulnFlag):
+    def perform(self, **kwargs) -> (List[Tco], VulnFlag):
         """
         Perform the scan
         :return: scan result (json)
