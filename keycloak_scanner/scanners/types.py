@@ -55,7 +55,26 @@ class ScannerType(Generic[SimpleType]):
         return isinstance(a, b)
 
 
+class SecurityConsole:
+
+    def __init__(self, realm: Realm, url: str, json: dict, secret: dict = None):
+        self.realm = realm
+        self.url = url
+        self.json = json
+        self.secret = secret
+
+    def __eq__(self, other):
+        if isinstance(other, SecurityConsole):
+            return self.realm == other.realm and self.url == other.url and self.json == other.json and self.secret == other.secret
+        return NotImplemented
+
+    def __repr__(self):
+        return f"SecurityConsoleResult({repr(self.realm)}, '{self.url}', '{self.json}', '{self.secret}')"
+
+
+
 realmType = ScannerType('realm', Realm)
 
-
 wellKnownType = ScannerType('well_known', WellKnown)
+
+securityConsoleType = ScannerType('securityConsole', SecurityConsole)
