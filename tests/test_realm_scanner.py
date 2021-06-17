@@ -9,7 +9,7 @@ def test_perform_with_event(base_url: str, full_scan_mock_session: Session, mast
 
     mediator = Mediator()
 
-    scanner = RealmScanner(mediator=mediator, result_type=realmType, base_url=base_url, realms=['master', 'other'],
+    scanner = RealmScanner(mediator=mediator, base_url=base_url, realms=['master', 'other'],
                            session_provider=lambda: full_scan_mock_session)
 
     scanner.perform_base()
