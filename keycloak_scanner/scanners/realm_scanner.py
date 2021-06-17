@@ -2,14 +2,12 @@ from typing import List
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.types import Realms, Realm
+from keycloak_scanner.scanners.types import Realm
 
 URL_PATTERN = '{}/auth/realms/{}'
 
 
-
-
-class RealmScanner(Scanner[Realms]):
+class RealmScanner(Scanner[Realm]):
 
     DEFAULT_REALMS = ['master']
 
@@ -19,9 +17,9 @@ class RealmScanner(Scanner[Realms]):
         self.realms = realms
         super().__init__(**kwargs)
 
-    def perform(self) -> (Realms, VulnFlag):
+    def perform(self) -> (List[Realm], VulnFlag):
 
-        realms: Realms = Realms([])
+        realms: List[Realm] = []
 
         for realm_name in self.realms:
 
