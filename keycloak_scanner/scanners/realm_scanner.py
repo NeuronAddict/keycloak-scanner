@@ -3,7 +3,7 @@ from typing import List
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.types import Realm
-from keycloak_scanner.scanners.wrap import WrapTypes
+from keycloak_scanner.scanners.wrap import WrapperTypes
 
 URL_PATTERN = '{}/auth/realms/{}'
 
@@ -16,7 +16,7 @@ class RealmScanner(Scanner[Realm]):
         if realms is None:
             realms = RealmScanner.DEFAULT_REALMS
         self.realms = realms
-        super().__init__(result_type=WrapTypes.REALM_TYPE, **kwargs)
+        super().__init__(result_type=WrapperTypes.REALM_TYPE, **kwargs)
 
     def perform(self) -> (List[Realm], VulnFlag):
 
