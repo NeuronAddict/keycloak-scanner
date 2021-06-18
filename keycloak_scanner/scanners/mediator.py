@@ -1,7 +1,7 @@
 from typing import TypeVar, List, Dict, Any
 
 from keycloak_scanner.scanners.scan_results import ScanResults
-from keycloak_scanner.scanners.wrap import WrapperType
+from keycloak_scanner.scanners.wrap import WrapperType, Wrapper
 
 T = TypeVar('T')
 
@@ -20,7 +20,7 @@ class Mediator:
         if result_type.name in self.scanners:
             for scanner in self.scanners[result_type.name]:
                 for value in value_list:
-                    scanner.receive(result_type, value)
+                    scanner.receive(Wrapper(result_type, value))
 
     def add(self, scanner):
         scanner.set_mediator(self)
