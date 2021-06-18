@@ -11,8 +11,8 @@ V = TypeVar('V')
 
 class WrapperType(Generic[SimpleType]):
 
-    def __init__(self, simple_type: SimpleType):
-        self.name = to_camel_case(simple_type.__class__.__name__)
+    def __init__(self, simple_type: type):
+        self.name = to_camel_case(simple_type.__name__)
         self.simple_type = simple_type
 
 
