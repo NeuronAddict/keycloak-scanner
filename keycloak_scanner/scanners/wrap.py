@@ -36,7 +36,7 @@ class Wrapper(Generic[SimpleType]):
         self.value_ = value
 
     def value(self) -> SimpleType:
-        return self.value
+        return self.value_
 
 
 class WrapTypes:
