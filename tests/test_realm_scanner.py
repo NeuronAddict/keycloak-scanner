@@ -2,7 +2,8 @@ from requests import Session
 
 from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.realm_scanner import RealmScanner
-from keycloak_scanner.scanners.types import Realm, WrapTypes
+from keycloak_scanner.scanners.types import Realm
+from keycloak_scanner.scanners.wrap import WrapTypes
 
 
 def test_perform_with_event(base_url: str, full_scan_mock_session: Session, master_realm: Realm, other_realm: Realm):
