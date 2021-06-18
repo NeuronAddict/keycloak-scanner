@@ -102,8 +102,10 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
 
     # TODO: receive iterable
     def receive(self, result_type: ScannerType[T], value: T) -> None:
-        for scan_kwargs in self.status.args(result_type.name, value):
-            self.perform_base(**scan_kwargs)
+        args = self.status.args(result_type.name, value)
+        if args:
+            for scan_kwargs in args:
+                self.perform_base(**scan_kwargs)
 
     def perform_base(self, **kwargs) -> None:
 
