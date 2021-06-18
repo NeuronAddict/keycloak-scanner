@@ -4,10 +4,8 @@ from typing import List
 from _pytest.fixtures import fixture
 from requests import Session
 
-from keycloak_scanner.scanners.clients_scanner import Client, Clients
-from keycloak_scanner.scanners.realm_scanner import Realms
-from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults, SecurityConsoleResult
-from keycloak_scanner.scanners.types import Realm, WellKnownDict
+from keycloak_scanner.scanners.clients_scanner import Client
+from keycloak_scanner.scanners.types import Realm, WellKnownDict, SecurityConsole
 from keycloak_scanner.scanners.well_known_scanner import WellKnown
 from tests.mock_response import MockResponse, RequestSpec, MockSpec
 
@@ -184,8 +182,8 @@ def other_realm_json() -> dict:
 
 
 @fixture
-def all_realms(master_realm: Realm, other_realm: Realm) -> Realms:
-    return Realms([master_realm, other_realm])
+def all_realms(master_realm: Realm, other_realm: Realm) -> List[Realm]:
+    return [master_realm, other_realm]
 
 
 @fixture
@@ -206,21 +204,21 @@ def client2() -> Client:
 
 
 @fixture
-def all_clients(client1: Client, client2: Client) -> Clients:
-    return Clients([client1, client2])
+def all_clients(client1: Client, client2: Client) -> List[Client]:
+    return [client1, client2]
 
 
 @fixture
-def security_console_results(master_realm: Realm, other_realm: Realm) -> SecurityConsoleResults:
-    return SecurityConsoleResults({
-        'master': SecurityConsoleResult(master_realm,
+def security_console_results(master_realm: Realm, other_realm: Realm) -> List[SecurityConsole]:
+    return [
+         SecurityConsole(master_realm,
                                         'http://localhost:8080/auth/realms/master/clients-registrations/default/security-admin-console',
                                         json={}),
 
-        'other': SecurityConsoleResult(other_realm,
+        SecurityConsole(other_realm,
                                        'http://localhost:8080/auth/realms/other/clients-registrations/default/security-admin-console',
                                        json={}, secret={'secret': 'secretdata'}),
-    })
+    ]
 
 
 @fixture
