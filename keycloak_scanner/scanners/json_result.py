@@ -1,3 +1,6 @@
+import json
+
+
 class JsonResult:
 
     def __init__(self, name: str, url: str, json: dict):
@@ -7,6 +10,9 @@ class JsonResult:
 
     def __repr__(self):
         return f"{self.__class__.__name__}('{self.name}', '{self.url}', {self.json})"
+
+    def __hash__(self):
+        return hash((self.name, self.url, json.dumps(self.json)))
 
     def __eq__(self, other):
         if isinstance(other, JsonResult):

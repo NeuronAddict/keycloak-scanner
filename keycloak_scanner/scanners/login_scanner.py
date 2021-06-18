@@ -1,84 +1,39 @@
-from typing import Dict
+from typing import List, Set
 
-import requests
 from requests import HTTPError
 
 from keycloak_scanner.keycloak_api import KeyCloakApi, FailedAuthException
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.clients_scanner import Clients, Client
-from keycloak_scanner.scanners.realm_scanner import Realms, Realm
+from keycloak_scanner.scanners.clients_scanner import Client
+from keycloak_scanner.scanners.realm_scanner import Realm
 from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.scanner_pieces import Need3
-from keycloak_scanner.scanners.session_holder import SessionProvider
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
+from keycloak_scanner.scanners.types import Credential
+from keycloak_scanner.scanners.well_known_scanner import WellKnown
+from keycloak_scanner.scanners.wrap import WrapperTypes
 
 
-class Credential:
-
-    def __init__(self, realm: Realm, client: Client, username: str, password: str):
-        self.realm = realm
-        self.client = client
-        self.username = username
-        self.password = password
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}({repr(self.realm)}, {repr(self.client)}, {repr(self.username)}, {repr(self.password)})"
-
-    def __eq__(self, other):
-        if isinstance(other, Credential):
-            return self.realm == other.realm and self.client == other.client and self.username == other.username \
-                   and self.password == other.password
-        return NotImplemented
-
-    def get_token(self, session_provider: SessionProvider,
-                  weel_known: WellKnown,
-                  grant_type='password',
-                  client_secret: str = ''):
-
-        r = session_provider().post(weel_known.json['token_endpoint'],
-                                   data={
-                                       'client_id': self.client.name,
-                                       'username': self.username,
-                                       'password': self.password,
-                                       'grant_type': grant_type,
-                                       'client_secret': client_secret
-                                   })
-
-        r.raise_for_status()
-        res = r.json()
-        return res['access_token'], res['refresh_token']
-
-
-class CredentialDict(Dict[str, Credential]):
-    pass
-
-
-class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict]):
+class LoginScanner(Scanner[Credential]):
 
     def __init__(self, username: str, password: str, **kwargs):
         self.username = username
         self.password = password
-        super().__init__(**kwargs)
+        super().__init__(result_type=WrapperTypes.CREDENTIAL_TYPE,
+                         needs=[WrapperTypes.REALM_TYPE, WrapperTypes.CLIENT_TYPE, WrapperTypes.WELL_KNOWN_TYPE],
+                         **kwargs)
 
-    def perform(self, realms: Realms, clients: Clients, well_known_dict: WellKnownDict, **kwargs) \
-            -> (CredentialDict, VulnFlag):
+    def perform(self, realm: Realm, client: Client, well_known: WellKnown, **kwargs) \
+            -> (List[Credential], VulnFlag):
 
-        results = CredentialDict()
+        results: Set[Credential] = set()
 
-        for realm in realms:
+        for grant_type in well_known.allowed_grants():
+            self.try_token(client, grant_type, realm, well_known, results)
 
-            for client in clients:
-
-                well_known = well_known_dict[realm.name]
-
-                for grant_type in well_known.allowed_grants():
-                    self.try_token(client, grant_type, realm, results, well_known)
-
-                self.try_form_auth(client, realm, results, well_known)
+        self.try_form_auth(client, realm, well_known, results)
 
         return results, VulnFlag(False)
 
-    def try_form_auth(self, client, realm, results, well_known):
+    def try_form_auth(self, client: Client, realm: Realm, well_known: WellKnown, results: Set[Credential]):
 
         kapi = KeyCloakApi(well_known.json, verbose=super().is_verbose(),
                            session_provider=super().session)
@@ -86,7 +41,7 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
             r = kapi.auth(client, self.username, self.password)
 
             if r.status_code == 302:
-                results[f'{realm.name}-{client.name}'] = Credential(realm, client, self.username, self.password)
+                results.add(Credential(realm, client, self.username, self.password))
 
                 super().find(self.name(), f'Form login work for {self.username} on realm {realm.name}, '
                                           f'client {client.name}, ({r.headers.get("Location", "<unable to get header>")})')
@@ -95,7 +50,7 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
         except FailedAuthException as e:
             super().verbose(f'auth process fail : {e}')
 
-    def try_token(self, client, grant_type, realm, results, well_known):
+    def try_token(self, client: Client, grant_type: str, realm: Realm, well_known: WellKnown, results: Set[Credential]):
 
         kapi = KeyCloakApi(well_known.json, verbose=super().is_verbose(),
                            session_provider=super().session)
@@ -111,7 +66,7 @@ class LoginScanner(Need3[Realms, Clients, WellKnownDict], Scanner[CredentialDict
             super().verbose(f'access_token: {access_token}, refresh_token: {refresh_token}, '
                             f'password: {self.password}')
 
-            results[f'{realm.name}-{client.name}'] = Credential(realm, client, self.username, self.password)
+            results.add(Credential(realm, client, self.username, self.password))
 
         except HTTPError as e:
             super().verbose(f'HTTP error when login : {e}')
