@@ -1,4 +1,4 @@
-from typing import TypeVar, List, Dict, Any
+from typing import TypeVar, List, Dict, Any, Set
 
 from keycloak_scanner.scanners.scan_results import ScanResults
 from keycloak_scanner.scanners.wrap import WrapperType, Wrapper
@@ -13,7 +13,7 @@ class Mediator:
         self.scan_results = ScanResults()
         super().__init__(**kwargs)
 
-    def send(self, result_type: WrapperType[T], value_list: List[T]) -> None:
+    def send(self, result_type: WrapperType[T], value_list: Set[T]) -> None:
 
         self.scan_results.add(result_type, value_list)
 
