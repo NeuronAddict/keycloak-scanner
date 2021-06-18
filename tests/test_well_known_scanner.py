@@ -18,8 +18,7 @@ def test_perform_with_event(base_url: str, all_realms: List[Realm],
 
     mediator.add(scanner)
 
-    for realm in all_realms:
-        scanner.receive(Wrapper(WrapperTypes.REALM_TYPE, realm))
+    mediator.send(WrapperTypes.REALM_TYPE, all_realms)
 
     assert mediator.scan_results.get(WrapperTypes.WELL_KNOWN_TYPE) == well_known_list
 
