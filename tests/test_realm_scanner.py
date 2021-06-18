@@ -2,7 +2,7 @@ from requests import Session
 
 from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.realm_scanner import RealmScanner
-from keycloak_scanner.scanners.types import Realm, realmType
+from keycloak_scanner.scanners.types import Realm, WrapTypes
 
 
 def test_perform_with_event(base_url: str, full_scan_mock_session: Session, master_realm: Realm, other_realm: Realm):
@@ -16,7 +16,7 @@ def test_perform_with_event(base_url: str, full_scan_mock_session: Session, mast
 
     scanner.perform_base()
 
-    assert mediator.scan_results.get(Realm) == [master_realm, other_realm]
+    assert mediator.scan_results.get(WrapTypes.REALM_TYPE) == [master_realm, other_realm]
 
     # TODO: vuln flag ?
     #assert not vf.has_vuln

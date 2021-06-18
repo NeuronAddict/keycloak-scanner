@@ -1,6 +1,7 @@
 from typing import List, TypeVar, Dict, Generic
 
 from keycloak_scanner.scanners.json_result import JsonResult
+from keycloak_scanner.utils import to_camel_case
 
 
 class Realm(JsonResult):
@@ -37,10 +38,10 @@ SimpleType = TypeVar('SimpleType') # bound to type ?
 V = TypeVar('V')
 
 
-class ScannerType(Generic[SimpleType]):
+class WrapperType(Generic[SimpleType]):
 
-    def __init__(self, name: str, simple_type: SimpleType):
-        self.name = name
+    def __init__(self, simple_type: SimpleType):
+        self.name = to_camel_case(simple_type.__class__.__name__)
         self.simple_type = simple_type
 
     def is_simple_type(self, value: V):
@@ -53,6 +54,16 @@ class ScannerType(Generic[SimpleType]):
 
     def test(self, a, b):
         return isinstance(a, b)
+
+
+class Wrapper(Generic[SimpleType]):
+
+    def __init__(self, wrapper_type: WrapperType[SimpleType], value: SimpleType):
+        self.wrapper_type: WrapperType[SimpleType] = wrapper_type
+        self.value_ = value
+
+    def value(self) -> SimpleType:
+        return self.value
 
 
 class SecurityConsole:
@@ -95,10 +106,14 @@ class Client:
         return NotImplemented
 
 
-realmType = ScannerType('realm', Realm)
+class WrapTypes:
 
-wellKnownType = ScannerType('well_known', WellKnown)
+    REALM_TYPE = WrapperType(Realm)
 
-securityConsoleType = ScannerType('security_console', SecurityConsole)
+    WELL_KNOWN_TYPE = WrapperType(WellKnown)
 
-clientType = ScannerType('client_scanner', Client)
+    SECURITY_CONSOLE_TYPE = WrapperType(SecurityConsole)
+
+    CLIENT_TYPE = WrapperType(Client)
+
+    CREDENTIAL_TYPE = WrapperType(Client)
