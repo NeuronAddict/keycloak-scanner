@@ -1,8 +1,9 @@
-from typing import Dict, List
+from typing import List
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.types import Realm, wellKnownType, WellKnown, realmType
+from keycloak_scanner.scanners.types import Realm, WellKnown
+from keycloak_scanner.scanners.wrap import WrapTypes
 
 URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 
@@ -10,7 +11,7 @@ URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 class WellKnownScanner(Scanner[WellKnown]):
 
     def __init__(self, **kwargs):
-        super().__init__(result_type=wellKnownType, needs=[realmType], **kwargs)
+        super().__init__(result_type=WrapTypes.WELL_KNOWN_TYPE, needs=[WrapTypes.REALM_TYPE], **kwargs)
 
     def perform(self, realm: Realm, **kwargs) -> (List[WellKnown], VulnFlag):
 
