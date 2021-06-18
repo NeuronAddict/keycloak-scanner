@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.scanner import Scanner
@@ -18,9 +18,9 @@ class RealmScanner(Scanner[Realm]):
         self.realms = realms
         super().__init__(result_type=WrapperTypes.REALM_TYPE, **kwargs)
 
-    def perform(self) -> (List[Realm], VulnFlag):
+    def perform(self) -> (Set[Realm], VulnFlag):
 
-        realms: List[Realm] = []
+        realms: Set[Realm] = set()
 
         for realm_name in self.realms:
 
@@ -36,6 +36,6 @@ class RealmScanner(Scanner[Realm]):
 
                 if 'public_key' in realm.json:
                     super().info(f'Public key for realm {realm_name} : {realm.json["public_key"]}')
-                realms.append(realm)
+                realms.add(realm)
 
         return realms, VulnFlag()
