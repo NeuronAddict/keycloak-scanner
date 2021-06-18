@@ -1,8 +1,7 @@
 from typing import TypeVar, List, Dict, Any
 
 from keycloak_scanner.scanners.scan_results import ScanResults
-from keycloak_scanner.scanners.types import ScannerType
-from keycloak_scanner.utils import to_camel_case
+from keycloak_scanner.scanners.types import  WrapperType
 
 T = TypeVar('T')
 
@@ -14,23 +13,21 @@ class Mediator:
         self.scan_results = ScanResults()
         super().__init__(**kwargs)
 
-    def send(self, result_type: type, value_list: List[T]) -> None:
+    def send(self, result_type: WrapperType[T], value_list: List[T]) -> None:
 
-        result_type_name = to_camel_case(result_type.__name__)
+        self.scan_results.add(result_type, value_list)
 
-        self.scan_results.add(result_type_name, value_list)
-
-        if result_type_name in self.scanners:
-            for scanner in self.scanners[result_type_name]:
+        if result_type.name in self.scanners:
+            for scanner in self.scanners[result_type.name]:
                 for value in value_list:
                     scanner.receive(result_type, value)
 
     def add(self, scanner):
         scanner.set_mediator(self)
 
-    def subscribe(self, scanner, scanner_type_name: str):
-        if scanner_type_name in self.scanners:
-            self.scanners[scanner_type_name].append(scanner)
+    def subscribe(self, scanner, t: WrapperType):
+        if t.name in self.scanners:
+            self.scanners[t.name].append(scanner)
         else:
-            self.scanners[scanner_type_name] = [scanner]
+            self.scanners[t.name] = [scanner]
 
