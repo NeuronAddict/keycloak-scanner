@@ -6,8 +6,7 @@ from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.scanner_exceptions import NoneResultException
 from keycloak_scanner.scanners.session_holder import SessionHolder
-from keycloak_scanner.scanners.types import ScannerType
-from keycloak_scanner.utils import to_camel_case
+from keycloak_scanner.scanners.types import  WrapperType, Wrapper
 
 Tco = TypeVar('Tco', covariant=True)
 
@@ -75,7 +74,7 @@ class UndefinedMediatorException(Exception):
 
 class Scanner(Generic[Tco], SessionHolder, PrintLogger):
 
-    def __init__(self, base_url: str, result_type: type, needs: List[type] = None, **kwargs):
+    def __init__(self, base_url: str, result_type: WrapperType[Tco], needs: List[WrapperType] = None, **kwargs):
         if needs is None:
             needs = []
         self.base_url_ = base_url
@@ -91,7 +90,7 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
     def set_mediator(self, mediator: Mediator):
         self.mediator = mediator
         for need in self.needs:
-            self.mediator.subscribe(self, to_camel_case(need.__name__))
+            self.mediator.subscribe(self, need.name)
 
     def base_url(self):
         assert not hasattr(super(), 'base_url')
@@ -102,11 +101,9 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
         return self.__class__.__name__
 
     # TODO: receive iterable
-    def receive(self, result_type: type, value: T) -> None:
+    def receive(self, value: Wrapper[T]) -> None:
 
-        result_type_name = to_camel_case(result_type.__name__)
-
-        args = self.status.args(result_type_name, value)
+        args = self.status.args(value.wrapper_type.name, value)
         if args:
             for scan_kwargs in args:
                 self.perform_base(**scan_kwargs)
