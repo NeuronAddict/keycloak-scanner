@@ -15,7 +15,7 @@ class RealmScanner(Scanner[Realm]):
         if realms is None:
             realms = RealmScanner.DEFAULT_REALMS
         self.realms = realms
-        super().__init__(result_type=realmType, **kwargs)
+        super().__init__(result_type=Realm, **kwargs)
 
     def perform(self) -> (List[Realm], VulnFlag):
 
