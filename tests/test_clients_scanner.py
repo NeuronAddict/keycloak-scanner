@@ -41,14 +41,12 @@ def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
     print(capture.err)
 
     assert result == [Client('client1', 'http://localhost:8080/auth/realms/master/client1',
-                                     'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth',
                                      client_registration=ClientConfig(name='client1',
                                                                       url='http://localhost:8080/realms/master/clients-registrations/default/client1',
                                                                       json={'data': 'coucou'}
                                                                       )
                                      ),
                               Client('client2', None,
-                                     'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth',
                                      client_registration=ClientConfig(name='client2',
                                                                       url='http://localhost:8080/realms/master/clients-registrations/default/client2',
                                                                       json={'data': 'coucou'}
@@ -58,4 +56,3 @@ def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
     assert not vf.has_vuln
 
     assert 'Find a client for realm master: client1' in capture.out
-    assert 'Find a client auth endpoint for realm master: client2' in capture.out
