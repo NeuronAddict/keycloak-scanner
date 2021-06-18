@@ -23,6 +23,9 @@ class WellKnown(JsonResult):
             return self.json['grant_types_supported']
         raise Exception('Unable to get allowed grants')
 
+    def __hash__(self):
+        return hash((self.realm, super()))
+
     def __repr__(self):
         return f"WellKnown({repr(self.realm)}, name='{self.name}', url='{self.url}', json={self.json})"
 
@@ -43,6 +46,9 @@ class SecurityConsole:
         self.url = url
         self.json = json
         self.secret = secret
+
+    def __hash__(self):
+        return hash((self.realm, self.url, self.json, self.secret))
 
     def __eq__(self, other):
         if isinstance(other, SecurityConsole):
@@ -65,6 +71,9 @@ class Client:
         self.url = url
         self.client_registration = client_registration
 
+    def __hash__(self):
+        return hash((self.name, self.url, self.client_registration))
+
     def __repr__(self):
         return f"Client({repr(self.name)}, {repr(self.url)}, " \
                f"{repr(self.client_registration)})"
@@ -84,6 +93,9 @@ class Credential:
         self.client = client
         self.username = username
         self.password = password
+
+    def __hash__(self):
+        return hash((self.realm, self.client, self.password))
 
     def __repr__(self):
         return f"{self.__class__.__name__}({repr(self.realm)}, {repr(self.client)}, {repr(self.username)}, {repr(self.password)})"

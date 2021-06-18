@@ -1,4 +1,4 @@
-from typing import Dict, Any, TypeVar, List
+from typing import Dict, Any, TypeVar, List, Set
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.wrap import WrapperType
@@ -11,17 +11,17 @@ class ScanResults(PrintLogger):
     def __init__(self, previous_deps: Dict[str, Any] = None, **kwargs):
         if previous_deps is None:
             previous_deps = {}
-        self.results: Dict[str, List[Any]] = previous_deps
+        self.results: Dict[str, Set[Any]] = previous_deps
         super().__init__(**kwargs)
 
-    def add(self, t: WrapperType[T], result: List[T]):
+    def add(self, t: WrapperType[T], result: Set[T]):
         if t.name in self.results:
-            self.results[t.name] += result
+            self.results[t.name] |= result
         else:
             self.results[t.name] = result
         super().verbose(f'new result with key: {t.name} ({result})')
 
-    def get(self, t: WrapperType[T]) -> List[T]:
+    def get(self, t: WrapperType[T]) -> Set[T]:
         return self.results.get(t.name)
 
     def __repr__(self):
