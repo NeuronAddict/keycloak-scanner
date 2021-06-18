@@ -39,7 +39,7 @@ class Wrapper(Generic[SimpleType]):
         return self.value_
 
 
-class WrapTypes:
+class WrapperTypes:
 
     REALM_TYPE = WrapperType(Realm)
 
