@@ -17,7 +17,7 @@ def test_perform_with_event(base_url: str, full_scan_mock_session: Session, mast
 
     scanner.perform_base()
 
-    assert mediator.scan_results.get(WrapperTypes.REALM_TYPE) == [master_realm, other_realm]
+    assert mediator.scan_results.get(WrapperTypes.REALM_TYPE) == {master_realm, other_realm}
 
     # TODO: vuln flag ?
     #assert not vf.has_vuln
