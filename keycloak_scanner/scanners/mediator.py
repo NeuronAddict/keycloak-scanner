@@ -1,7 +1,7 @@
 from typing import TypeVar, List, Dict, Any
 
 from keycloak_scanner.scanners.scan_results import ScanResults
-from keycloak_scanner.scanners.types import  WrapperType
+from keycloak_scanner.scanners.wrap import WrapperType
 
 T = TypeVar('T')
 
