@@ -2,6 +2,7 @@ from typing import Dict, Any, TypeVar, List
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.scanners.types import ScannerType
+from keycloak_scanner.utils import to_camel_case
 
 T = TypeVar('T')
 
@@ -21,8 +22,8 @@ class ScanResults(PrintLogger):
             self.results[name] = result
         super().verbose(f'new result with key: {name} ({result})')
 
-    def get(self, t: ScannerType[T]) -> List[T]:
-        return self.results.get(t.name)
+    def get(self, t: type) -> List[T]:
+        return self.results.get(to_camel_case(t.__name__))
 
     def __repr__(self):
         return repr(self.results)
