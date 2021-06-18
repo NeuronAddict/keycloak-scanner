@@ -4,14 +4,14 @@ from requests import HTTPError
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.types import Realm, WellKnown, clientType, Client, ClientConfig
+from keycloak_scanner.scanners.types import Realm, WellKnown, clientType, Client, ClientConfig, realmType, wellKnownType
 
 
 class ClientScanner(Scanner[Client]):
 
     def __init__(self, clients: List[str], **kwargs):
         self.clients = clients
-        super().__init__(result_type=clientType, **kwargs)
+        super().__init__(result_type=clientType, needs=[realmType], **kwargs)
 
     def has_endpoint(self, realm: Realm, client_name: str) -> str:
         url = f'{super().base_url()}/auth/realms/{realm.name}/{client_name}'
@@ -24,7 +24,7 @@ class ClientScanner(Scanner[Client]):
         except Exception as e:
             super().info(f'[ClientScanner]: {e}')
 
-    def perform(self, realm: Realm, well_known: WellKnown, **kwargs) -> (List[Client], VulnFlag):
+    def perform(self, realm: Realm, **kwargs) -> (List[Client], VulnFlag):
 
         result: List[Client] = []
 
@@ -32,13 +32,10 @@ class ClientScanner(Scanner[Client]):
 
             url = self.has_endpoint(realm, client_name)
 
-            # TODO: auth endpoint in other scanner ?
-            auth_url = self.has_auth_endpoint(client_name, realm, well_known)
-
             registration = self.get_registration(client_name, realm)
 
-            if auth_url is not None or url is not None or registration is not None:
-                result.append(Client(name=client_name, auth_endpoint=auth_url, url=url, client_registration=registration))
+            if url is not None or registration is not None:
+                result.append(Client(name=client_name, url=url, client_registration=registration))
 
         return result, VulnFlag(False)
 
