@@ -5,7 +5,7 @@ from requests import Session
 from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.types import WellKnown, Realm
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
-from keycloak_scanner.scanners.wrap import WrapTypes, Wrapper
+from keycloak_scanner.scanners.wrap import WrapperTypes, Wrapper
 
 
 def test_perform_with_event(base_url: str, all_realms: List[Realm],
@@ -19,9 +19,9 @@ def test_perform_with_event(base_url: str, all_realms: List[Realm],
     mediator.add(scanner)
 
     for realm in all_realms:
-        scanner.receive(Wrapper(WrapTypes.REALM_TYPE, realm))
+        scanner.receive(Wrapper(WrapperTypes.REALM_TYPE, realm))
 
-    assert mediator.scan_results.get(WrapTypes.WELL_KNOWN_TYPE) == well_known_list
+    assert mediator.scan_results.get(WrapperTypes.WELL_KNOWN_TYPE) == well_known_list
 
 
     # TODO : keep vf ?
