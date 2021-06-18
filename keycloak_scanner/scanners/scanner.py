@@ -90,7 +90,7 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
     def set_mediator(self, mediator: Mediator):
         self.mediator = mediator
         for need in self.needs:
-            self.mediator.subscribe(self, need.name)
+            self.mediator.subscribe(self, need)
 
     def base_url(self):
         assert not hasattr(super(), 'base_url')
@@ -103,7 +103,7 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
     # TODO: receive iterable
     def receive(self, value: Wrapper[T]) -> None:
 
-        args = self.status.args(value.wrapper_type.name, value)
+        args = self.status.args(value.wrapper_type.name, value.value())
         if args:
             for scan_kwargs in args:
                 self.perform_base(**scan_kwargs)
