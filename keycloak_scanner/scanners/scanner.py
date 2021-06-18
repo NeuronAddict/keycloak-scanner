@@ -6,7 +6,7 @@ from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.scanner_exceptions import NoneResultException
 from keycloak_scanner.scanners.session_holder import SessionHolder
-from keycloak_scanner.scanners.types import  WrapperType, Wrapper
+from keycloak_scanner.scanners.wrap import WrapperType, Wrapper
 
 Tco = TypeVar('Tco', covariant=True)
 
