@@ -9,12 +9,14 @@ def test_perform_with_event(base_url: str, full_scan_mock_session: Session, mast
 
     mediator = Mediator()
 
-    scanner = RealmScanner(mediator=mediator, base_url=base_url, realms=['master', 'other'],
+    scanner = RealmScanner(base_url=base_url, realms=['master', 'other'],
                            session_provider=lambda: full_scan_mock_session)
+
+    scanner.set_mediator(mediator)
 
     scanner.perform_base()
 
-    assert mediator.scan_results.get(realmType) == [master_realm, other_realm]
+    assert mediator.scan_results.get(Realm) == [master_realm, other_realm]
 
     # TODO: vuln flag ?
     #assert not vf.has_vuln
