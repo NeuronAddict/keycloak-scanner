@@ -193,14 +193,12 @@ def other_realm(other_realm_json: dict) -> Realm:
 
 @fixture
 def client1() -> Client:
-    return Client(name='client1', url='http://localhost:8080/auth/realms/master/client1',
-                  auth_endpoint='http://localhost:8080/auth/realms/master/protocol/openid-connect/auth')
+    return Client(name='client1', url='http://localhost:8080/auth/realms/master/client1')
 
 
 @fixture
 def client2() -> Client:
-    return Client(name='client2', url='http://localhost:8080/auth/realms/master/client2',
-                  auth_endpoint='http://localhost:8080/auth/realms/master/protocol/openid-connect/auth')
+    return Client(name='client2', url='http://localhost:8080/auth/realms/master/client2')
 
 
 @fixture
