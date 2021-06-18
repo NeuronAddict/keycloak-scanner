@@ -1,11 +1,12 @@
-from typing import List, TypeVar, Dict, Generic
+from typing import List, Dict
 
 from keycloak_scanner.scanners.json_result import JsonResult
-from keycloak_scanner.utils import to_camel_case
+from keycloak_scanner.scanners.session_holder import SessionProvider
 
 
 class Realm(JsonResult):
     pass
+
 
 class Realms(List[Realm]):
     pass
@@ -34,37 +35,6 @@ class WellKnown(JsonResult):
 class WellKnownDict(Dict[str, WellKnown]):
     pass
 
-SimpleType = TypeVar('SimpleType') # bound to type ?
-V = TypeVar('V')
-
-
-class WrapperType(Generic[SimpleType]):
-
-    def __init__(self, simple_type: SimpleType):
-        self.name = to_camel_case(simple_type.__class__.__name__)
-        self.simple_type = simple_type
-
-    def is_simple_type(self, value: V):
-        return self.test(value, self.simple_type)
-
-    def is_list_type(self, value: List[V]):
-        if len(value) == 0:
-            return True
-        return self.is_simple_type(value[0])
-
-    def test(self, a, b):
-        return isinstance(a, b)
-
-
-class Wrapper(Generic[SimpleType]):
-
-    def __init__(self, wrapper_type: WrapperType[SimpleType], value: SimpleType):
-        self.wrapper_type: WrapperType[SimpleType] = wrapper_type
-        self.value_ = value
-
-    def value(self) -> SimpleType:
-        return self.value
-
 
 class SecurityConsole:
 
@@ -76,11 +46,13 @@ class SecurityConsole:
 
     def __eq__(self, other):
         if isinstance(other, SecurityConsole):
-            return self.realm == other.realm and self.url == other.url and self.json == other.json and self.secret == other.secret
+            return self.realm == other.realm and self.url == other.url and self.json == other.json \
+                   and self.secret == other.secret
         return NotImplemented
 
     def __repr__(self):
         return f"SecurityConsoleResult({repr(self.realm)}, '{self.url}', '{self.json}', '{self.secret}')"
+
 
 class ClientConfig(JsonResult):
     pass
@@ -95,7 +67,8 @@ class Client:
         self.client_registration = client_registration
 
     def __repr__(self):
-        return f"Client({repr(self.name)}, {repr(self.url)}, {repr(self.auth_endpoint)}, {repr(self.client_registration)})"
+        return f"Client({repr(self.name)}, {repr(self.url)}, {repr(self.auth_endpoint)}, " \
+               f"{repr(self.client_registration)})"
 
     def __eq__(self, other):
         if isinstance(other, Client):
@@ -106,14 +79,38 @@ class Client:
         return NotImplemented
 
 
-class WrapTypes:
+class Credential:
 
-    REALM_TYPE = WrapperType(Realm)
+    def __init__(self, realm: Realm, client: Client, username: str, password: str):
+        self.realm = realm
+        self.client = client
+        self.username = username
+        self.password = password
 
-    WELL_KNOWN_TYPE = WrapperType(WellKnown)
+    def __repr__(self):
+        return f"{self.__class__.__name__}({repr(self.realm)}, {repr(self.client)}, {repr(self.username)}, {repr(self.password)})"
 
-    SECURITY_CONSOLE_TYPE = WrapperType(SecurityConsole)
+    def __eq__(self, other):
+        if isinstance(other, Credential):
+            return self.realm == other.realm and self.client == other.client and self.username == other.username \
+                   and self.password == other.password
+        return NotImplemented
 
-    CLIENT_TYPE = WrapperType(Client)
+    def get_token(self, session_provider: SessionProvider,
+                  weel_known: WellKnown,
+                  grant_type='password',
+                  client_secret: str = ''):
 
-    CREDENTIAL_TYPE = WrapperType(Client)
+        r = session_provider().post(weel_known.json['token_endpoint'],
+                                   data={
+                                       'client_id': self.client.name,
+                                       'username': self.username,
+                                       'password': self.password,
+                                       'grant_type': grant_type,
+                                       'client_secret': client_secret
+                                   })
+
+        r.raise_for_status()
+        res = r.json()
+        return res['access_token'], res['refresh_token']
+
