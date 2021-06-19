@@ -51,7 +51,7 @@ class SecurityConsole:
         self.secret = secret
 
     def __hash__(self):
-        return hash((self.realm, self.url, self.json, self.secret))
+        return hash((self.realm, self.url, json.dumps(self.json), json.dumps(self.secret)))
 
     def __eq__(self, other):
         if isinstance(other, SecurityConsole):
@@ -164,4 +164,21 @@ class OpenRedirect:
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.realm == other.realm and self.client == other.client
+        return NotImplemented
+
+
+class NoneSign:
+
+    def __init__(self, realm: Realm):
+        self.realm = realm
+
+    def __hash__(self):
+        return hash(self.realm)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({repr(self.realm)})"
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.realm == other.realm
         return NotImplemented
