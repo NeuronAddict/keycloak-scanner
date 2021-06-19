@@ -26,10 +26,13 @@ class LoginScanner(Scanner[Credential]):
 
         results: Set[Credential] = set()
 
-        for grant_type in well_known.allowed_grants():
-            self.try_token(client, grant_type, realm, well_known, results)
+        # TODO : this condition in weird
+        if well_known.realm == realm:
 
-        self.try_form_auth(client, realm, well_known, results)
+            for grant_type in well_known.allowed_grants():
+                self.try_token(client, grant_type, realm, well_known, results)
+
+            self.try_form_auth(client, realm, well_known, results)
 
         return results, VulnFlag(False)
 

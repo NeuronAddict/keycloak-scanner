@@ -90,7 +90,7 @@ class Credential:
         self.password = password
 
     def __hash__(self):
-        return hash((self.realm, self.client, self.password))
+        return hash((self.realm, self.client, self.username, self.password))
 
     def __repr__(self):
         return f"{self.__class__.__name__}({repr(self.realm)}, {repr(self.client)}, {repr(self.username)}, {repr(self.password)})"
