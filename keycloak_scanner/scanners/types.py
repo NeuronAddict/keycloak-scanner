@@ -1,3 +1,4 @@
+import json
 from typing import List, Dict
 
 from keycloak_scanner.scanners.json_result import JsonResult
@@ -24,7 +25,7 @@ class WellKnown(JsonResult):
         raise Exception('Unable to get allowed grants')
 
     def __hash__(self):
-        return hash((self.realm, super()))
+        return hash((self.realm, self.name, self.url, json.dumps(self.json)))
 
     def __repr__(self):
         return f"WellKnown({repr(self.realm)}, name='{self.name}', url='{self.url}', json={self.json})"
