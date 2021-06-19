@@ -174,3 +174,21 @@ class NoneSign:
         if isinstance(other, self.__class__):
             return self.realm == other.realm
         return NotImplemented
+
+
+# TODO : base class for this
+class FormPostXSS:
+
+    def __init__(self, realm: Realm):
+        self.realm = realm
+
+    def __hash__(self):
+        return hash(self.realm)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({repr(self.realm)})"
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.realm == other.realm
+        return NotImplemented
