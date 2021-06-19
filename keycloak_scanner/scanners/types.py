@@ -1,6 +1,8 @@
 import json
 from typing import List, Dict
 
+import requests
+
 from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.session_holder import SessionProvider
 
@@ -125,3 +127,23 @@ class Credential:
         res = r.json()
         return res['access_token'], res['refresh_token']
 
+
+class ClientRegistration(JsonResult):
+
+    def __init__(self, callback_url, **kwargs):
+        self.callback_url = callback_url
+        super().__init__(**kwargs)
+
+    def __hash__(self):
+        return hash((self.callback_url, self.name, self.url, json.dumps(self.json)))
+
+    def __eq__(self, other):
+        return isinstance(other, ClientRegistration) and self.callback_url == other.callback_url \
+               and super().__eq__(other)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({repr(self.callback_url)}, name={repr(self.name)}, " \
+               f"url={repr(self.url)}, json={repr(self.json)})"
+
+    def delete(self, session: requests.Session):
+        session.delete(self.url, headers={'Authorization': f'Bearer {self.json["registration_access_token"]}'})

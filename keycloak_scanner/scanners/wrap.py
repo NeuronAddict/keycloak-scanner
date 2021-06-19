@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Generic, TypeVar, List
 
-from keycloak_scanner.scanners.types import Realm, WellKnown, SecurityConsole, Client, Credential
+from keycloak_scanner.scanners.types import Realm, WellKnown, SecurityConsole, Client, Credential, ClientRegistration
 from keycloak_scanner.utils import to_camel_case
 
 
@@ -50,3 +50,5 @@ class WrapperTypes:
     CLIENT_TYPE = WrapperType(Client)
 
     CREDENTIAL_TYPE = WrapperType(Credential)
+
+    CLIENT_REGISTRATION = WrapperType(ClientRegistration)
