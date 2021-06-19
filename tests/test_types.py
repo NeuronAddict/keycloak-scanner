@@ -1,6 +1,7 @@
 import pytest
 
 from keycloak_scanner.scanners.wrap import WrapperType, Wrapper, BadWrappedTypeException
+from keycloak_scanner.utils import to_camel_case
 
 
 def test_scanner_type():
@@ -24,3 +25,9 @@ def test_shoud_fail_when_bad_type():
         Wrapper(s, 2)
 
     assert str(e.value) == 'Wrapper error: value 2 not compatible with type TestClass'
+
+
+def test_camel_case():
+    assert to_camel_case('ClassName') == 'class_name'
+    assert to_camel_case('WellKnown') == 'well_known'
+    assert to_camel_case('Realms') == 'realms'
