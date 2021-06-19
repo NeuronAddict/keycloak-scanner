@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set
 
 from requests import HTTPError
 
@@ -25,9 +25,9 @@ class ClientScanner(Scanner[Client]):
         except Exception as e:
             super().info(f'[ClientScanner]: {e}')
 
-    def perform(self, realm: Realm, **kwargs) -> (List[Client], VulnFlag):
+    def perform(self, realm: Realm, **kwargs) -> (Set[Client], VulnFlag):
 
-        result: List[Client] = []
+        result: Set[Client] = set()
 
         for client_name in self.clients:
 
@@ -36,7 +36,7 @@ class ClientScanner(Scanner[Client]):
             registration = self.get_registration(client_name, realm)
 
             if url is not None or registration is not None:
-                result.append(Client(name=client_name, url=url, client_registration=registration))
+                result.add(Client(name=client_name, url=url, client_registration=registration))
 
         return result, VulnFlag(False)
 
