@@ -1,5 +1,5 @@
 import itertools
-from typing import TypeVar, Generic, Dict, Any, List, Iterator, Optional, Tuple
+from typing import TypeVar, Generic, Dict, Any, List, Iterator, Optional, Tuple, Set
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.logging.vuln_flag import VulnFlag
@@ -120,7 +120,7 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
 
         self.mediator.send(self.result_type, result)
 
-    def perform(self, **kwargs) -> (List[Tco], VulnFlag):
+    def perform(self, **kwargs) -> (Set[Tco], VulnFlag):
         """
         Perform the scan
         :return: scan result (json)
