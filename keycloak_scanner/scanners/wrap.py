@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Generic, TypeVar, List
 
 from keycloak_scanner.scanners.types import Realm, WellKnown, SecurityConsole, Client, Credential, ClientRegistration, \
-    OpenRedirect
+    OpenRedirect, NoneSign
 from keycloak_scanner.utils import to_camel_case
 
 
@@ -40,6 +40,7 @@ class Wrapper(Generic[SimpleType]):
         return self.value_
 
 
+# TODO : map classes with wrapper types ?
 class WrapperTypes:
 
     REALM_TYPE = WrapperType(Realm)
@@ -55,3 +56,5 @@ class WrapperTypes:
     OPEN_REDIRECT = WrapperType(OpenRedirect)
 
     SECURITY_CONSOLE = WrapperType(SecurityConsole)
+
+    NONE_SIGN = WrapperType(NoneSign)
