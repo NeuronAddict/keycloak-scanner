@@ -221,7 +221,7 @@ def security_console_results(master_realm: Realm, other_realm: Realm) -> List[Se
                                         'http://localhost:8080/auth/realms/master/clients-registrations/default/security-admin-console',
                                         json={}),
 
-        SecurityConsole(other_realm,
+         SecurityConsole(other_realm,
                                        'http://localhost:8080/auth/realms/other/clients-registrations/default/security-admin-console',
                                        json={}, secret={'secret': 'secretdata'}),
     ]
