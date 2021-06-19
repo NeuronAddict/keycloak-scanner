@@ -3,7 +3,6 @@ from typing import TypeVar, Generic, Dict, Any, List, Iterator, Optional, Tuple,
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.scanner_exceptions import NoneResultException
 from keycloak_scanner.scanners.session_holder import SessionHolder
 from keycloak_scanner.scanners.wrap import WrapperType, Wrapper
@@ -87,7 +86,7 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
 
         super().__init__(**kwargs)
 
-    def set_mediator(self, mediator: Mediator):
+    def set_mediator(self, mediator):
         self.mediator = mediator
         for need in self.needs:
             self.mediator.subscribe(self, need)
