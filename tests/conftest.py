@@ -5,7 +5,7 @@ from _pytest.fixtures import fixture
 from requests import Session
 
 from keycloak_scanner.scanners.clients_scanner import Client
-from keycloak_scanner.scanners.types import Realm, WellKnownDict, SecurityConsole, WellKnown
+from keycloak_scanner.scanners.types import Realm, SecurityConsole, WellKnown
 
 from tests.mock_response import MockResponse, RequestSpec, MockSpec
 
@@ -133,19 +133,6 @@ def well_known_json_other() -> dict:
             "backchannel_token_delivery_modes_supported": ["poll"],
             "backchannel_authentication_endpoint": "http://localhost:8080/auth/realms/other/protocol/openid-connect/ext/ciba/auth"}
 
-
-@fixture()
-def well_known_dict(master_realm: Realm, other_realm: Realm, well_known_json_master: dict,
-                    well_known_json_other: dict) -> WellKnownDict:
-    # TODO: master wk json in all
-    return WellKnownDict({
-        'master': WellKnown(realm=master_realm, name='master',
-                            url='http://localhost:8080/auth/realms/master/.well-known/openid-configuration',
-                            json=well_known_json_master),
-        'other': WellKnown(realm=other_realm, name='other',
-                           url='http://localhost:8080/auth/realms/other/.well-known/openid-configuration',
-                           json=well_known_json_other)
-    })
 
 
 @fixture
