@@ -117,7 +117,7 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
         if result is None:
             raise NoneResultException()
 
-        self.mediator.send(self.result_type, result)
+        self.mediator.send(self.result_type, result, vf)
 
     def perform(self, **kwargs) -> (Set[Tco], VulnFlag):
         """
