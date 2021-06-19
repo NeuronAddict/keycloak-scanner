@@ -1,13 +1,16 @@
 from pathlib import Path
+from typing import Set, List
 
 from _pytest.fixtures import fixture
 
-from keycloak_scanner.scanners.clientregistration_scanner import ClientRegistrationScanner, ClientRegistrations, \
-    ClientRegistration, RandomStr
+from keycloak_scanner.scanners.clientregistration_scanner import ClientRegistrationScanner, ClientRegistration, \
+    RandomStr
 from keycloak_scanner.scanners.clients_scanner import Client
-from keycloak_scanner.scanners.login_scanner import CredentialDict, Credential
-from keycloak_scanner.scanners.realm_scanner import Realms, Realm
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
+from keycloak_scanner.scanners.login_scanner import Credential
+from keycloak_scanner.scanners.mediator import Mediator
+from keycloak_scanner.scanners.realm_scanner import Realm
+from keycloak_scanner.scanners.types import WellKnown
+from keycloak_scanner.scanners.wrap import WrapperTypes
 from tests.mock_response import RequestSpec, MockResponse, MockSpec
 
 
@@ -30,19 +33,17 @@ def check_request(**kwargs):
 
 
 @fixture
-def credential_dict() -> CredentialDict:
-    return CredentialDict(
-        {
-            'master': Credential(username='tester', password='tester',
+def credential_set() -> Set[Credential]:
+    return {
+            Credential(username='tester', password='tester',
                                  client=Client('keycloak-client-456789', '', None),
                                  realm=Realm('master', '', None))
         }
-    )
 
 
 def test_client_registration_scanner_should_register(master_realm: Realm,
-                                                     well_known_dict: WellKnownDict,
-                                                     credential_dict: CredentialDict):
+                                                     well_known_list: List[WellKnown],
+                                                     credential_set: Set[Credential]):
     class TestRandomStr(RandomStr):
 
         def random_str(self) -> str:
@@ -84,26 +85,26 @@ def test_client_registration_scanner_should_register(master_realm: Realm,
                         "jwks_uri": "http://callback/public_keys.jwks"
                     }})}).session()
 
-    scanner = TestClientRegistrationScanner(['http://callback'], base_url='http://localhost:8080',
-                                            session_provider=session_provider)
+    mediator = Mediator([
+        TestClientRegistrationScanner(['http://callback'], base_url='http://localhost:8080',
+                                      session_provider=session_provider)
+    ])
 
-    result, vf = scanner.perform(Realms([master_realm]), well_known_dict, credential_dict)
+    mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
-    assert result == ClientRegistrations([
-        ClientRegistration(
+    assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == {ClientRegistration(
             'http://callback',
             name='keycloak-client-456789',
             url='http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b',
             json=response
-        )
-    ])
-
-    assert vf.has_vuln
+        )}
 
 
 def test_client_registration_scanner_should_not_register(master_realm: Realm,
-                                                         well_known_dict: WellKnownDict,
-                                                         credential_dict: CredentialDict):
+                                                         well_known_list: List[WellKnown],
+                                                         credential_set: Set[Credential]):
     class TestRandomStr(RandomStr):
 
         def random_str(self) -> str:
@@ -130,19 +131,23 @@ def test_client_registration_scanner_should_not_register(master_realm: Realm,
 
     ).session()
 
-    scanner = TestClientRegistrationScanner(['http://callback'], base_url='http://localhost:8080',
-                                            session_provider=session_provider)
+    mediator = Mediator([
+        TestClientRegistrationScanner(['http://callback'], base_url='http://localhost:8080',
+                                      session_provider=session_provider)
+    ])
 
-    result, vf = scanner.perform(Realms([master_realm]), well_known_dict, credential_dict)
+    mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
-    assert result == ClientRegistrations([])
+    assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == set()
 
-    assert not vf.has_vuln
 
 
 def test_client_registration_scanner_should_register_callback_list(master_realm: Realm,
-                                                                   well_known_dict: WellKnownDict,
-                                                                   credential_dict: CredentialDict):
+                                                                   well_known_list: List[WellKnown],
+                                                                   credential_set: Set[Credential]):
+
     class TestRandomStr(RandomStr):
 
         def random_str(self) -> str:
@@ -184,12 +189,16 @@ def test_client_registration_scanner_should_register_callback_list(master_realm:
                         "jwks_uri": "http://callback/public_keys.jwks"
                     }})}).session()
 
-    scanner = TestClientRegistrationScanner(['http://callback', 'http://callback2'], base_url='http://localhost:8080',
-                                            session_provider=session_provider)
+    mediator = Mediator([
+        TestClientRegistrationScanner(['http://callback', 'http://callback2'], base_url='http://localhost:8080',
+                                      session_provider=session_provider)
+    ])
 
-    result, vf = scanner.perform(Realms([master_realm]), well_known_dict, credential_dict)
+    mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
-    assert result == ClientRegistrations([
+    assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == {
         ClientRegistration(
             'http://callback',
             name='keycloak-client-456789',
@@ -202,14 +211,14 @@ def test_client_registration_scanner_should_register_callback_list(master_realm:
             url='http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b',
             json=response
         )
-    ])
-
-    assert vf.has_vuln
+    }
 
 
-def test_client_registration_scanner_should_register_callback_file(master_realm: Realm, well_known_dict: WellKnownDict,
-                                                                   callback_file: Path,
-                                                                   credential_dict: CredentialDict):
+
+def test_client_registration_scanner_should_register_callback_file(master_realm: Realm,
+                                                                   well_known_list: List[WellKnown],
+                                                                   credential_set: Set[Credential],
+                                                                   callback_file: Path):
     class TestRandomStr(RandomStr):
 
         def random_str(self) -> str:
@@ -252,12 +261,16 @@ def test_client_registration_scanner_should_register_callback_file(master_realm:
                         }
                 })}).session()
 
-    scanner = TestClientRegistrationScanner(str(callback_file.absolute()), base_url='http://localhost:8080',
-                                            session_provider=session_provider)
+    mediator = Mediator([
+        TestClientRegistrationScanner(str(callback_file.absolute()), base_url='http://localhost:8080',
+                                      session_provider=session_provider)
+    ])
 
-    result, vf = scanner.perform(Realms([master_realm]), well_known_dict, credential_dict)
+    mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
-    assert result == ClientRegistrations([
+    assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == {
         ClientRegistration(
             'http://callback',
             name='keycloak-client-456789',
@@ -270,15 +283,15 @@ def test_client_registration_scanner_should_register_callback_file(master_realm:
             url='http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b',
             json=response
         )
-    ])
+    }
 
-    assert vf.has_vuln
+
 
 i = 0
 
 def test_client_registration_scanner_should_register_with_token(master_realm: Realm,
-                                                                well_known_dict: WellKnownDict,
-                                                                credential_dict: CredentialDict):
+                                                                well_known_list: List[WellKnown],
+                                                                credential_set: Set[Credential]):
     def check_request_auth(**kwargs):
         global i
         i = i + 1
@@ -353,11 +366,21 @@ def test_client_registration_scanner_should_register_with_token(master_realm: Re
 
     ).session()
 
-    scanner = TestClientRegistrationScanner(['http://callback'], base_url='http://localhost:8080',
-                                            session_provider=session_provider)
 
-    result, vf = scanner.perform(Realms([master_realm]), well_known_dict, credential_dict)
+    mediator = Mediator([
+        TestClientRegistrationScanner(['http://callback'], base_url='http://localhost:8080',
+                                      session_provider=session_provider)
+    ])
 
-    assert result == ClientRegistrations([ClientRegistration('http://callback', name='keycloak-client-456789', url='http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b', json={'redirect_uris': ['http://localhost:8080/callback'], 'token_endpoint_auth_method': 'client_secret_basic', 'grant_types': ['authorization_code', 'refresh_token'], 'response_types': ['code', 'none'], 'client_id': '539ce782-5d15-4256-a5fa-1a46609d056b', 'client_secret': 'c94f5fc0-0a04-4e2f-aec6-b1f5edad1d44', 'client_name': 'keycloak-client-456789', 'scope': 'address phone offline_access microprofile-jwt', 'jwks_uri': 'http://localhost:8080/public_keys.jwks', 'subject_type': 'pairwise', 'request_uris': ['http://localhost:8080/rf.txt'], 'tls_client_certificate_bound_access_tokens': False, 'client_id_issued_at': 1622306364, 'client_secret_expires_at': 0, 'registration_client_uri': 'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b', 'backchannel_logout_session_required': False})])
+    mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
-    assert vf.has_vuln
+    assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == {
+        ClientRegistration(
+            'http://callback',
+            name='keycloak-client-456789',
+            url='http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b',
+            json={'redirect_uris': ['http://localhost:8080/callback'], 'token_endpoint_auth_method': 'client_secret_basic', 'grant_types': ['authorization_code', 'refresh_token'], 'response_types': ['code', 'none'], 'client_id': '539ce782-5d15-4256-a5fa-1a46609d056b', 'client_secret': 'c94f5fc0-0a04-4e2f-aec6-b1f5edad1d44', 'client_name': 'keycloak-client-456789', 'scope': 'address phone offline_access microprofile-jwt', 'jwks_uri': 'http://localhost:8080/public_keys.jwks', 'subject_type': 'pairwise', 'request_uris': ['http://localhost:8080/rf.txt'], 'tls_client_certificate_bound_access_tokens': False, 'client_id_issued_at': 1622306364, 'client_secret_expires_at': 0, 'registration_client_uri': 'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect/539ce782-5d15-4256-a5fa-1a46609d056b', 'backchannel_logout_session_required': False}
+        )
+    }
