@@ -17,11 +17,8 @@ class ScanStatus:
 
 class MasterScanner(PrintLogger):
 
-    def __init__(self, scanners: List[Scanner], previous_deps: Dict[str, Any] = None, verbose=False, fail_fast=False, **kwargs):
-        if previous_deps is None:
-            previous_deps = {}
+    def __init__(self, scanners: List[Scanner], verbose=False, fail_fast=False, **kwargs):
         self.mediator = Mediator(scanners, fail_fast=fail_fast)
-        self.results = ScanResults(previous_deps, verbose=verbose)
         self.fail_fast = fail_fast
         super().__init__(verbose=verbose, **kwargs)
 
