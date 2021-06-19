@@ -11,10 +11,6 @@ class Realm(JsonResult):
     pass
 
 
-class Realms(List[Realm]):
-    pass
-
-
 class WellKnown(JsonResult):
 
     def __init__(self, realm: Realm, **kwargs):
@@ -36,10 +32,6 @@ class WellKnown(JsonResult):
         if isinstance(other, WellKnown):
             return self.realm == other.realm and self.url == other.url and self.json == other.json
         return NotImplemented
-
-
-class WellKnownDict(Dict[str, WellKnown]):
-    pass
 
 
 class SecurityConsole:
