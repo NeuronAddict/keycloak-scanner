@@ -148,16 +148,24 @@ def well_known_dict(master_realm: Realm, other_realm: Realm, well_known_json_mas
     })
 
 
-@fixture()
-def well_known_list(master_realm: Realm, other_realm: Realm, well_known_json_master: dict,
-                    well_known_json_other: dict) -> List[WellKnown]:
-    # TODO: master wk json in all
-    return [WellKnown(realm=master_realm, name='master',
+@fixture
+def well_known_master(master_realm: Realm, well_known_json_master: dict) -> WellKnown:
+    return WellKnown(realm=master_realm, name='master',
                       url='http://localhost:8080/auth/realms/master/.well-known/openid-configuration',
-                      json=well_known_json_master),
-            WellKnown(realm=other_realm, name='other',
+                      json=well_known_json_master)
+
+
+@fixture
+def well_known_other(other_realm: Realm, well_known_json_other: dict) -> WellKnown:
+    return WellKnown(realm=other_realm, name='other',
                       url='http://localhost:8080/auth/realms/other/.well-known/openid-configuration',
-                      json=well_known_json_other)]
+                      json=well_known_json_other)
+
+
+@fixture
+def well_known_list(well_known_master: WellKnown, well_known_other: WellKnown) -> List[WellKnown]:
+    # TODO: master wk json in all
+    return [well_known_master, well_known_other]
 
 
 @fixture

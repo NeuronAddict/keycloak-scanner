@@ -42,7 +42,7 @@ def credential_set() -> Set[Credential]:
 
 
 def test_client_registration_scanner_should_register(master_realm: Realm,
-                                                     well_known_list: List[WellKnown],
+                                                     well_known_master: WellKnown,
                                                      credential_set: Set[Credential]):
     class TestRandomStr(RandomStr):
 
@@ -91,7 +91,7 @@ def test_client_registration_scanner_should_register(master_realm: Realm,
     ])
 
     mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
-    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_master})
     mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
     assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == {ClientRegistration(
@@ -103,7 +103,7 @@ def test_client_registration_scanner_should_register(master_realm: Realm,
 
 
 def test_client_registration_scanner_should_not_register(master_realm: Realm,
-                                                         well_known_list: List[WellKnown],
+                                                         well_known_master: WellKnown,
                                                          credential_set: Set[Credential]):
     class TestRandomStr(RandomStr):
 
@@ -137,7 +137,7 @@ def test_client_registration_scanner_should_not_register(master_realm: Realm,
     ])
 
     mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
-    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_master})
     mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
     assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == set()
@@ -145,7 +145,7 @@ def test_client_registration_scanner_should_not_register(master_realm: Realm,
 
 
 def test_client_registration_scanner_should_register_callback_list(master_realm: Realm,
-                                                                   well_known_list: List[WellKnown],
+                                                                   well_known_master: WellKnown,
                                                                    credential_set: Set[Credential]):
 
     class TestRandomStr(RandomStr):
@@ -195,7 +195,7 @@ def test_client_registration_scanner_should_register_callback_list(master_realm:
     ])
 
     mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
-    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_master})
     mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
     assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == {
@@ -216,7 +216,7 @@ def test_client_registration_scanner_should_register_callback_list(master_realm:
 
 
 def test_client_registration_scanner_should_register_callback_file(master_realm: Realm,
-                                                                   well_known_list: List[WellKnown],
+                                                                   well_known_master: WellKnown,
                                                                    credential_set: Set[Credential],
                                                                    callback_file: Path):
     class TestRandomStr(RandomStr):
@@ -267,7 +267,7 @@ def test_client_registration_scanner_should_register_callback_file(master_realm:
     ])
 
     mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
-    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_master})
     mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
     assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == {
@@ -290,7 +290,7 @@ def test_client_registration_scanner_should_register_callback_file(master_realm:
 i = 0
 
 def test_client_registration_scanner_should_register_with_token(master_realm: Realm,
-                                                                well_known_list: List[WellKnown],
+                                                                well_known_master: WellKnown,
                                                                 credential_set: Set[Credential]):
     def check_request_auth(**kwargs):
         global i
@@ -373,7 +373,7 @@ def test_client_registration_scanner_should_register_with_token(master_realm: Re
     ])
 
     mediator.send(WrapperTypes.REALM_TYPE, {master_realm})
-    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_list[0]})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, {well_known_master})
     mediator.send(WrapperTypes.CREDENTIAL_TYPE, credential_set)
 
     assert mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == {
