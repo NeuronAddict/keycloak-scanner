@@ -1,9 +1,9 @@
-from typing import Dict, List
+from typing import Dict, List, Set
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.scanner_pieces import Need
-from keycloak_scanner.scanners.types import Realm, SecurityConsole, securityConsoleType
+from keycloak_scanner.scanners.types import Realm, SecurityConsole
+from keycloak_scanner.scanners.wrap import WrapperTypes
 
 URL_PATTERN = '{}/auth/realms/{}/clients-registrations/default/security-admin-console'
 
@@ -15,9 +15,11 @@ class SecurityConsoleScanner(Scanner[SecurityConsole]):
     """
 
     def __init__(self, **kwargs):
-        super().__init__(result_type=securityConsoleType, **kwargs)
+        super().__init__(result_type=WrapperTypes.SECURITY_CONSOLE,
+                         needs=[WrapperTypes.REALM_TYPE],
+                         **kwargs)
 
-    def perform(self, realm: Realm, **kwargs) -> (List[SecurityConsole], VulnFlag):
+    def perform(self, realm: Realm, **kwargs) -> (Set[SecurityConsole], VulnFlag):
 
         vf = VulnFlag()
         result = None
@@ -36,4 +38,4 @@ class SecurityConsoleScanner(Scanner[SecurityConsole]):
                 super().info(f'find a secret in security console (realm {realm.name}) : {secret}')
                 result.secret = secret
 
-        return [result] if result else [], vf
+        return {result} if result else set(), vf
