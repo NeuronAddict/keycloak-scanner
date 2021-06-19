@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Generic, TypeVar, List
 
 from keycloak_scanner.scanners.types import Realm, WellKnown, SecurityConsole, Client, Credential, ClientRegistration, \
-    OpenRedirect, NoneSign
+    OpenRedirect, NoneSign, FormPostXSS
 from keycloak_scanner.utils import to_camel_case
 
 
@@ -58,3 +58,5 @@ class WrapperTypes:
     SECURITY_CONSOLE = WrapperType(SecurityConsole)
 
     NONE_SIGN = WrapperType(NoneSign)
+
+    FORM_POST_XSS = WrapperType(FormPostXSS)
