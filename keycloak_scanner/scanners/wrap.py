@@ -46,8 +46,6 @@ class WrapperTypes:
 
     WELL_KNOWN_TYPE = WrapperType(WellKnown)
 
-    SECURITY_CONSOLE_TYPE = WrapperType(SecurityConsole)
-
     CLIENT_TYPE = WrapperType(Client)
 
     CREDENTIAL_TYPE = WrapperType(Credential)
@@ -55,3 +53,5 @@ class WrapperTypes:
     CLIENT_REGISTRATION = WrapperType(ClientRegistration)
 
     OPEN_REDIRECT = WrapperType(OpenRedirect)
+
+    SECURITY_CONSOLE = WrapperType(SecurityConsole)
