@@ -18,9 +18,9 @@ def test_perform_with_event(base_url: str, all_realms: List[Realm],
 
     mediator.add(scanner)
 
-    mediator.send(WrapperTypes.REALM_TYPE, all_realms)
+    mediator.send(WrapperTypes.REALM_TYPE, set(all_realms))
 
-    assert mediator.scan_results.get(WrapperTypes.WELL_KNOWN_TYPE) == well_known_list
+    assert mediator.scan_results.get(WrapperTypes.WELL_KNOWN_TYPE) == set(well_known_list)
 
 
     # TODO : keep vf ?
