@@ -8,12 +8,10 @@ from keycloak_scanner.scanners.wrap import WrapperTypes
 
 def test_perform_with_event(base_url: str, full_scan_mock_session: Session, master_realm: Realm, other_realm: Realm):
 
-    mediator = Mediator()
-
     scanner = RealmScanner(base_url=base_url, realms=['master', 'other'],
                            session_provider=lambda: full_scan_mock_session)
 
-    scanner.set_mediator(mediator)
+    mediator = Mediator([scanner])
 
     scanner.perform_base()
 

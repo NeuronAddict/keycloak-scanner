@@ -15,12 +15,10 @@ from keycloak_scanner.scanners.wrap import WrapperTypes
 def test_perform_with_event(base_url: str, all_realms: List[Realm], all_clients: List[Client],
                             well_known_list: List[WellKnown],
                             full_scan_mock_session: requests.Session, capsys):
-    mediator = Mediator()
-
-    scanner = LoginScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session, username='admin',
-                           password='pa55w0rd')
-
-    mediator.add(scanner)
+    mediator = Mediator([
+        LoginScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session, username='admin',
+                     password='pa55w0rd')
+    ])
 
     mediator.send(WrapperTypes.REALM_TYPE, set(all_realms))
     mediator.send(WrapperTypes.CLIENT_TYPE, set(all_clients))
