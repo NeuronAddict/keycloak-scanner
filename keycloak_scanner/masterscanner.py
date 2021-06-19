@@ -2,6 +2,7 @@ from typing import List, Dict, Any, Sized
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.logging.vuln_flag import VulnFlag
+from keycloak_scanner.scanners.mediator import Mediator
 from keycloak_scanner.scanners.scan_results import ScanResults
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_exceptions import NoneResultException
@@ -16,48 +17,16 @@ class ScanStatus:
 
 class MasterScanner(PrintLogger):
 
-    def __init__(self, scans: List[Scanner], previous_deps: Dict[str, Any] = None, verbose=False, fail_fast=False, **kwargs):
+    def __init__(self, scanners: List[Scanner], previous_deps: Dict[str, Any] = None, verbose=False, fail_fast=False, **kwargs):
         if previous_deps is None:
             previous_deps = {}
-        self.scans = scans
+        self.mediator = Mediator(scanners, fail_fast=fail_fast)
         self.results = ScanResults(previous_deps, verbose=verbose)
-        self.fail_fast = True
+        self.fail_fast = fail_fast
         super().__init__(verbose=verbose, **kwargs)
 
     def start(self) -> ScanStatus:
 
-        has_errors = False
-        vf = VulnFlag()
-
-        for scanner in self.scans:
-
-            super().info(f'Start scanner {scanner.name()}...')
-
-            try:
-
-                result, has_vuln = scanner.perform(**self.results.results)
-
-                if has_vuln.has_vuln:
-                    vf.set_vuln()
-
-                if result is None:
-                    super().warn(f'None result for scanner {scanner.name()}')
-                    raise NoneResultException()
-
-                if isinstance(result, Sized) and len(result) == 0:
-                    super().warn(f'Result of {scanner.name()} as no results (void list), subsequent scans can be void too.')
-
-                self.results.add(result)
-
-            except TypeError as e:
-                print(f'Missing dependency for {scanner.__class__.__name__}: ({str(e)}). '
-                      f'A required previous scanner as fail.')
-                has_errors = True
-
-            except Exception as e:
-                print(f'Failed scan : {scanner.__class__.__name__}: ({str(e)}). ')
-                has_errors = True
-                if self.fail_fast:
-                    raise e
+        has_errors, vf = self.mediator.start()
 
         return ScanStatus(has_errors, vf.has_vuln)
