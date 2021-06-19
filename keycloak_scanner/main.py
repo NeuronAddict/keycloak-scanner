@@ -95,7 +95,7 @@ def start(args, initial_session_provider: SessionProvider):
         'session_provider': session_provider
     }
 
-    scanner = MasterScanner(scans=[
+    scanner = MasterScanner(scanners=[
         RealmScanner(realms=realms, **common_args),
         WellKnownScanner(**common_args),
         ClientScanner(clients=clients, **common_args),
