@@ -147,3 +147,21 @@ class ClientRegistration(JsonResult):
 
     def delete(self, session: requests.Session):
         session.delete(self.url, headers={'Authorization': f'Bearer {self.json["registration_access_token"]}'})
+
+
+class OpenRedirect:
+
+    def __init__(self, realm: Realm, client: Client):
+        self.realm = realm
+        self.client = client
+
+    def __hash__(self):
+        return hash((self.realm, self.client))
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({repr(self.realm)}, {repr(self.client)})"
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.realm == other.realm and self.client == other.client
+        return NotImplemented
