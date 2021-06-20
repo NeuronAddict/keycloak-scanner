@@ -86,7 +86,6 @@ docker container:
 pytest deployed test :
   extends: .pytest
   before_script:
-    - apk add --no-cache python py2-pip
     - pip install --no-cache-dir docker-compose
     - docker-compose -v
     - docker-compose -f itests/docker-compose.yml up -d && python itests/wait-docker-compose.py
