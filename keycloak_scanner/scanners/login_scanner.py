@@ -22,7 +22,7 @@ class LoginScanner(Scanner[Credential]):
                          **kwargs)
 
     def perform(self, realm: Realm, client: Client, well_known: WellKnown, **kwargs) \
-            -> (List[Credential], VulnFlag):
+            -> (Set[Credential], VulnFlag):
 
         results: Set[Credential] = set()
 
