@@ -92,7 +92,7 @@ pytest deployed test :
     - docker-compose -f itests/docker-compose.yml up -d && python itests/wait-docker-compose.py
   after_script:
     - docker-compose -f itests/docker-compose.yml down
-  stage: test-deployed-in-test-env
+  stage: itest-in-test-env
   script:
     - pytest -s itests
 
