@@ -112,6 +112,8 @@ class Scanner(Generic[Tco], SessionHolder, PrintLogger):
         if self.mediator is None:
             raise UndefinedMediatorException()
 
+        super().verbose(f'Start scanner {self.name()} with ({kwargs})')
+
         result, vf = self.perform(**kwargs)
 
         if result is None:
