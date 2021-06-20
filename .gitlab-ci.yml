@@ -62,7 +62,7 @@ pytest webserver:
 
 docker container:
   extends: .docker-build
-  when: never
+  allow_failure: true
   variables:
     TAG: latest
   rules:
