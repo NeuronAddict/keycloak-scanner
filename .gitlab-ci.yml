@@ -1,0 +1,104 @@
+stages:
+  - test
+  - dockerize
+  - init-test-env
+  - itest-in-test-env
+  - init-deploy
+  - deploy-test
+  - deploy-prod
+
+#################################################################################################
+## generic jobs
+#################################################################################################
+
+.pytest:
+  image: python:3.9-slim
+  cache:
+    paths:
+      - "$CI_PROJECT_DIR/pip-cache"
+    key: "$CI_PROJECT_ID"
+  before_script:
+    - python -m venv venv
+    - source venv/bin/activate
+    - env
+    - python -m pip install -r dev-requirements.txt
+    - python -m pip install -r requirements.txt
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
+    PYTHONPATH: '.'
+
+
+.docker-build:
+  stage: dockerize
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - >
+      /kaniko/executor
+      --context $CI_PROJECT_DIR/
+      --dockerfile $CI_PROJECT_DIR/Dockerfile
+      --destination $CI_REGISTRY_IMAGE/keycloak-scanner:$TAG
+      --destination $CI_REGISTRY_IMAGE/keycloak-scanner:$CI_COMMIT_REF_SLUG
+      --cache=true
+
+
+#################################################################################################
+## pytest
+#################################################################################################
+
+pytest webserver:
+  extends: .pytest
+  stage: test
+  script:
+    - pytest tests
+
+
+#################################################################################################
+## docker build
+#################################################################################################
+
+docker container:
+  extends: .docker-build
+  allow_failure: true
+  variables:
+    TAG: latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+
+#################################################################################################
+## init deployment
+#################################################################################################
+
+
+#################################################################################################
+## deploy on test
+#################################################################################################
+
+
+#################################################################################################
+## test in test env
+#################################################################################################
+
+pytest deployed test :
+  extends: .pytest
+  before_script:
+    - apk add --no-cache python py2-pip
+    - pip install --no-cache-dir docker-compose
+    - docker-compose -v
+    - docker-compose -f itests/docker-compose.yml up -d && python itests/wait-docker-compose.py
+  after_script:
+    - docker-compose -f itests/docker-compose.yml down
+  stage: test-deployed-in-test-env
+  script:
+    - pytest -s itests
+
+
+#################################################################################################
+## deployment jobs
+#################################################################################################
+
+#deploy on pypi:
