@@ -1,10 +1,9 @@
 from typing import Set
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.realm_scanner import Realm
-from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.types import FormPostXSS, WellKnown, Client
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.scanner import Scanner
+from keycloak_scanner.scan_base.types import FormPostXSS, WellKnown, Client, Realm
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
 class FormPostXssScanner(Scanner[FormPostXSS]):

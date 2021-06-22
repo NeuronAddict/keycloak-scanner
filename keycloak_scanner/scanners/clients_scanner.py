@@ -3,9 +3,9 @@ from typing import List, Set
 from requests import HTTPError
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.types import Realm, WellKnown, Client, ClientConfig
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.scanner import Scanner
+from keycloak_scanner.scan_base.types import Realm, Client, ClientConfig
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
 class ClientScanner(Scanner[Client]):
