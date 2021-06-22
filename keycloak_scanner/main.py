@@ -13,7 +13,7 @@ from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
 from keycloak_scanner.scanners.realm_scanner import RealmScanner
 from keycloak_scanner.masterscanner import MasterScanner
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
-from keycloak_scanner.scanners.session_holder import SessionProvider
+from keycloak_scanner.scan_base.session_holder import SessionProvider
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
 from keycloak_scanner._version import __version__
 

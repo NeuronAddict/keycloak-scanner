@@ -3,11 +3,10 @@ from typing import List
 from requests import Session
 
 from keycloak_scanner.scanners.clients_scanner import Client
-from keycloak_scanner.scanners.mediator import Mediator
+from keycloak_scanner.scan_base.mediator import Mediator
 from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
-from keycloak_scanner.scanners.realm_scanner import Realm
-from keycloak_scanner.scanners.types import WellKnown, OpenRedirect
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.types import WellKnown, OpenRedirect, Realm
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
 def test_perform_with_event(base_url: str, full_scan_mock_session: Session, master_realm: Realm, other_realm: Realm,
