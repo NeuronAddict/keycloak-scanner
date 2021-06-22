@@ -47,6 +47,7 @@ class ClientRegistrationScanner(Scanner[ClientRegistration], RandomStr):
         super().__init__(result_type=WrapperTypes.CLIENT_REGISTRATION,
                          needs=[WrapperTypes.REALM_TYPE, WrapperTypes.WELL_KNOWN_TYPE, WrapperTypes.CREDENTIAL_TYPE],
                          **kwargs)
+        super().verbose(f'callback urls: {callback_url}')
 
     def perform(self, realm: Realm, well_known: WellKnown, credential: Credential, **kwargs) \
             -> (Set[ClientRegistration], VulnFlag):
