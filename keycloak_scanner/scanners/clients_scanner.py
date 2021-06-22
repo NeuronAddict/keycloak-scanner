@@ -35,7 +35,7 @@ class ClientScanner(Scanner[Client]):
 
             registration = self.get_registration(client_name, realm)
 
-            if url is not None or registration is not None:
+            if url is not None or registration is not None or self.has_auth_endpoint(client_name, realm):
                 result.add(Client(name=client_name, url=url, client_registration=registration))
 
         return result, VulnFlag(False)
@@ -52,3 +52,22 @@ class ClientScanner(Scanner[Client]):
             super().verbose(str(e))
         except ValueError as e:
             super().warn(f'{url} is not json but status is 200. It\'s weird. {e}')
+
+
+    def has_auth_endpoint(self, client_name: str, realm: Realm) -> bool:
+        try:
+
+            r = super().session().get(realm.get_well_known(self.base_url(),
+                                                           self.session()).json['authorization_endpoint'],
+                                      params={'client_id': client_name}, allow_redirects=False)
+
+            # TODO : is code 400 always an existing client ?
+            if r.status_code == 302 or r.status_code == 400:
+                super().find(self.name(), 'Find a client auth endpoint for realm {}: {}'.format(realm.name, client_name))
+                return True
+
+        except KeyError as e:
+            print(
+                f'realm {realm.name}\'s wellknown doesn\'t exists or do not have "authorization_endpoint". ({well_known_dict})')
+            print(e)
+        return False
