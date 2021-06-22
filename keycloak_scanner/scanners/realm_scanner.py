@@ -10,11 +10,9 @@ URL_PATTERN = '{}/auth/realms/{}'
 
 class RealmScanner(Scanner[Realm]):
 
-    DEFAULT_REALMS = ['master']
-
     def __init__(self, realms: List[str] = None, **kwargs):
         if realms is None:
-            realms = RealmScanner.DEFAULT_REALMS
+            realms = []
         self.realms = realms
         super().__init__(result_type=WrapperTypes.REALM_TYPE, **kwargs)
 

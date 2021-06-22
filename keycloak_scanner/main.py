@@ -40,7 +40,7 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument('base_url', help='URL to scan. ex http://localhost:8080')
-    parser.add_argument('--realms', help='Comma separated list of custom realms to test. ie : master', required=True)
+    parser.add_argument('--realms', help='Comma separated list of custom realms to test. ie : master', default='master')
     parser.add_argument('--clients', help='Comma separated list of custom clients to test. On default installation, '
                                           'use account,admin-cli,broker,realm-management,security-admin-console', required=True)
     parser.add_argument('--proxy', help='Use a great proxy like BURP ;)')
