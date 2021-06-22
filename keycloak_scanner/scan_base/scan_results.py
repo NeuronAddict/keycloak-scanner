@@ -1,7 +1,7 @@
-from typing import Dict, Any, TypeVar, List, Set
+from typing import Dict, Any, TypeVar, Set
 
 from keycloak_scanner.logging.printlogger import PrintLogger
-from keycloak_scanner.scanners.wrap import WrapperType
+from .wrap import WrapperType
 
 T = TypeVar('T')
 
