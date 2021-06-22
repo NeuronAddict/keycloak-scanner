@@ -57,8 +57,8 @@ class ClientScanner(Scanner[Client]):
     def has_auth_endpoint(self, client_name: str, realm: Realm) -> bool:
         try:
 
-            r = super().session().get(realm.get_well_known(self.base_url(),
-                                                           self.session()).json['authorization_endpoint'],
+            well_known = realm.get_well_known(self.base_url(), self.session())
+            r = super().session().get(well_known.json['authorization_endpoint'],
                                       params={'client_id': client_name}, allow_redirects=False)
 
             # TODO : is code 400 always an existing client ?
@@ -68,6 +68,6 @@ class ClientScanner(Scanner[Client]):
 
         except KeyError as e:
             print(
-                f'realm {realm.name}\'s wellknown doesn\'t exists or do not have "authorization_endpoint". ({well_known_dict})')
+                f'realm {realm.name}\'s wellknown doesn\'t exists or do not have "authorization_endpoint".')
             print(e)
         return False
