@@ -1,37 +1,17 @@
 import uuid
-from typing import List, Union
+from typing import List, Union, Set
 
 import requests
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.json_result import JsonResult
-from keycloak_scanner.scanners.login_scanner import Credential, CredentialDict
-from keycloak_scanner.scanners.realm_scanner import Realms, Realm
+from keycloak_scanner.scanners.login_scanner import Credential
+from keycloak_scanner.scanners.realm_scanner import Realm
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.scanner_pieces import Need3
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
-
-
-class ClientRegistration(JsonResult):
-
-    def __init__(self, callback_url, **kwargs):
-        self.callback_url = callback_url
-        super().__init__(**kwargs)
-
-    def __eq__(self, other):
-        return isinstance(other, ClientRegistration) and self.callback_url == other.callback_url \
-               and super().__eq__(other)
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}({repr(self.callback_url)}, name={repr(self.name)}, " \
-               f"url={repr(self.url)}, json={repr(self.json)})"
-
-    def delete(self, session: requests.Session):
-        session.delete(self.url, headers={'Authorization': f'Bearer {self.json["registration_access_token"]}'})
-
-
-class ClientRegistrations(List[ClientRegistration]):
-    pass
+from keycloak_scanner.scanners.types import ClientRegistration
+from keycloak_scanner.scanners.well_known_scanner import WellKnown
+from keycloak_scanner.scanners.wrap import WrapperTypes
 
 
 class RandomStr:
@@ -53,7 +33,7 @@ def callbackurl_iterator(callback_url: Union[str, List[str]]):
             yield cb
 
 
-class ClientRegistrationScanner(Need3[Realms, WellKnownDict, CredentialDict], Scanner[ClientRegistrations], RandomStr):
+class ClientRegistrationScanner(Scanner[ClientRegistration], RandomStr):
     """
     This scanner add a client registration, with and without credentials, if provideds.
     After scan, client is deleted.
@@ -71,40 +51,37 @@ class ClientRegistrationScanner(Need3[Realms, WellKnownDict, CredentialDict], Sc
         if callback_url is None or callback_url == '' or len(callback_url) == 0:
             raise Exception('please provide a callback url for client registration scanner')
         self.callback_url = callback_url
-        super().__init__(**kwargs)
+        super().__init__(result_type=WrapperTypes.CLIENT_REGISTRATION,
+                         needs=[WrapperTypes.REALM_TYPE, WrapperTypes.WELL_KNOWN_TYPE, WrapperTypes.CREDENTIAL_TYPE],
+                         **kwargs)
 
-    def perform(self, realms: Realms, well_known_dict: WellKnownDict, credential_dict: CredentialDict, **kwargs) \
-            -> (ClientRegistrations, VulnFlag):
+    def perform(self, realm: Realm, well_known: WellKnown, credential: Credential, **kwargs) \
+            -> (Set[ClientRegistration], VulnFlag):
         """
         Perform scan.
 
         For each realm, search for registration endpoint in well known
-        :param credential_dict: credentials list to test
         :param realms: realms to test
-        :param well_known_dict: well known dictionary
         :param kwargs:
         :return: a list of ClientRegistration and a vuln flag. vulnerable if a client can be registered
         """
 
-        result = ClientRegistrations()
+        result: Set[ClientRegistration] = set()
 
-        for realm in realms:
+        registration_endpoint = well_known.json['registration_endpoint']
 
-            well_known = well_known_dict[realm.name]
+        # callback url is a file, open the file and test each line
+        for callback_url in callbackurl_iterator(self.callback_url):
 
-            registration_endpoint = well_known.json['registration_endpoint']
+            cr = self.check_registration_endpoint(realm, registration_endpoint, callback_url, well_known)
+            if cr is not None:
+                result.add(cr)
+            else:
 
-            # callback url is a file, open the file and test each line
-            for callback_url in callbackurl_iterator(self.callback_url):
-
-                cr = self.check_registration_endpoint(realm, registration_endpoint, callback_url, well_known)
+                cr = self.check_registration_endpoint(realm, registration_endpoint, callback_url, well_known, credential)
                 if cr is not None:
-                    result.append(cr)
-                else:
-                    for key, credential in credential_dict.items():
-                        cr = self.check_registration_endpoint(realm, registration_endpoint, callback_url, credential)
-                        if cr is not None:
-                            result.append(cr)
+                    result.add(cr)
+
 
         # clean all clients
         for client_registration in result:

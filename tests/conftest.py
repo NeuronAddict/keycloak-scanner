@@ -1,12 +1,12 @@
 from pathlib import Path
+from typing import List
 
 from _pytest.fixtures import fixture
 from requests import Session
 
-from keycloak_scanner.scanners.clients_scanner import Client, Clients
-from keycloak_scanner.scanners.realm_scanner import Realm, Realms
-from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleResults, SecurityConsoleResult
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict, WellKnown
+from keycloak_scanner.scanners.clients_scanner import Client
+from keycloak_scanner.scanners.types import Realm, SecurityConsole, WellKnown
+
 from tests.mock_response import MockResponse, RequestSpec, MockSpec
 
 
@@ -134,18 +134,25 @@ def well_known_json_other() -> dict:
             "backchannel_authentication_endpoint": "http://localhost:8080/auth/realms/other/protocol/openid-connect/ext/ciba/auth"}
 
 
-@fixture()
-def well_known_dict(master_realm: Realm, other_realm: Realm, well_known_json_master: dict,
-                    well_known_json_other: dict) -> WellKnownDict:
+
+@fixture
+def well_known_master(master_realm: Realm, well_known_json_master: dict) -> WellKnown:
+    return WellKnown(realm=master_realm, name='master',
+                      url='http://localhost:8080/auth/realms/master/.well-known/openid-configuration',
+                      json=well_known_json_master)
+
+
+@fixture
+def well_known_other(other_realm: Realm, well_known_json_other: dict) -> WellKnown:
+    return WellKnown(realm=other_realm, name='other',
+                      url='http://localhost:8080/auth/realms/other/.well-known/openid-configuration',
+                      json=well_known_json_other)
+
+
+@fixture
+def well_known_list(well_known_master: WellKnown, well_known_other: WellKnown) -> List[WellKnown]:
     # TODO: master wk json in all
-    return WellKnownDict({
-        'master': WellKnown(realm=master_realm, name='master',
-                            url='http://localhost:8080/auth/realms/master/.well-known/openid-configuration',
-                            json=well_known_json_master),
-        'other': WellKnown(realm=other_realm, name='other',
-                           url='http://localhost:8080/auth/realms/other/.well-known/openid-configuration',
-                           json=well_known_json_other)
-    })
+    return [well_known_master, well_known_other]
 
 
 @fixture
@@ -170,8 +177,8 @@ def other_realm_json() -> dict:
 
 
 @fixture
-def all_realms(master_realm: Realm, other_realm: Realm) -> Realms:
-    return Realms([master_realm, other_realm])
+def all_realms(master_realm: Realm, other_realm: Realm) -> List[Realm]:
+    return [master_realm, other_realm]
 
 
 @fixture
@@ -181,32 +188,30 @@ def other_realm(other_realm_json: dict) -> Realm:
 
 @fixture
 def client1() -> Client:
-    return Client(name='client1', url='http://localhost:8080/auth/realms/master/client1',
-                  auth_endpoint='http://localhost:8080/auth/realms/master/protocol/openid-connect/auth')
+    return Client(name='client1', url='http://localhost:8080/auth/realms/master/client1')
 
 
 @fixture
 def client2() -> Client:
-    return Client(name='client2', url='http://localhost:8080/auth/realms/master/client2',
-                  auth_endpoint='http://localhost:8080/auth/realms/master/protocol/openid-connect/auth')
+    return Client(name='client2', url='http://localhost:8080/auth/realms/master/client2')
 
 
 @fixture
-def all_clients(client1: Client, client2: Client) -> Clients:
-    return Clients([client1, client2])
+def all_clients(client1: Client, client2: Client) -> List[Client]:
+    return [client1, client2]
 
 
 @fixture
-def security_console_results(master_realm: Realm, other_realm: Realm) -> SecurityConsoleResults:
-    return SecurityConsoleResults({
-        'master': SecurityConsoleResult(master_realm,
+def security_console_results(master_realm: Realm, other_realm: Realm) -> List[SecurityConsole]:
+    return [
+         SecurityConsole(master_realm,
                                         'http://localhost:8080/auth/realms/master/clients-registrations/default/security-admin-console',
                                         json={}),
 
-        'other': SecurityConsoleResult(other_realm,
+         SecurityConsole(other_realm,
                                        'http://localhost:8080/auth/realms/other/clients-registrations/default/security-admin-console',
                                        json={}, secret={'secret': 'secretdata'}),
-    })
+    ]
 
 
 @fixture

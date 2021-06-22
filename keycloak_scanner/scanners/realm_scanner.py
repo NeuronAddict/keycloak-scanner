@@ -1,21 +1,14 @@
-from typing import List, NewType
+from typing import List, Set
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.scanner import Scanner
+from keycloak_scanner.scanners.types import Realm
+from keycloak_scanner.scanners.wrap import WrapperTypes
 
 URL_PATTERN = '{}/auth/realms/{}'
 
 
-class Realm(JsonResult):
-    pass
-
-
-class Realms(List[Realm]):
-    pass
-
-
-class RealmScanner(Scanner[Realms]):
+class RealmScanner(Scanner[Realm]):
 
     DEFAULT_REALMS = ['master']
 
@@ -23,11 +16,11 @@ class RealmScanner(Scanner[Realms]):
         if realms is None:
             realms = RealmScanner.DEFAULT_REALMS
         self.realms = realms
-        super().__init__(**kwargs)
+        super().__init__(result_type=WrapperTypes.REALM_TYPE, **kwargs)
 
-    def perform(self) -> (Realms, VulnFlag):
+    def perform(self) -> (Set[Realm], VulnFlag):
 
-        realms: Realms = Realms([])
+        realms: Set[Realm] = set()
 
         for realm_name in self.realms:
 
@@ -43,6 +36,6 @@ class RealmScanner(Scanner[Realms]):
 
                 if 'public_key' in realm.json:
                     super().info(f'Public key for realm {realm_name} : {realm.json["public_key"]}')
-                realms.append(realm)
+                realms.add(realm)
 
         return realms, VulnFlag()
