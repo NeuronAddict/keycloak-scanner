@@ -3,11 +3,10 @@ from typing import List
 from requests import Session
 
 
-from keycloak_scanner.scanners.mediator import Mediator
+from keycloak_scanner.scan_base.mediator import Mediator
 from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
-from keycloak_scanner.scanners.realm_scanner import Realm
-from keycloak_scanner.scanners.types import WellKnown, SecurityConsole, Client, NoneSign
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.types import WellKnown, SecurityConsole, Client, NoneSign, Realm
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 from tests.mock_response import MockPrintLogger
 
 

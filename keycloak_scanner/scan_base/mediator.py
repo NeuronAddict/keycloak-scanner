@@ -1,9 +1,9 @@
 from typing import TypeVar, List, Dict, Set
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.scan_results import ScanResults
-from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.wrap import WrapperType, Wrapper
+from .scan_results import ScanResults
+from .scanner import Scanner
+from .wrap import WrapperType, Wrapper
 
 T = TypeVar('T')
 

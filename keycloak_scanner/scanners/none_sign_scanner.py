@@ -3,9 +3,9 @@ from typing import Set
 from keycloak_scanner.jwt_attack import change_to_none
 from keycloak_scanner.keycloak_api import KeyCloakApi
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.types import NoneSign, Client, WellKnown, SecurityConsole, Realm
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.scanner import Scanner
+from keycloak_scanner.scan_base.types import NoneSign, Client, WellKnown, SecurityConsole, Realm
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
 class NoneSignScanner(Scanner[NoneSign]):
