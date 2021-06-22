@@ -4,7 +4,7 @@ from _pytest.fixtures import fixture
 
 from keycloak_scanner.keycloak_api import KeyCloakApi, FailedAuthException
 from keycloak_scanner.scanners.clients_scanner import Client
-from keycloak_scanner.scanners.types import WellKnown
+from keycloak_scanner.scan_base.types import WellKnown
 from tests.mock_response import MockResponse, mock_session, RequestSpec
 
 

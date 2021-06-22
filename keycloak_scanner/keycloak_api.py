@@ -4,8 +4,8 @@ import requests
 from bs4 import BeautifulSoup
 
 from keycloak_scanner.logging.printlogger import PrintLogger
-from keycloak_scanner.scanners.session_holder import SessionHolder
-from keycloak_scanner.scanners.types import Client
+from keycloak_scanner.scan_base.session_holder import SessionHolder
+from keycloak_scanner.scan_base.types import Client
 
 
 class FailedAuthException(Exception):

@@ -4,8 +4,8 @@ from typing import List
 import requests
 from requests import Session
 
-from keycloak_scanner.scanners.json_result import JsonResult
-from keycloak_scanner.scanners.session_holder import SessionProvider
+from .json_result import JsonResult
+from .session_holder import SessionProvider
 
 
 class WellKnown(JsonResult):

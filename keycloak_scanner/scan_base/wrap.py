@@ -1,7 +1,6 @@
-from enum import Enum
-from typing import Generic, TypeVar, List
+from typing import Generic, TypeVar
 
-from keycloak_scanner.scanners.types import Realm, WellKnown, SecurityConsole, Client, Credential, ClientRegistration, \
+from .types import Realm, WellKnown, SecurityConsole, Client, Credential, ClientRegistration, \
     OpenRedirect, NoneSign, FormPostXSS
 from keycloak_scanner.utils import to_camel_case
 

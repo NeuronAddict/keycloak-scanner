@@ -1,11 +1,8 @@
-from typing import List, Dict, Any, Sized
+from typing import List
 
 from keycloak_scanner.logging.printlogger import PrintLogger
-from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.mediator import Mediator
-from keycloak_scanner.scanners.scan_results import ScanResults
-from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.scanner_exceptions import NoneResultException
+from keycloak_scanner.scan_base.mediator import Mediator
+from keycloak_scanner.scan_base.scanner import Scanner
 
 
 class ScanStatus:

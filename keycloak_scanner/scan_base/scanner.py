@@ -3,9 +3,9 @@ from typing import TypeVar, Generic, Dict, Any, List, Iterator, Optional, Tuple,
 
 from keycloak_scanner.logging.printlogger import PrintLogger
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.scanner_exceptions import NoneResultException
-from keycloak_scanner.scanners.session_holder import SessionHolder
-from keycloak_scanner.scanners.wrap import WrapperType, Wrapper
+from .scanner_exceptions import NoneResultException
+from .session_holder import SessionHolder
+from .wrap import WrapperType, Wrapper
 
 Tco = TypeVar('Tco', covariant=True)
 
