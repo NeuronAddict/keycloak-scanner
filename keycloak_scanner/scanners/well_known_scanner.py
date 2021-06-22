@@ -1,11 +1,9 @@
-from typing import List, Set
+from typing import Set
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.types import Realm, WellKnown
 from keycloak_scanner.scanners.wrap import WrapperTypes
-
-URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
 
 
 class WellKnownScanner(Scanner[WellKnown]):
@@ -15,16 +13,16 @@ class WellKnownScanner(Scanner[WellKnown]):
 
     def perform(self, realm: Realm, **kwargs) -> (Set[WellKnown], VulnFlag):
 
-        url = URL_PATTERN.format(super().base_url(), realm.name)
-        r = super().session().get(url)
-
         result: Set[WellKnown] = set()
 
-        if r.status_code != 200:
-            super().verbose('Bad status code for realm {} {}: {}'.format(realm.name, url, r.status_code))
+        try:
 
-        else:
-            super().info('Find a well known for realm {} {}'.format(realm.name, url))
-            result.add(WellKnown(realm, name=realm.name, url=url, json=r.json()))
+            well_known = realm.get_well_known(self.base_url(), super().session())
+            super().find(self.name(), 'Find a well known for realm {} {}'.format(realm.name, well_known.url))
+            result.add(well_known)
+
+        except Exception as e:
+
+            super().verbose(str(e))
 
         return result, VulnFlag()

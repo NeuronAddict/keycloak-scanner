@@ -1,19 +1,16 @@
 import json
-from typing import List, Dict
+from typing import List
 
 import requests
+from requests import Session
 
 from keycloak_scanner.scanners.json_result import JsonResult
 from keycloak_scanner.scanners.session_holder import SessionProvider
 
 
-class Realm(JsonResult):
-    pass
-
-
 class WellKnown(JsonResult):
 
-    def __init__(self, realm: Realm, **kwargs):
+    def __init__(self, realm, **kwargs):
         self.realm = realm
         super().__init__(**kwargs)
 
@@ -32,6 +29,24 @@ class WellKnown(JsonResult):
         if isinstance(other, WellKnown):
             return self.realm == other.realm and self.url == other.url and self.json == other.json
         return NotImplemented
+
+
+class Realm(JsonResult):
+
+    WELL_KNOWN_URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
+
+    well_known_ = None
+
+    def get_well_known(self, base_url: str, session: Session) -> WellKnown:
+
+        if not self.well_known_:
+
+            url = self.WELL_KNOWN_URL_PATTERN.format(base_url, self.name)
+            r = session.get(url)
+            r.raise_for_status()
+            self.well_known_ = WellKnown(self, name=self.name, url=url, json=r.json())
+
+        return self.well_known_
 
 
 class SecurityConsole:
