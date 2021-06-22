@@ -16,21 +16,20 @@ class LoginScanner(Scanner[Credential]):
         self.username = username
         self.password = password
         super().__init__(result_type=WrapperTypes.CREDENTIAL_TYPE,
-                         needs=[WrapperTypes.REALM_TYPE, WrapperTypes.CLIENT_TYPE, WrapperTypes.WELL_KNOWN_TYPE],
+                         needs=[WrapperTypes.REALM_TYPE, WrapperTypes.CLIENT_TYPE],
                          **kwargs)
 
-    def perform(self, realm: Realm, client: Client, well_known: WellKnown, **kwargs) \
+    def perform(self, realm: Realm, client: Client, **kwargs) \
             -> (Set[Credential], VulnFlag):
 
         results: Set[Credential] = set()
 
-        # TODO : this condition in weird
-        if well_known.realm == realm:
+        well_known = realm.get_well_known(super().base_url(), super().session())
 
-            for grant_type in well_known.allowed_grants():
-                self.try_token(client, grant_type, realm, well_known, results)
+        for grant_type in well_known.allowed_grants():
+            self.try_token(client, grant_type, realm, well_known, results)
 
-            self.try_form_auth(client, realm, well_known, results)
+        self.try_form_auth(client, realm, well_known, results)
 
         return results, VulnFlag(False)
 
