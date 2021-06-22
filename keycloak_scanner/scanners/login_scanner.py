@@ -1,15 +1,13 @@
-from typing import List, Set
+from typing import Set
 
 from requests import HTTPError
 
 from keycloak_scanner.keycloak_api import KeyCloakApi, FailedAuthException
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.scanners.clients_scanner import Client
-from keycloak_scanner.scanners.realm_scanner import Realm
-from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.types import Credential
-from keycloak_scanner.scanners.well_known_scanner import WellKnown
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.scanner import Scanner
+from keycloak_scanner.scan_base.types import Credential, WellKnown, Realm
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
 class LoginScanner(Scanner[Credential]):

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Set, List
+from typing import Set
 
 from _pytest.fixtures import fixture
 
@@ -7,10 +7,9 @@ from keycloak_scanner.scanners.clientregistration_scanner import ClientRegistrat
     RandomStr
 from keycloak_scanner.scanners.clients_scanner import Client
 from keycloak_scanner.scanners.login_scanner import Credential
-from keycloak_scanner.scanners.mediator import Mediator
-from keycloak_scanner.scanners.realm_scanner import Realm
-from keycloak_scanner.scanners.types import WellKnown
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.mediator import Mediator
+from keycloak_scanner.scan_base.types import WellKnown, Realm
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 from tests.mock_response import RequestSpec, MockResponse, MockSpec
 
 

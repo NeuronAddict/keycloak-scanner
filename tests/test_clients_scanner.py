@@ -3,8 +3,7 @@ from typing import List
 from _pytest.capture import CaptureFixture
 
 from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client, ClientConfig
-from keycloak_scanner.scanners.realm_scanner import Realm
-from keycloak_scanner.scanners.types import WellKnown
+from keycloak_scanner.scan_base.types import WellKnown, Realm
 
 from tests.mock_response import MockSpec, RequestSpec, MockResponse
 

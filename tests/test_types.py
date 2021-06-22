@@ -1,6 +1,6 @@
 import pytest
 
-from keycloak_scanner.scanners.wrap import WrapperType, Wrapper, BadWrappedTypeException
+from keycloak_scanner.scan_base.wrap import WrapperType, Wrapper, BadWrappedTypeException
 from keycloak_scanner.utils import to_camel_case
 
 

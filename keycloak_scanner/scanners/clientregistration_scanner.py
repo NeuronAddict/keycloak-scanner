@@ -1,17 +1,10 @@
 import uuid
 from typing import List, Union, Set
 
-import requests
-
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.json_result import JsonResult
-from keycloak_scanner.scanners.login_scanner import Credential
-from keycloak_scanner.scanners.realm_scanner import Realm
-from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.scanner_pieces import Need3
-from keycloak_scanner.scanners.types import ClientRegistration
-from keycloak_scanner.scanners.well_known_scanner import WellKnown
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.scanner import Scanner
+from keycloak_scanner.scan_base.types import ClientRegistration, Realm, WellKnown, Credential
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
 class RandomStr:
