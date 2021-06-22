@@ -38,7 +38,7 @@ def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys: C
 
     print(captured.err)
 
-    assert captured.err == '[WARN] Result of SecurityConsoleScanner as no results (void list), subsequent scans can be void too.\n'
+    assert '[WARN] Can\'t get token: 400 Client Error: Bad Request for url: http://localhost:8080/auth/realms/master/protocol/openid-connect/token' in captured.err
 
     assert 'Find realm master' in captured.out
 
@@ -48,7 +48,7 @@ def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys: C
 
     assert "[INFO] Find a client for realm master: account" in captured.out
 
-    assert "[INFO] Find a client auth endpoint for realm master: security-admin-console" in captured.out
+    assert "[+] ClientScanner - Find a client auth endpoint for realm master: security-admin-console" in captured.out
 
     assert "[+] LoginScanner - Form login work for admin on realm master, client security-admin-console" in captured.out
 
