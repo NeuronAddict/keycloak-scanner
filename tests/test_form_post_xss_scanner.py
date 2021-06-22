@@ -3,10 +3,9 @@ from typing import List
 from requests import Session
 
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
-from keycloak_scanner.scanners.mediator import Mediator
-from keycloak_scanner.scanners.realm_scanner import Realm
-from keycloak_scanner.scanners.types import Client, WellKnown
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.mediator import Mediator
+from keycloak_scanner.scan_base.types import Client, WellKnown, Realm
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
 def test_perform_with_event(base_url, full_scan_mock_session: Session, all_realms: List[Realm], all_clients: List[Client],

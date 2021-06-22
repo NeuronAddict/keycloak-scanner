@@ -2,10 +2,10 @@ from typing import List
 
 from requests import Session
 
-from keycloak_scanner.scanners.mediator import Mediator
-from keycloak_scanner.scanners.types import WellKnown, Realm
+from keycloak_scanner.scan_base.mediator import Mediator
+from keycloak_scanner.scan_base.types import WellKnown, Realm
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
 def test_perform_with_event(base_url: str, all_realms: List[Realm],
