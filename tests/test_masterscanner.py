@@ -1,23 +1,20 @@
-from unittest.mock import MagicMock
-
 import pytest
-import requests
 from _pytest.capture import CaptureFixture
 from requests import Session
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.masterscanner import MasterScanner
-from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client
+from keycloak_scanner.scanners.clients_scanner import ClientScanner
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
 from keycloak_scanner.scanners.login_scanner import LoginScanner
 from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
 from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
-from keycloak_scanner.scanners.realm_scanner import RealmScanner, Realm
+from keycloak_scanner.scanners.realm_scanner import RealmScanner
 from keycloak_scanner.scanners.scanner import Scanner
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
 from keycloak_scanner.scanners.wrap import WrapperType
-from tests.mock_response import MockResponse, MockSpec, RequestSpec
+from tests.mock_response import MockSpec
 
 
 def test_start(base_url: str, full_scan_mock_session: Session, capsys: CaptureFixture):
@@ -44,13 +41,11 @@ def test_start(base_url: str, full_scan_mock_session: Session, capsys: CaptureFi
 
     print(captured.out)
 
-    #assert captured.err == '[WARN] Result of SecurityConsoleScanner as no results (void list), subsequent scans can be void too.\n'
-
     assert 'Find realm master' in captured.out
 
     assert 'Public key for realm master : ' in captured.out
 
-    assert "[INFO] Find a well known for realm master" in captured.out
+    assert "[+] WellKnownScanner - Find a well known for realm master" in captured.out
 
     assert "[INFO] Find a client for realm master: client1" in captured.out
 
@@ -118,4 +113,4 @@ def test_should_fail_fast(base_url: str, full_scan_mock: MockSpec, capsys: Captu
 
     assert 'Public key for realm master : ' in captured.out
 
-    assert "[INFO] Find a well known for realm master" in captured.out
+    assert "[+] WellKnownScanner - Find a well known for realm master" in captured.out
