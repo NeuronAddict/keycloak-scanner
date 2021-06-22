@@ -42,7 +42,8 @@ def credential_set() -> Set[Credential]:
 
 def test_client_registration_scanner_should_register(master_realm: Realm,
                                                      well_known_master: WellKnown,
-                                                     credential_set: Set[Credential]):
+                                                     credential_set: Set[Credential],
+                                                     well_known_json_master: dict):
     class TestRandomStr(RandomStr):
 
         def random_str(self) -> str:
@@ -72,6 +73,11 @@ def test_client_registration_scanner_should_register(master_realm: Realm,
     }
 
     session_provider = lambda: MockSpec(
+        get={
+            'http://localhost:8080/auth/realms/master/.well-known/openid-configuration': RequestSpec(
+                MockResponse(status_code=200, response=well_known_json_master)
+            ),
+        },
         post={
             'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect':
                 RequestSpec(response=MockResponse(status_code=201, response=response),
@@ -103,7 +109,8 @@ def test_client_registration_scanner_should_register(master_realm: Realm,
 
 def test_client_registration_scanner_should_not_register(master_realm: Realm,
                                                          well_known_master: WellKnown,
-                                                         credential_set: Set[Credential]):
+                                                         credential_set: Set[Credential],
+                                                         well_known_json_master: dict):
     class TestRandomStr(RandomStr):
 
         def random_str(self) -> str:
@@ -113,6 +120,11 @@ def test_client_registration_scanner_should_not_register(master_realm: Realm,
         pass
 
     session_provider = lambda: MockSpec(
+        get={
+            'http://localhost:8080/auth/realms/master/.well-known/openid-configuration': RequestSpec(
+                MockResponse(status_code=200, response=well_known_json_master)
+            ),
+        },
         post={
             'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect':
                 RequestSpec(response=MockResponse(status_code=403),
@@ -145,7 +157,8 @@ def test_client_registration_scanner_should_not_register(master_realm: Realm,
 
 def test_client_registration_scanner_should_register_callback_list(master_realm: Realm,
                                                                    well_known_master: WellKnown,
-                                                                   credential_set: Set[Credential]):
+                                                                   credential_set: Set[Credential],
+                                                                   well_known_json_master: dict):
 
     class TestRandomStr(RandomStr):
 
@@ -176,6 +189,11 @@ def test_client_registration_scanner_should_register_callback_list(master_realm:
     }
 
     session_provider = lambda: MockSpec(
+        get={
+            'http://localhost:8080/auth/realms/master/.well-known/openid-configuration': RequestSpec(
+                MockResponse(status_code=200, response=well_known_json_master)
+            ),
+        },
         post={
             'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect':
                 RequestSpec(response=MockResponse(status_code=201, response=response),
@@ -217,7 +235,8 @@ def test_client_registration_scanner_should_register_callback_list(master_realm:
 def test_client_registration_scanner_should_register_callback_file(master_realm: Realm,
                                                                    well_known_master: WellKnown,
                                                                    credential_set: Set[Credential],
-                                                                   callback_file: Path):
+                                                                   callback_file: Path,
+                                                                   well_known_json_master: dict):
     class TestRandomStr(RandomStr):
 
         def random_str(self) -> str:
@@ -247,6 +266,11 @@ def test_client_registration_scanner_should_register_callback_file(master_realm:
     }
 
     session_provider = lambda: MockSpec(
+        get={
+            'http://localhost:8080/auth/realms/master/.well-known/openid-configuration': RequestSpec(
+                MockResponse(status_code=200, response=well_known_json_master)
+            ),
+        },
         post={
             'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect':
                 RequestSpec(response=MockResponse(status_code=201, response=response),
@@ -290,7 +314,8 @@ i = 0
 
 def test_client_registration_scanner_should_register_with_token(master_realm: Realm,
                                                                 well_known_master: WellKnown,
-                                                                credential_set: Set[Credential]):
+                                                                credential_set: Set[Credential],
+                                                                well_known_json_master: dict):
     def check_request_auth(**kwargs):
         global i
         i = i + 1
@@ -344,6 +369,11 @@ def test_client_registration_scanner_should_register_with_token(master_realm: Re
     }
 
     session_provider = lambda: MockSpec(
+        get={
+            'http://localhost:8080/auth/realms/master/.well-known/openid-configuration': RequestSpec(
+                MockResponse(status_code=200, response=well_known_json_master)
+            ),
+        },
         post={
             'http://localhost:8080/auth/realms/master/clients-registrations/openid-connect':
                 RequestSpec(response=MockResponse(status_code=201, response=response),
