@@ -1,13 +1,17 @@
+from typing import List
+
 from _pytest.capture import CaptureFixture
 
-from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client, Clients, ClientConfig
-from keycloak_scanner.scanners.realm_scanner import Realm, Realms
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
+from keycloak_scanner.scanners.clients_scanner import ClientScanner, Client, ClientConfig
+from keycloak_scanner.scanners.realm_scanner import Realm
+from keycloak_scanner.scanners.types import WellKnown
+
 from tests.mock_response import MockSpec, RequestSpec, MockResponse
 
 
 def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
-                 well_known_dict: WellKnownDict, capsys: CaptureFixture):
+                 capsys: CaptureFixture, well_known_list: List[WellKnown]):
+
     def assert0(**kwargs) -> bool:
         print(kwargs)
         return kwargs['params']['client_id'] in ['client1', 'client2']
@@ -29,31 +33,26 @@ def test_perform(base_url: str, master_realm: Realm, other_realm: Realm,
                                        }
                                    ).session())
 
-    realms = Realms([master_realm])
-
-    result, vf = client_scanner.perform(realms=realms, well_known_dict=well_known_dict)
+    result, vf = client_scanner.perform(realm=master_realm, well_known=well_known_list[0])
 
     capture = capsys.readouterr()
 
     print(capture.out)
     print(capture.err)
 
-    assert result == Clients([Client('client1', 'http://localhost:8080/auth/realms/master/client1',
-                                     'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth',
+    assert result == {Client('client1', 'http://localhost:8080/auth/realms/master/client1',
                                      client_registration=ClientConfig(name='client1',
                                                                       url='http://localhost:8080/realms/master/clients-registrations/default/client1',
                                                                       json={'data': 'coucou'}
                                                                       )
                                      ),
                               Client('client2', None,
-                                     'http://localhost:8080/auth/realms/master/protocol/openid-connect/auth',
                                      client_registration=ClientConfig(name='client2',
                                                                       url='http://localhost:8080/realms/master/clients-registrations/default/client2',
                                                                       json={'data': 'coucou'}
                                                                       )
-                                     )])
+                                     )}
 
     assert not vf.has_vuln
 
     assert 'Find a client for realm master: client1' in capture.out
-    assert 'Find a client auth endpoint for realm master: client2' in capture.out
