@@ -1,8 +1,6 @@
 import uuid
 from typing import List
-from unittest.mock import MagicMock
 
-import requests
 from requests import Session
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
@@ -13,12 +11,12 @@ from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
 from keycloak_scanner.scanners.login_scanner import LoginScanner
 from keycloak_scanner.scanners.none_sign_scanner import NoneSignScanner
 from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner, OpenRedirect
-from keycloak_scanner.scanners.realm_scanner import RealmScanner, Realm
-from keycloak_scanner.scanners.scanner import Scanner
+from keycloak_scanner.scanners.realm_scanner import RealmScanner
+from keycloak_scanner.scan_base.scanner import Scanner
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
-from keycloak_scanner.scanners.types import Credential
+from keycloak_scanner.scan_base.types import Credential, Realm
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner, WellKnown
-from keycloak_scanner.scanners.wrap import WrapperTypes
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 from tests.mock_response import MockPrintLogger
 
 

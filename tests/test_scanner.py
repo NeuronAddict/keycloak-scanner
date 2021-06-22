@@ -1,6 +1,6 @@
 import pytest
 
-from keycloak_scanner.scanners.scanner import ScannerStatus, TooManyResultsException
+from keycloak_scanner.scan_base.scanner import ScannerStatus, TooManyResultsException
 
 
 def test_status():
