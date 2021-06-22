@@ -57,8 +57,9 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
     parser.add_argument('--version', action='version', version=f'keycloak-scanner {__version__}. '
                                                                f'https://github.com/NeuronAddict/keycloak-scanner.')
 
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--registration-callback', help='Callback url to use on client registration test', action='append')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--registration-callback', help='Callback url to use on client registration test',
+                       action='append', default='http://localhost')
     group.add_argument('--registration-callback-list', help='File with one callback to test for registration by line')
 
     return parser
