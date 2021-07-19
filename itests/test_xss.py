@@ -46,7 +46,7 @@ def test_should_start_scan_xss_fail_security_console_exit_4(base_url: str, capsy
 
     assert "[INFO] Find a client for realm master: account" in captured.out
 
-    assert "[+] ClientScanner - Find a client auth endpoint for realm master: security-admin-console" in captured.out
+    assert "[+] ClientScanner - Find a client auth endpoint for realm master and client security-admin-console" in captured.out
 
     # TODO may be work after fix client scanner with registration
     #    assert "[+] LoginScanner - Form login work for admin on realm master, client security-admin-console" in captured.out
