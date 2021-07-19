@@ -58,12 +58,13 @@ class ClientScanner(Scanner[Client]):
         try:
 
             well_known = realm.get_well_known(self.base_url(), self.session())
-            r = super().session().get(well_known.json['authorization_endpoint'],
+            url = well_known.json['authorization_endpoint']
+            r = super().session().get(url,
                                       params={'client_id': client_name}, allow_redirects=False)
 
             # TODO : is code 400 always an existing client ?
             if r.status_code == 302 or r.status_code == 400:
-                super().find(self.name(), 'Find a client auth endpoint for realm {}: {}'.format(realm.name, client_name))
+                super().find(self.name(), f'Find a client auth endpoint for realm {realm.name} and client {client_name}: {url}')
                 return True
 
         except KeyError as e:
