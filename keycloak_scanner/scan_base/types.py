@@ -207,3 +207,11 @@ class FormPostXSS:
         if isinstance(other, self.__class__):
             return self.realm == other.realm
         return NotImplemented
+
+
+class Username(str):
+    pass
+
+
+class Password(str):
+    pass
