@@ -14,7 +14,7 @@ from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner,
 from keycloak_scanner.scanners.realm_scanner import RealmScanner
 from keycloak_scanner.scan_base.scanner import Scanner
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
-from keycloak_scanner.scan_base.types import Credential, Realm
+from keycloak_scanner.scan_base.types import Credential, Realm, Username, Password
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner, WellKnown
 from keycloak_scanner.scan_base.wrap import WrapperTypes
 from tests.mock_response import MockPrintLogger
@@ -68,7 +68,7 @@ def test_full_scan(base_url: str, full_scan_mock_session: Session, monkeypatch,
         RealmScanner(realms=['master', 'other'], **common_args),
         WellKnownScanner(**common_args),
         ClientScanner(clients=['client1', 'client2'], **common_args),
-        LoginScanner(**common_args, username='user', password='user'),
+        LoginScanner(**common_args),
         ClientRegistrationScanner(**common_args, callback_url=['http://callback']),
         SecurityConsoleScanner(**common_args),
         OpenRedirectScanner(**common_args),
@@ -76,7 +76,9 @@ def test_full_scan(base_url: str, full_scan_mock_session: Session, monkeypatch,
         NoneSignScanner(**common_args)
     ]
 
-    scanner = MasterScanner(scanners=scanners, verbose=True)
+    scanner = MasterScanner(scanners=scanners, initial_values={
+        WrapperTypes.USERNAME_TYPE: {Username('user')}, WrapperTypes.PASSWORD_TYPE: {Password('user')}
+    }, verbose=True)
     scanner.start()
 
     assert scanner.mediator.scan_results.get(WrapperTypes.CLIENT_REGISTRATION) == {
