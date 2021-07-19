@@ -9,7 +9,7 @@ from keycloak_scanner.main import parser
 from keycloak_scanner.main import start
 
 
-#@pytest.mark.skipif(os.getenv('ITESTS') != 'true', reason='integration tests')
+@pytest.mark.skipif(os.getenv('ITESTS') != 'true', reason='integration tests')
 def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys: CaptureFixture, proxy: str, callback_file: Path):
     p = parser()
 
