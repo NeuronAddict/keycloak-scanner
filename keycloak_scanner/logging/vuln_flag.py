@@ -13,8 +13,8 @@ class VoidFlag:
 class VulnFlag(VoidFlag):
 
     def __init__(self, has_vuln=False, **kwargs):
-        self.has_vuln = has_vuln
         super().__init__(**kwargs)
+        self.has_vuln = has_vuln
 
     def set_vuln(self):
         self.has_vuln = True

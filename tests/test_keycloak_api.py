@@ -1,12 +1,10 @@
-from unittest.mock import MagicMock
-
 import pytest
 import requests
 from _pytest.fixtures import fixture
 
 from keycloak_scanner.keycloak_api import KeyCloakApi, FailedAuthException
 from keycloak_scanner.scanners.clients_scanner import Client
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
+from keycloak_scanner.scan_base.types import WellKnown
 from tests.mock_response import MockResponse, mock_session, RequestSpec
 
 
@@ -27,7 +25,7 @@ def test_session_must_be_different_all_calls():
     assert kapi.session() != kapi.session()
 
 
-def test_should_return_token(well_known_dict: WellKnownDict):
+def test_should_return_token(well_known_master: WellKnown):
 
     session_provider = lambda: mock_session(post={
         'http://localhost:8080/auth/realms/master/protocol/openid-connect/token'
@@ -40,12 +38,12 @@ def test_should_return_token(well_known_dict: WellKnownDict):
                                                                     'username': 'user'})
     })
 
-    kapi = KeyCloakApi(well_known=well_known_dict['master'].json, session_provider=session_provider)
+    kapi = KeyCloakApi(well_known=well_known_master.json, session_provider=session_provider)
 
     assert kapi.get_token('account', '', 'user', 'pass', 'password') == ('access_token', 'refresh_token')
 
 
-def test_should_make_auth(well_known_dict: WellKnownDict, login_html_page: str):
+def test_should_make_auth(well_known_master: WellKnown, login_html_page: str):
 
     session_provider = lambda: mock_session({
 
@@ -62,14 +60,14 @@ def test_should_make_auth(well_known_dict: WellKnownDict, login_html_page: str):
         : RequestSpec(response=MockResponse(status_code=302), assertion=lambda **kwargs: kwargs['data'] == {'password': 'pass', 'username': 'user'})
     })
 
-    kapi = KeyCloakApi(well_known=well_known_dict['master'].json, session_provider=session_provider)
+    kapi = KeyCloakApi(well_known=well_known_master.json, session_provider=session_provider)
 
-    r = kapi.auth(Client('account', auth_endpoint=None, url=''), password='pass', username='user')
+    r = kapi.auth(Client('account', url=''), password='pass', username='user')
 
     assert r.status_code == 302
 
 
-def test_should_fail_when_bad_form_on_auth(well_known_dict: WellKnownDict, login_html_page: str):
+def test_should_fail_when_bad_form_on_auth(well_known_master: WellKnown, login_html_page: str):
 
     session_provider = lambda: mock_session({
 
@@ -83,9 +81,9 @@ def test_should_fail_when_bad_form_on_auth(well_known_dict: WellKnownDict, login
 
     })
 
-    kapi = KeyCloakApi(well_known=well_known_dict['master'].json, session_provider=session_provider)
+    kapi = KeyCloakApi(well_known=well_known_master.json, session_provider=session_provider)
 
     with pytest.raises(FailedAuthException) as e:
-        r = kapi.auth(Client('account', auth_endpoint=None, url=''), password='pass', username='user')
+        r = kapi.auth(Client('account', url=''), password='pass', username='user')
 
     assert str(e.value) == "'NoneType' object has no attribute 'attrs'"

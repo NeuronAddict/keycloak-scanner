@@ -4,8 +4,8 @@ import requests
 from bs4 import BeautifulSoup
 
 from keycloak_scanner.logging.printlogger import PrintLogger
-from keycloak_scanner.scanners.clients_scanner import Client
-from keycloak_scanner.scanners.session_holder import SessionHolder
+from keycloak_scanner.scan_base.session_holder import SessionHolder
+from keycloak_scanner.scan_base.types import Client
 
 
 class FailedAuthException(Exception):
@@ -67,11 +67,11 @@ class KeyCloakApi(PrintLogger, SessionHolder):
             o = urlparse(link)
             q = parse_qs(o.query)
 
-            auth_params = {'session_code': q['session_code'],
-                           'execution': q['execution'],
-                           'client_id': client.name,
-                           'tab_id': q['tab_id']
-                           }
+            auth_params = {'client_id': client.name}
+
+            for param in ['session_code', 'execution', 'tab_id']:
+                if param in q:
+                    auth_params[param] = q[param]
 
             auth_data = {"username": username, "password": password}
 

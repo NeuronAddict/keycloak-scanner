@@ -1,5 +1,23 @@
 # changelog
 
+# version 1.0.4
+
+- fail fast mode
+- Examples in doc
+- Don't display all objects on logs for better readability
+- client registration scanner
+- improve client scanner
+- callback list support for client registration scanner
+- delete client after client registration scan
+
+# version 1.1.0
+
+- Use a mediator pattern for more versatile scanners
+- Fail fast mode
+- Client registration scanner
+- Improve command line options and default values
+- Various bug fixes
+
 # version 1.0.3
 
 - Add login scanner
