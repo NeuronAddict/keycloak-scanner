@@ -59,7 +59,6 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--registration-callback', help='Callback url to use on client registration test',
-                       nargs='*',
                        default=['http://localhost'])
     group.add_argument('--registration-callback-list', help='File with one callback to test for registration by line')
 
