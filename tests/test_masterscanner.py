@@ -4,6 +4,7 @@ from requests import Session
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
 from keycloak_scanner.masterscanner import MasterScanner
+from keycloak_scanner.scan_base.types import Username, Password
 from keycloak_scanner.scanners.clients_scanner import ClientScanner
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
 from keycloak_scanner.scanners.login_scanner import LoginScanner
@@ -13,7 +14,7 @@ from keycloak_scanner.scanners.realm_scanner import RealmScanner
 from keycloak_scanner.scan_base.scanner import Scanner
 from keycloak_scanner.scanners.security_console_scanner import SecurityConsoleScanner
 from keycloak_scanner.scanners.well_known_scanner import WellKnownScanner
-from keycloak_scanner.scan_base.wrap import WrapperType
+from keycloak_scanner.scan_base.wrap import WrapperType, WrapperTypes
 from tests.mock_response import MockSpec
 
 
@@ -28,12 +29,15 @@ def test_start(base_url: str, full_scan_mock_session: Session, capsys: CaptureFi
         RealmScanner(**common_args, realms=['master', 'other']),
         WellKnownScanner(**common_args),
         ClientScanner(**common_args, clients=['client1', 'client2']),
-        LoginScanner(**common_args, username='admin', password='admin'),
+        LoginScanner(**common_args),
         SecurityConsoleScanner(**common_args),
         OpenRedirectScanner(**common_args),
         FormPostXssScanner(**common_args),
         NoneSignScanner(**common_args)
-    ])
+    ], initial_values={
+        WrapperTypes.USERNAME_TYPE: [Username('admin')],
+        WrapperTypes.PASSWORD_TYPE: [Password('admin')],
+    } )
 
     status = ms.start()
 
@@ -87,12 +91,15 @@ def test_should_fail_fast(base_url: str, full_scan_mock: MockSpec, capsys: Captu
         WellKnownScanner(**common_args),
         ErrorScanner(**common_args),
         ClientScanner(**common_args, clients=['client1', 'client2']),
-        LoginScanner(**common_args, username='admin', password='admin'),
+        LoginScanner(**common_args),
         SecurityConsoleScanner(**common_args),
         OpenRedirectScanner(**common_args),
         FormPostXssScanner(**common_args),
         NoneSignScanner(**common_args)
-    ], fail_fast=True)
+    ], initial_values={
+        WrapperTypes.USERNAME_TYPE: {Username('admin')},
+        WrapperTypes.PASSWORD_TYPE: {Password('admin')}
+    }, fail_fast=True)
 
     with pytest.raises(FailFastException) as e:
 
