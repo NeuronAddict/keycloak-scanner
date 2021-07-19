@@ -45,21 +45,25 @@ class ClientRegistrationScanner(Scanner[ClientRegistration], RandomStr):
             raise Exception('please provide a callback url for client registration scanner')
         self.callback_url = callback_url
         super().__init__(result_type=WrapperTypes.CLIENT_REGISTRATION,
-                         needs=[WrapperTypes.REALM_TYPE, WrapperTypes.WELL_KNOWN_TYPE, WrapperTypes.CREDENTIAL_TYPE],
+                         needs=[WrapperTypes.REALM_TYPE, WrapperTypes.CREDENTIAL_TYPE],
                          **kwargs)
+        super().verbose(f'callback urls: {callback_url}')
 
-    def perform(self, realm: Realm, well_known: WellKnown, credential: Credential, **kwargs) \
+    def perform(self, realm: Realm, credential: Credential, **kwargs) \
             -> (Set[ClientRegistration], VulnFlag):
         """
         Perform scan.
 
         For each realm, search for registration endpoint in well known
-        :param realms: realms to test
+        :param credential: credential to test
+        :param realm: realm to test
         :param kwargs:
         :return: a list of ClientRegistration and a vuln flag. vulnerable if a client can be registered
         """
 
         result: Set[ClientRegistration] = set()
+
+        well_known = realm.get_well_known(super().base_url(), super().session())
 
         registration_endpoint = well_known.json['registration_endpoint']
 

@@ -4,6 +4,8 @@ import sys
 import requests
 import urllib3
 
+from keycloak_scanner.scan_base.types import Username, Password
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 from keycloak_scanner.scanners.clientregistration_scanner import ClientRegistrationScanner
 from keycloak_scanner.scanners.clients_scanner import ClientScanner
 from keycloak_scanner.scanners.form_post_xss_scanner import FormPostXssScanner
@@ -40,10 +42,10 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument('base_url', help='URL to scan. ex http://localhost:8080')
-    parser.add_argument('--realms', help='Comma separated list of custom realms to test. ie : master', required=True)
-    parser.add_argument('--clients', help='Comma separated list of custom clients to test. On default installation, '
-                                          'use account,admin-cli,broker,realm-management,security-admin-console', required=True)
-    parser.add_argument('--proxy', help='Use a great proxy like BURP ;)')
+    parser.add_argument('--realms', help='Comma separated list of custom realms to test. Default: master', default='master')
+    parser.add_argument('--clients', help='Comma separated list of custom clients to test. Default: account,admin-cli,broker,realm-management,security-admin-console',
+                        default='account,admin-cli,broker,realm-management,security-admin-console')
+    parser.add_argument('--proxy', help='Use an http proxy. ex: http://127.0.0.1:8080')
     parser.add_argument('--username', help='If a username is specified, try to connect and attack a token. If no '
                                            'password, try username as password.')
     parser.add_argument('--password', help='password to test with username')
@@ -57,8 +59,9 @@ Bugs, feature requests, request another scan, questions : https://github.com/Neu
     parser.add_argument('--version', action='version', version=f'keycloak-scanner {__version__}. '
                                                                f'https://github.com/NeuronAddict/keycloak-scanner.')
 
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--registration-callback', help='Callback url to use on client registration test', action='append')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--registration-callback', help='Callback url to use on client registration test',
+                       default='http://localhost')
     group.add_argument('--registration-callback-list', help='File with one callback to test for registration by line')
 
     return parser
@@ -99,14 +102,17 @@ def start(args, initial_session_provider: SessionProvider):
         RealmScanner(realms=realms, **common_args),
         WellKnownScanner(**common_args),
         ClientScanner(clients=clients, **common_args),
-        LoginScanner(username=args.username, password=args.password, **common_args),
+        LoginScanner(**common_args),
         ClientRegistrationScanner(**common_args,
-                                  callback_url=args.registration_callback if args.registration_callback else args.registration_callback_list),
+                                  callback_url=[args.registration_callback] if args.registration_callback else args.registration_callback_list), # TODO: list + file when str can confuse
         SecurityConsoleScanner(**common_args),
         OpenRedirectScanner(**common_args),
         FormPostXssScanner(**common_args),
         NoneSignScanner(**common_args)
-    ], verbose=args.verbose, fail_fast=True)
+    ], initial_values={
+        WrapperTypes.USERNAME_TYPE: [Username(args.username)],
+        WrapperTypes.PASSWORD_TYPE: [Password(args.password)],
+    }, verbose=args.verbose, fail_fast=True)
     status = scanner.start()
 
     if not args.no_fail and status.has_vulns:

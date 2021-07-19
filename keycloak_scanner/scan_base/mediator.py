@@ -10,8 +10,15 @@ T = TypeVar('T')
 
 class Mediator:
 
-    def __init__(self, scanners: List[Scanner], fail_fast=False, **kwargs):
+    def __init__(self, scanners: List[Scanner], initial_values=None, fail_fast=False, **kwargs):
+
+        if initial_values is None:
+            initial_values = {}
+
         self.scanners: Dict[str, List[Scanner]] = {}
+
+        self.initial_values = initial_values
+
         self.scan_results = ScanResults()
         self.fail_fast = fail_fast
 
@@ -35,6 +42,10 @@ class Mediator:
     def start(self) -> (bool, VulnFlag):
         if not self.in_progress:
             self.in_progress = True
+
+            for wrapper_type, values in self.initial_values.items():
+
+                self.send(wrapper_type, values)
 
             for scanner in self.start_scanners:
                 # TODO : duplicate code
