@@ -176,6 +176,6 @@ keycloak-scanner
 
 ## TODO
 
-- Use secret to test auth 
-- Username/password files support
-- integrated documentation on scanner via base methods
+- password dictionary support
+- Scanner details via command line
+- 
