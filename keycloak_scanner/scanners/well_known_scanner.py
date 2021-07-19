@@ -1,57 +1,28 @@
-from typing import Dict, List
+from typing import Set
 
 from keycloak_scanner.logging.vuln_flag import VulnFlag
-from keycloak_scanner.scanners.json_result import JsonResult
-from keycloak_scanner.scanners.realm_scanner import Realm, Realms
-from keycloak_scanner.scanners.scanner import Scanner
-from keycloak_scanner.scanners.scanner_pieces import Need
-
-URL_PATTERN = '{}/auth/realms/{}/.well-known/openid-configuration'
+from keycloak_scanner.scan_base.scanner import Scanner
+from keycloak_scanner.scan_base.types import Realm, WellKnown
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
-class WellKnown(JsonResult):
+class WellKnownScanner(Scanner[WellKnown]):
 
-    def __init__(self, realm: Realm, **kwargs):
-        self.realm = realm
-        super().__init__(**kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(result_type=WrapperTypes.WELL_KNOWN_TYPE, needs=[WrapperTypes.REALM_TYPE], **kwargs)
 
-    def allowed_grants(self) -> List[str]:
-        if 'grant_types_supported' in self.json:
-            return self.json['grant_types_supported']
-        raise Exception('Unable to get allowed grants')
+    def perform(self, realm: Realm, **kwargs) -> (Set[WellKnown], VulnFlag):
 
-    def __repr__(self):
-        return f"WellKnown({repr(self.realm)}, name='{self.name}', url='{self.url}', json={self.json})"
+        result: Set[WellKnown] = set()
 
-    def __eq__(self, other):
-        if isinstance(other, WellKnown):
-            return self.realm == other.realm and self.url == other.url and self.json == other.json
-        return NotImplemented
+        try:
 
+            well_known = realm.get_well_known(self.base_url(), super().session())
+            super().find(self.name(), 'Find a well known for realm {} {}'.format(realm.name, well_known.url))
+            result.add(well_known)
 
-class WellKnownDict(Dict[str, WellKnown]):
-    pass
+        except Exception as e:
 
-
-class WellKnownScanner(Need[Realms], Scanner):
-
-    def __init__(self, **kwars):
-        super().__init__(**kwars)
-
-    def perform(self, realms: Realms, **kwargs) -> (WellKnownDict, VulnFlag):
-
-        result: WellKnownDict = WellKnownDict()
-
-        for realm in realms:
-
-            url = URL_PATTERN.format(super().base_url(), realm.name)
-            r = super().session().get(url)
-
-            if r.status_code != 200:
-                super().verbose('Bad status code for realm {} {}: {}'.format(realm, url, r.status_code))
-
-            else:
-                super().info('Find a well known for realm {} {}'.format(realm, url))
-                result[realm.name] = WellKnown(realm, name=realm.name, url=url, json=r.json())
+            super().verbose(str(e))
 
         return result, VulnFlag()

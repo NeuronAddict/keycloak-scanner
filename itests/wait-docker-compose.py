@@ -4,7 +4,7 @@ from waiting import wait
 
 def is_keycloak_loaded():
     try:
-        r = requests.get('http://localhost:8080/auth/')
+        r = requests.get('http://localhost:8080/auth/', timeout=1)
         return 'Welcome to Keycloak' in r.text
     except Exception as e:
         print(e)

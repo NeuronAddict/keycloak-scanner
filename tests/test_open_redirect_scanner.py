@@ -1,20 +1,26 @@
+from typing import List
+
 from requests import Session
 
-from keycloak_scanner.scanners.clients_scanner import Client, Clients
+from keycloak_scanner.scanners.clients_scanner import Client
+from keycloak_scanner.scan_base.mediator import Mediator
 from keycloak_scanner.scanners.open_redirect_scanner import OpenRedirectScanner
-from keycloak_scanner.scanners.realm_scanner import Realm, Realms
-from keycloak_scanner.scanners.well_known_scanner import WellKnownDict
+from keycloak_scanner.scan_base.types import WellKnown, OpenRedirect, Realm
+from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
-def test_perform(base_url: str, full_scan_mock_session: Session, master_realm: Realm, other_realm: Realm,
-                 client1: Client, client2: Client, well_known_dict: WellKnownDict):
+def test_perform_with_event(base_url: str, full_scan_mock_session: Session, master_realm: Realm, other_realm: Realm,
+                            client1: Client, client2: Client, well_known_list: List[WellKnown]):
+    mediator = Mediator(
+        [
+            OpenRedirectScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session)
+        ]
+    )
 
-    open_redirect_scanner = OpenRedirectScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session)
+    mediator.send(WrapperTypes.REALM_TYPE, {master_realm, other_realm})
+    mediator.send(WrapperTypes.CLIENT_TYPE, {client1})
+    mediator.send(WrapperTypes.WELL_KNOWN_TYPE, set(well_known_list))
 
-    result, vf = open_redirect_scanner.perform(realms=Realms([master_realm, other_realm]),
-                                           clients=Clients([client1, client1]),
-                                           well_known_dict=well_known_dict)
-
-    assert result.results == {'master-client1': True, 'other-client1': True}
-
-    assert vf.has_vuln
+    assert mediator.scan_results.get(WrapperTypes.OPEN_REDIRECT) == {
+        OpenRedirect(master_realm, client1), OpenRedirect(other_realm, client1),
+    }
