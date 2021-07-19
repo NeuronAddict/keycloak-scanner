@@ -9,13 +9,13 @@ from keycloak_scanner.main import parser
 from keycloak_scanner.main import start
 
 
-@pytest.mark.skipif(os.getenv('ITESTS') != 'true', reason='integration tests')
+#@pytest.mark.skipif(os.getenv('ITESTS') != 'true', reason='integration tests')
 def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys: CaptureFixture, proxy: str, callback_file: Path):
     p = parser()
 
     base_args = [base_url, '--realms', 'master,other', '--clients',
                  'account,account-console,admin-cli,broker,master-realm,security-admin-console',
-                 '--username', 'admin', '--password', 'Pa55w0rd',
+                 '--username', 'admin', '--password', 'Pa55w0rd', '--proxy', 'http://localhost:8118',
                  '--registration-callback-list', str(callback_file.absolute())]
 
     if os.getenv('ITESTS_VERBOSE') == 'true':
@@ -48,7 +48,7 @@ def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys: C
 
     assert "[INFO] Find a client for realm master: account" in captured.out
 
-    assert "[+] ClientScanner - Find a client auth endpoint for realm master: security-admin-console" in captured.out
+    assert "[+] ClientScanner - Find a client auth endpoint for realm master and client security-admin-console" in captured.out
 
     assert "[+] LoginScanner - Form login work for admin on realm master, client security-admin-console" in captured.out
 
