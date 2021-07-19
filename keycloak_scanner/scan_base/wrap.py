@@ -1,7 +1,7 @@
 from typing import Generic, TypeVar
 
 from .types import Realm, WellKnown, SecurityConsole, Client, Credential, ClientRegistration, \
-    OpenRedirect, NoneSign, FormPostXSS
+    OpenRedirect, NoneSign, FormPostXSS, Username, Password
 from keycloak_scanner.utils import to_camel_case
 
 
@@ -59,3 +59,7 @@ class WrapperTypes:
     NONE_SIGN = WrapperType(NoneSign)
 
     FORM_POST_XSS = WrapperType(FormPostXSS)
+
+    USERNAME_TYPE = WrapperType(Username)
+
+    PASSWORD_TYPE = WrapperType(Password)

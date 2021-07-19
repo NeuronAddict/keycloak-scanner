@@ -7,7 +7,7 @@ from keycloak_scanner.scanners.clients_scanner import Client
 from keycloak_scanner.scanners.login_scanner import LoginScanner, Credential
 from keycloak_scanner.scan_base.mediator import Mediator
 from keycloak_scanner.scan_base.session_holder import SessionProvider
-from keycloak_scanner.scan_base.types import WellKnown, Realm
+from keycloak_scanner.scan_base.types import WellKnown, Realm, Username, Password
 from keycloak_scanner.scan_base.wrap import WrapperTypes
 
 
@@ -15,9 +15,11 @@ def test_perform_with_event(base_url: str, all_realms: List[Realm], all_clients:
                             well_known_list: List[WellKnown],
                             full_scan_mock_session: requests.Session, capsys):
     mediator = Mediator([
-        LoginScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session, username='admin',
-                     password='pa55w0rd')
+        LoginScanner(base_url=base_url, session_provider=lambda: full_scan_mock_session)
     ])
+
+    mediator.send(WrapperTypes.USERNAME_TYPE, {Username('admin')})
+    mediator.send(WrapperTypes.PASSWORD_TYPE, {Password('pa55w0rd')})
 
     mediator.send(WrapperTypes.REALM_TYPE, set(all_realms))
     mediator.send(WrapperTypes.CLIENT_TYPE, set(all_clients))
