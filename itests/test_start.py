@@ -15,7 +15,7 @@ def test_should_start_scan_fail_security_console_exit_4(base_url: str, capsys: C
 
     base_args = [base_url, '--realms', 'master,other', '--clients',
                  'account,account-console,admin-cli,broker,master-realm,security-admin-console',
-                 '--username', 'admin', '--password', 'Pa55w0rd', '--proxy', 'http://localhost:8118',
+                 '--username', 'admin', '--password', 'Pa55w0rd',
                  '--registration-callback-list', str(callback_file.absolute())]
 
     if os.getenv('ITESTS_VERBOSE') == 'true':
