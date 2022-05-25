@@ -12,7 +12,7 @@ chardet==4.0.0
     # via requests
 idna==2.10
     # via requests
-pyjwt==2.1.0
+pyjwt==2.4.0
     # via -r requirements.in
 requests==2.25.1
     # via -r requirements.in
