@@ -7,7 +7,7 @@ volumes:
 
 services:
   mariadb:
-      image: mariadb:10.5
+      image: docker.io/library/mariadb:10.5
       volumes:
         - mysql_data:/var/lib/mysql
       environment:
@@ -19,7 +19,7 @@ services:
       healthcheck:
         test: ["CMD", "mysqladmin", "ping", "--silent"]
   keycloak:
-      image: jboss/keycloak:13.0.1
+      image: docker.io/jboss/keycloak:13.0.1
       environment:
         DB_VENDOR: mariadb
         DB_ADDR: mariadb
