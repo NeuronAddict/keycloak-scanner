@@ -14,7 +14,7 @@ idna==3.4
     # via requests
 pyjwt==2.7.0
     # via -r requirements.in
-requests==2.31.0
+requests==2.32.0
     # via -r requirements.in
 soupsieve==2.4.1
     # via beautifulsoup4
