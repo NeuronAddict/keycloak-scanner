@@ -20,7 +20,7 @@ soupsieve==2.4.1
     # via beautifulsoup4
 termcolor==2.3.0
     # via -r requirements.in
-urllib3==2.0.3
+urllib3==2.2.2
     # via
     #   -r requirements.in
     #   requests
